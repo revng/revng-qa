@@ -1,0 +1,5 @@
+macro(artifact_handler CATEGORY INPUT_FILE CONFIGURATION OUTPUT TARGET_NAME)
+  get_tool(objdump "${CONFIGURATION}" DISASSEMBLER)
+  set(COMMAND_TO_RUN ${DISASSEMBLER} -d ${INPUT_FILE} > ${OUTPUT})
+endmacro()
+register_derived_artifact("compiled" "disassembled" ".S" "FILE")
