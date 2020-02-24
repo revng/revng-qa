@@ -11,13 +11,7 @@
 
 int root(char *buffer, size_t size) {
   int result;
-
-#ifdef TARGET_mips
-  __asm__("li $v0,0xfb8\n\tsyscall\n\tmove %0, $v0" : "=r"(result) : : "%v0");
-#else
-  result = syscall(SYS_getuid);
-#endif
-
+  result = syscall(SYS_dup3, 100, 0);
   return result;
 }
 
