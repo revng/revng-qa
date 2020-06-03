@@ -23,7 +23,7 @@ set(CFLAGS_arm ${CFLAGS_arm} -Wl,-Ttext-segment=0x20000)
 # static_native is like dynamic but with -static
 set(CFLAGS_static_native ${CFLAGS_dynamic_native} -static)
 
-set(CFLAGS_CATEGORY_tests_analysis -nostdlib)
+set(CFLAGS_CATEGORY_tests_analysis -nostdlib -O2 -fno-stack-protector -fomit-frame-pointer -fno-reorder-functions -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-stack-check -fno-optimize-sibling-calls -fno-inline-functions -fno-inline-small-functions -fno-align-functions -fno-optimize-sibling-calls)
 set(CFLAGS_CATEGORY_tests_analysis_StackAnalysis -nostdlib)
 set(CFLAGS_CATEGORY_tests_runtime -std=c99 -fno-pic -fno-pie -ggdb3 -fno-stack-protector)
 
