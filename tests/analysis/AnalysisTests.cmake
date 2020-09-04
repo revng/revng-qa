@@ -47,3 +47,6 @@ register_artifact("tests_analysis_StackAnalysis" "dsaof" "x86_64" "dsaof.S")
 register_artifact("tests_analysis_StackAnalysis" "saofc" "x86_64" "saofc.S")
 register_artifact("tests_analysis_StackAnalysis" "usaof" "x86_64" "usaof.S")
 register_artifact("tests_analysis_StackAnalysis" "stack-argument-contradiction" "x86_64" "saofc.S")
+
+register_artifact_category("tests_analysis_RestructureCFGPass" "OFF")
+register_artifact("tests_analysis_RestructureCFGPass" "throttle" "x86_64" "throttle.c")
