@@ -174,12 +174,14 @@ macro(register_derived_artifact FROM_ARTIFACTS NAME SUFFIX TYPE)
 
             foreach(FROM_ARTIFACT ${FROM_ARTIFACTS})
               if(NOT "${FROM_ARTIFACT}" STREQUAL "sources" AND DERIVED_ARTIFACT_${FROM_ARTIFACT}_IS_LOCAL)
-                set(DEPEND_ON "${DEPEND_ON} compile-${FROM_ARTIFACT}_${ARTIFACT_CATEGORY}__${ARTIFACT}__${CONFIGURATION}")
+                set(DEPEND_ON ${DEPEND_ON} compile-${FROM_ARTIFACT}_${ARTIFACT_CATEGORY}__${ARTIFACT}__${CONFIGURATION})
               endif()
             endforeach()
-            string(STRIP "${DEPEND_ON}" DEPEND_ON)
 
             add_custom_target(compile-${NAME}_${ARTIFACT_CATEGORY}__${ARTIFACT}__${CONFIGURATION} ALL DEPENDS ${OUTPUT} ${DEPEND_ON})
+            if(DEPEND_ON)
+              add_dependencies(compile-${NAME}_${ARTIFACT_CATEGORY}__${ARTIFACT}__${CONFIGURATION} ${DEPEND_ON})
+            endif()
 
             if("${TYPE}" STREQUAL "PROGRAM")
               install(PROGRAMS "${OUTPUT}" DESTINATION "${INSTALL_PATH}")
