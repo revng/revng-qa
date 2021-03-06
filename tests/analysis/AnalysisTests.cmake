@@ -20,6 +20,7 @@ register_artifact("tests_analysis" "jump-table-base-before-function-call" "mips"
 
 register_artifact("tests_analysis" "try-catch-ehframe" "x86_64" "try-catch-ehframe.S")
 register_artifact("tests_analysis" "switch-jump-table" "x86_64" "switch-jump-table.S")
+register_artifact("tests_analysis" "switch-jump-table-32-bit-comparison" "x86_64" "switch-jump-table-32-bit-comparison.S")
 register_artifact("tests_analysis" "rda-in-memory" "x86_64" "rda-in-memory.S")
 register_artifact("tests_analysis" "longjmp" "x86_64" "longjmp.S")
 register_artifact("tests_analysis" "indirect-tail-call" "x86_64" "indirect-tail-call.S")
