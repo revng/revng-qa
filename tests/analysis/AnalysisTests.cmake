@@ -51,3 +51,9 @@ register_artifact("tests_analysis_StackAnalysis" "stack-argument-contradiction" 
 
 register_artifact_category("tests_analysis_RestructureCFGPass" "OFF")
 register_artifact("tests_analysis_RestructureCFGPass" "throttle" "x86_64" "throttle.c")
+
+register_artifact_category("tests_analysis_Decompilation" "OFF")
+register_artifact("tests_analysis_Decompilation" "struct" "dynamic_native" "struct.c")
+register_artifact("tests_analysis_Decompilation" "array" "dynamic_native" "array.c")
+register_artifact("tests_analysis_Decompilation" "linked_list" "dynamic_native" "linked_list.c")
+register_artifact("tests_analysis_Decompilation" "array_of_structs" "dynamic_native" "array_of_structs.c")
