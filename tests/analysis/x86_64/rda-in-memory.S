@@ -3,6 +3,7 @@
 #
 
     .intel_syntax noprefix
+    .type _start, @function
 	.globl	_start
 _start:
     cmp    DWORD PTR [rbx+0x8],0x3

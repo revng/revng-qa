@@ -3,6 +3,7 @@
 #
 
 .intel_syntax noprefix
+.type _start, @function
 .global _start
 _start:
     call func
@@ -10,11 +11,13 @@ _start:
 
 # In this function call rax is an argument, but in the callee is NoOrDead,
 # therefore, rax is Dead in callee.
+.type func, @function
 func:
     mov rax,42
     call callee
     ret
 
+.type callee, @function
 callee:
     mov rax,43
     ret

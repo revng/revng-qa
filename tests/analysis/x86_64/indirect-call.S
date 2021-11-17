@@ -3,11 +3,13 @@
 #
 
 .intel_syntax noprefix
+.type _start, @function
 .global _start
 _start:
     call indirectcall
     ret
 
+.type indirectcall, @function
 indirectcall:
     push rbx
     call rbx

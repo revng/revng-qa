@@ -3,6 +3,7 @@
 #
 
     .intel_syntax noprefix
+    .type _start, @function
 	.globl	_start
 _start:
     cmp    rax,0x3

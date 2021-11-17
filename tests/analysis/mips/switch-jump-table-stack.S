@@ -3,6 +3,7 @@
 #
 
     .globl  __start
+    .type __start, "function"
     .set    noreorder
     .set    nomacro
 jumptable:

@@ -3,11 +3,13 @@
 #
 
 .intel_syntax noprefix
+.type _start, @function
 .global _start
 _start:
     call longjmp
     ret
 
+.type longjmp, @function
 longjmp:
     jle ret
     push rax

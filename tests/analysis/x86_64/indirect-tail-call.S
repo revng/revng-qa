@@ -3,11 +3,13 @@
 #
 
 .intel_syntax noprefix
+.type _start, @function
 .global _start
 _start:
     call tailcall
     ret
 
+.type tailcall, @function
 tailcall:
     push rax
     pop rax

@@ -16,6 +16,7 @@
 @ }
 
     .syntax unified
+    .type _start, "function"
     .global _start
 _start:
     sub     r3, r0, #20 @ x - 20

@@ -3,6 +3,7 @@
 #
 
 .intel_syntax noprefix
+.type _start, @function
 .global _start
 _start:
     push rax
@@ -11,6 +12,7 @@ _start:
     lea rsp, [rsp+16]
     ret
 
+.type usaof, @function
 usaof:
     # This is a used argument on the stack
     mov rbx, QWORD PTR [rsp+8]

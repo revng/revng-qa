@@ -3,6 +3,7 @@
 @
 
     .syntax unified
+    .type _start, "function"
     .global _start
 _start:
     cmp     ip, #3

@@ -6,7 +6,7 @@
 	.intel_syntax noprefix
 	.globl	_start
 	.p2align	4, 0x90
-	.type	_start,@function
+	.type	_start, @function
 _start:
 	add	edi, -65
 	cmp	edi, 35

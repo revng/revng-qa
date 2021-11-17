@@ -3,6 +3,7 @@
 #
 
     .globl  __start
+    .type __start, "function"
     .set    noreorder
     .set    nomacro
 jumptable:
@@ -41,6 +42,7 @@ three:
     jr      $ra
     nop
 
+    .type function, "function"
 function:
     addiu   $v1,$v1,1
     addiu   $t1,$t1,1

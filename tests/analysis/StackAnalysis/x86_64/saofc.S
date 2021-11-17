@@ -3,11 +3,13 @@
 #
 
 .intel_syntax noprefix
+.type _start, @function
 .global _start
 _start:
     call saofc
     ret
 
+.type saofc, @function
 saofc:
     call callee
     # rax is a No here, since the caller has to assume that the callee will
@@ -16,5 +18,6 @@ saofc:
     mov rax,[rsp+8]
     ret
 
+.type callee, @function
 callee:
     ret

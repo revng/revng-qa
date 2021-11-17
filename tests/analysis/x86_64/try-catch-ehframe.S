@@ -27,6 +27,7 @@ _Unwind_Resume:
 __cxa_begin_catch:
 __cxa_end_catch:
 _ZTIi:
+	.type function_call, @function
 function_call:
     ret
 

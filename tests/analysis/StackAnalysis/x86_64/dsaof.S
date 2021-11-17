@@ -3,6 +3,7 @@
 #
 
 .intel_syntax noprefix
+.type _start, @function
 .global _start
 _start:
     add rsp, -8
@@ -12,6 +13,7 @@ _start:
 
 # [rsp+8] is Dead. It's not NoOrDead, since accessing a stack argument,
 # automatically implies it actually is an argument.
+.type dsaof, @function
 dsaof:
     mov QWORD PTR [rsp+8],42
     ret

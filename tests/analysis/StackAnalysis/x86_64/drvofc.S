@@ -3,12 +3,14 @@
 #
 
 .intel_syntax noprefix
+.type _start, @function
 .global _start
 _start:
     call drvofc
     ret
 
 # In this function call, rax is NoOrDead
+.type drvofc, @function
 drvofc:
     call rbx
     mov rax,42

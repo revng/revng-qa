@@ -3,6 +3,7 @@
 @
 
     .syntax unified
+    .type _start, "function"
     .global _start
 _start:
     push {lr}
@@ -10,6 +11,7 @@ _start:
     pop {lr}
     bx lr
 
+    .type indirectcall, "function"
 indirectcall:
     push {lr}
     push {r0}
