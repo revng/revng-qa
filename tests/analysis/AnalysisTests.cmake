@@ -53,3 +53,6 @@ register_artifact("tests_analysis_Decompilation" "struct" "dynamic_native" "stru
 register_artifact("tests_analysis_Decompilation" "array" "dynamic_native" "array.c")
 register_artifact("tests_analysis_Decompilation" "linked_list" "dynamic_native" "linked_list.c")
 register_artifact("tests_analysis_Decompilation" "array_of_structs" "dynamic_native" "array_of_structs.c")
+
+register_artifact_category("tests_analysis_PromoteStackPointer" "OFF")
+register_artifact("tests_analysis_PromoteStackPointer" "stackframe" "dynamic_native" "stackframe.c")

@@ -27,6 +27,7 @@ set(CFLAGS_CATEGORY_tests_analysis -nostdlib -O2 -fno-stack-protector -fomit-fra
 set(CFLAGS_CATEGORY_tests_analysis_StackAnalysis -nostdlib)
 set(CFLAGS_CATEGORY_tests_runtime -std=c99 -fno-pic -fno-pie -ggdb3 -fno-stack-protector)
 set(CFLAGS_CATEGORY_tests_analysis_Decompilation -fno-inline)
+set(CFLAGS_CATEGORY_tests_analysis_PromoteStackPointer -no-pie -fno-unroll-loops -fno-inline -O1 -fno-stack-protector)
 
 macro(artifact_handler CATEGORY INPUT_FILE CONFIGURATION OUTPUT TARGET_NAME)
   get_tool(gcc "${CONFIGURATION}" COMPILER)
