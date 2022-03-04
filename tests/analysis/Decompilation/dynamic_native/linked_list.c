@@ -23,31 +23,43 @@ int getNext(struct Node *n) {
   return 0;
 }
 
+uint32_t getContent(struct Node *n) {
+  return n ? n->content_uint32 : 0U;
+}
+
+void initNode(struct Node *n) {
+  if (!n)
+    return;
+  n->prev = NULL;
+  n->next = NULL;
+  n->content_uint32 = 0U;
+}
+
 static struct Node Nodes[11] = {0};
 
 static struct Node* getGlobalNodes() {
   return &Nodes[0];
 }
 
-
 int main(int argc, char **argv) {
   struct Node *first = getGlobalNodes();
-  first->prev = NULL;
+  initNode(first);
 
   struct Node *cur = first;
   for (int i = 0; i < 10; i++) {
     struct Node *new_node = first + i + 1;
+    initNode(new_node);
+    new_node->content_uint32 = i;
+    new_node->prev = cur;
 
     cur->next = new_node;
-    new_node->prev = cur;
-    new_node->next = NULL;
-    new_node->content_uint32 = i;
-    cur = cur->next;
+    cur = new_node;
   }
 
   int sum = 0;
   cur = first;
   while (cur) {
+    sum += getContent(cur);
     sum += getPrevious(cur);
     sum += getNext(cur);
     cur = cur->next;
