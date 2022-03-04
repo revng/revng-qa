@@ -16,19 +16,28 @@ int getPrevious(struct Node *n) {
     return n->prev->content_uint32;
   return 0;
 }
+
 int getNext(struct Node *n) {
   if (n->next)
     return n->next->content_uint32;
   return 0;
 }
 
-int main() {
-  struct Node *first = (struct Node *) malloc(sizeof(struct Node));
+static struct Node Nodes[11] = {0};
+
+static struct Node* getGlobalNodes() {
+  return &Nodes[0];
+}
+
+
+int main(int argc, char **argv) {
+  struct Node *first = getGlobalNodes();
   first->prev = NULL;
 
   struct Node *cur = first;
   for (int i = 0; i < 10; i++) {
-    struct Node *new_node = (struct Node *) malloc(sizeof(struct Node));
+    struct Node *new_node = first + i + 1;
+
     cur->next = new_node;
     new_node->prev = cur;
     new_node->next = NULL;
