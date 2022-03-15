@@ -16,7 +16,7 @@
 #include "platform_specific/x86.h"
 #else
 #include "platform_specific/x86_64.h"
-_Static_assert(0, "unsupported platform architecture");
+static_assert(0, "unsupported platform architecture");
 #endif
 
 /* LFSR generator */
@@ -32,7 +32,7 @@ uint64_t get_next_lfsr(void) {
 
 #define GET_1ST_HELPER(THIS_ONE, ...) THIS_ONE
 #define GET_1ST(THIS_ONE, ...) GET_1ST_HELPER(THIS_ONE, __VA_ARGS__)
-#define FIRST_REGISTER GET_1ST(REGISTER_LIST)
+#define TMP_REGISTER GET_1ST(REGISTER_LIST)
 
 #define STACK_VALUE_COUNT 32
 #define REGISTER_COUNT COUNT_ARGUMENTS(REGISTER_LIST)
@@ -41,34 +41,34 @@ uint64_t get_next_lfsr(void) {
 #ifdef STATE_LOCATION
 #undef STATE_LOCATION
 #endif
-#define STATE_LOCATION "random_state"
+#define STATE_LOCATION "randomized_state"
 
 char *register_list[REGISTER_COUNT] = {
   COMMA_SEPARATED_FOR_EACH(STRINGIFY, REGISTER_LIST)
 };
 
-static __attribute((used)) register_type random_state[GENERATED_COUNT];
+static __attribute((used)) register_type randomized_state[GENERATED_COUNT];
 void regenerate_state(void) {
   for (uint32_t counter = 0; counter < GENERATED_COUNT; ++counter)
-    random_state[counter] = get_next_lfsr();
+    randomized_state[counter] = get_next_lfsr();
 }
 void print_current_state(void) {
-  /* Dump registers */
-  puts("- Registers:");
-  for (uint32_t index = 0; index < REGISTER_COUNT; ++index) {
-    printf("    - Name: \"%s\"\n"
-           "      Value: " GET_MASK(REGISTER_BIT_SIZE) "\n",
-           register_list[index],
-           GET_VALUE(REGISTER_BIT_SIZE,
-                     random_state[REGISTER_COUNT - index - 1]));
+  /* Dump Stack */
+  puts("- Stack:");
+  for (uint32_t index = REGISTER_COUNT; index < GENERATED_COUNT; ++index) {
+    printf("    - Offset: 0x%02x\n      Value: 0x",
+           (index - REGISTER_COUNT) * REGISTER_SIZE);
+    PRINT_VALUE(uint64_t, randomized_state[index]);
+    puts("");
   }
 
-  /* Dump Stack */
-  puts("  Stack:");
-  for (uint32_t index = REGISTER_COUNT; index < GENERATED_COUNT; ++index)
-    printf("    - Offset: -0x%04x\n      Value: 0x%016lx\n",
-           (GENERATED_COUNT - index) * REGISTER_SIZE,
-           random_state[index]);
+  /* Dump registers */
+  puts("  Registers:");
+  for (uint32_t index = 0; index < REGISTER_COUNT; ++index) {
+    printf("    - Name: \"%s\"\n      Value: 0x", register_list[index]);
+    PRINT_VALUE(register_type, randomized_state[REGISTER_COUNT - index - 1]);
+    puts("");
+  }
 }
 
 #define CALL_ITERATION_WITH(FUNCTION_NAME) \
@@ -83,27 +83,27 @@ void print_current_state(void) {
 #endif
 
 /* clang-format off */
-#define DEFINE_ITERATION_WITH(FUNCTION_NAME)                                   \
-void CALL_ITERATION_WITH(FUNCTION_NAME)(void) {                                \
-  if (setjmp(jump_buffer) == 0) {                                              \
-    regenerate_state();                                                        \
-    print_current_state();                                                     \
-                                                                               \
-    __asm__ (                                                                  \
-      /* Popularize the stack with random data */                              \
-      REPEAT(PUSH_CONSTANT, STACK_VALUE_COUNT, REGISTER_COUNT, FIRST_REGISTER) \
-      /* Popularize all the registers with random data */                      \
-      INDEXED_FOR_EACH(FILL_REGISTER, REGISTER_LIST)                           \
-                                                                               \
-      /* Call the function */                                                  \
-      CALL_A_FUNCTION(FUNCTION_NAME)                                           \
-                                                                               \
-      /* Restore the stack */                                                  \
-      RESTORE_STACK(STACK_VALUE_COUNT)                                         \
-    );                                                                         \
-                                                                               \
-    longjmp(jump_buffer, 1);                                                   \
-  }                                                                            \
+#define DEFINE_ITERATION_WITH(FUNCTION_NAME)                                  \
+void CALL_ITERATION_WITH(FUNCTION_NAME)(void) {                               \
+  if (setjmp(jump_buffer) == 0) {                                             \
+    regenerate_state();                                                       \
+    print_current_state();                                                    \
+                                                                              \
+    __asm__ (                                                                 \
+      /* Popularize the stack with random data */                             \
+      REPEAT(PUSH_CONSTANT, STACK_VALUE_COUNT, GENERATED_COUNT, TMP_REGISTER) \
+      /* Popularize all the registers with random data */                     \
+      INDEXED_FOR_EACH(FILL_REGISTER, REGISTER_LIST)                          \
+                                                                              \
+      /* Call the function */                                                 \
+      CALL_A_FUNCTION(FUNCTION_NAME)                                          \
+                                                                              \
+      /* Restore the stack */                                                 \
+      RESTORE_STACK(STACK_VALUE_COUNT)                                        \
+    );                                                                        \
+                                                                              \
+    longjmp(jump_buffer, 1);                                                  \
+  }                                                                           \
 }
 
 __asm__ ( /* Define the return value setup function */
@@ -115,7 +115,7 @@ STRINGIFY(FUNCTION_NAME_PREFIX) "set_return_value_up:\n"
   CALL_A_FUNCTION(print_current_state)
 
   /* Fill stack with pre-generated random values */
-  REPEAT(PUSH_CONSTANT, STACK_VALUE_COUNT, REGISTER_COUNT, FIRST_REGISTER)
+  REPEAT(PUSH_CONSTANT, STACK_VALUE_COUNT, REGISTER_COUNT, TMP_REGISTER)
   /* Fill registers with pre-generated random values */
   INDEXED_FOR_EACH(FILL_REGISTER, REGISTER_LIST)
 
@@ -140,6 +140,13 @@ STRINGIFY(FUNCTION_NAME_PREFIX) "set_return_value_up:\n"
 
 SEMICOLON_SEPARATED_FOR_EACH(DEFINE_ITERATION_WITH, ARGUMENT_FUNCTION_LIST);
 int main(void) {
+
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+  assert(!runtime_endianness_check());
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+  assert(runtime_endianness_check());
+#endif
+
   puts("---");
   SEMICOLON_SEPARATED_FOR_EACH(ITERATE_ON_ARGUMENTS, ARGUMENT_FUNCTION_LIST);
   SEMICOLON_SEPARATED_FOR_EACH(ITERATE_ON_RVALUES, RETURN_VALUE_FUNCTION_LIST);

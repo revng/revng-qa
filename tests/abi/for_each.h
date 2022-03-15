@@ -142,39 +142,90 @@
 #define SFE_31(ACTION, X, ...) ACTION(X); SFE_30(ACTION, __VA_ARGS__)
 #define SFE_32(ACTION, X, ...) ACTION(X); SFE_31(ACTION, __VA_ARGS__)
 
+#define FEP_2(ACTION, X, Y) ACTION(X, Y)
+#define FEP_4(ACTION, X, Y, ...) ACTION(X, Y) FEP_2(ACTION, __VA_ARGS__)
+#define FEP_6(ACTION, X, Y, ...) ACTION(X, Y) FEP_4(ACTION, __VA_ARGS__)
+#define FEP_8(ACTION, X, Y, ...) ACTION(X, Y) FEP_6(ACTION, __VA_ARGS__)
+#define FEP_10(ACTION, X, Y, ...) ACTION(X, Y) FEP_8(ACTION, __VA_ARGS__)
+#define FEP_12(ACTION, X, Y, ...) ACTION(X, Y) FEP_10(ACTION, __VA_ARGS__)
+#define FEP_14(ACTION, X, Y, ...) ACTION(X, Y) FEP_12(ACTION, __VA_ARGS__)
+#define FEP_16(ACTION, X, Y, ...) ACTION(X, Y) FEP_14(ACTION, __VA_ARGS__)
+#define FEP_18(ACTION, X, Y, ...) ACTION(X, Y) FEP_16(ACTION, __VA_ARGS__)
+#define FEP_20(ACTION, X, Y, ...) ACTION(X, Y) FEP_18(ACTION, __VA_ARGS__)
+#define FEP_22(ACTION, X, Y, ...) ACTION(X, Y) FEP_20(ACTION, __VA_ARGS__)
+#define FEP_24(ACTION, X, Y, ...) ACTION(X, Y) FEP_22(ACTION, __VA_ARGS__)
+#define FEP_26(ACTION, X, Y, ...) ACTION(X, Y) FEP_24(ACTION, __VA_ARGS__)
+#define FEP_28(ACTION, X, Y, ...) ACTION(X, Y) FEP_26(ACTION, __VA_ARGS__)
+#define FEP_30(ACTION, X, Y, ...) ACTION(X, Y) FEP_28(ACTION, __VA_ARGS__)
+#define FEP_32(ACTION, X, Y, ...) ACTION(X, Y) FEP_30(ACTION, __VA_ARGS__)
+
 #define IFE_0(ACTION) ACTION()
 #define IFE_1(ACTION, X) ACTION(X, 0)
-#define IFE_2(ACTION, X, ...) ACTION(X, 1) IFE_1(ACTION, __VA_ARGS__)
-#define IFE_3(ACTION, X, ...) ACTION(X, 2) IFE_2(ACTION, __VA_ARGS__)
-#define IFE_4(ACTION, X, ...) ACTION(X, 3) IFE_3(ACTION, __VA_ARGS__)
-#define IFE_5(ACTION, X, ...) ACTION(X, 4) IFE_4(ACTION, __VA_ARGS__)
-#define IFE_6(ACTION, X, ...) ACTION(X, 5) IFE_5(ACTION, __VA_ARGS__)
-#define IFE_7(ACTION, X, ...) ACTION(X, 6) IFE_6(ACTION, __VA_ARGS__)
-#define IFE_8(ACTION, X, ...) ACTION(X, 7) IFE_7(ACTION, __VA_ARGS__)
-#define IFE_9(ACTION, X, ...) ACTION(X, 8) IFE_8(ACTION, __VA_ARGS__)
-#define IFE_10(ACTION, X, ...) ACTION(X, 9) IFE_9(ACTION, __VA_ARGS__)
-#define IFE_11(ACTION, X, ...) ACTION(X, 10) IFE_10(ACTION, __VA_ARGS__)
-#define IFE_12(ACTION, X, ...) ACTION(X, 11) IFE_11(ACTION, __VA_ARGS__)
-#define IFE_13(ACTION, X, ...) ACTION(X, 12) IFE_12(ACTION, __VA_ARGS__)
-#define IFE_14(ACTION, X, ...) ACTION(X, 13) IFE_13(ACTION, __VA_ARGS__)
-#define IFE_15(ACTION, X, ...) ACTION(X, 14) IFE_14(ACTION, __VA_ARGS__)
-#define IFE_16(ACTION, X, ...) ACTION(X, 15) IFE_15(ACTION, __VA_ARGS__)
-#define IFE_17(ACTION, X, ...) ACTION(X, 16) IFE_16(ACTION, __VA_ARGS__)
-#define IFE_18(ACTION, X, ...) ACTION(X, 17) IFE_17(ACTION, __VA_ARGS__)
-#define IFE_19(ACTION, X, ...) ACTION(X, 18) IFE_18(ACTION, __VA_ARGS__)
-#define IFE_20(ACTION, X, ...) ACTION(X, 19) IFE_19(ACTION, __VA_ARGS__)
-#define IFE_21(ACTION, X, ...) ACTION(X, 20) IFE_20(ACTION, __VA_ARGS__)
-#define IFE_22(ACTION, X, ...) ACTION(X, 21) IFE_21(ACTION, __VA_ARGS__)
-#define IFE_23(ACTION, X, ...) ACTION(X, 22) IFE_22(ACTION, __VA_ARGS__)
-#define IFE_24(ACTION, X, ...) ACTION(X, 23) IFE_23(ACTION, __VA_ARGS__)
-#define IFE_25(ACTION, X, ...) ACTION(X, 24) IFE_24(ACTION, __VA_ARGS__)
-#define IFE_26(ACTION, X, ...) ACTION(X, 25) IFE_25(ACTION, __VA_ARGS__)
-#define IFE_27(ACTION, X, ...) ACTION(X, 26) IFE_26(ACTION, __VA_ARGS__)
-#define IFE_28(ACTION, X, ...) ACTION(X, 27) IFE_27(ACTION, __VA_ARGS__)
-#define IFE_29(ACTION, X, ...) ACTION(X, 28) IFE_28(ACTION, __VA_ARGS__)
-#define IFE_30(ACTION, X, ...) ACTION(X, 29) IFE_29(ACTION, __VA_ARGS__)
-#define IFE_31(ACTION, X, ...) ACTION(X, 30) IFE_30(ACTION, __VA_ARGS__)
-#define IFE_32(ACTION, X, ...) ACTION(X, 31) IFE_31(ACTION, __VA_ARGS__)
+#define IFE_2(ACTION, X, ...) IFE_1(ACTION, __VA_ARGS__) ACTION(X, 1)
+#define IFE_3(ACTION, X, ...) IFE_2(ACTION, __VA_ARGS__) ACTION(X, 2)
+#define IFE_4(ACTION, X, ...) IFE_3(ACTION, __VA_ARGS__) ACTION(X, 3)
+#define IFE_5(ACTION, X, ...) IFE_4(ACTION, __VA_ARGS__) ACTION(X, 4)
+#define IFE_6(ACTION, X, ...) IFE_5(ACTION, __VA_ARGS__) ACTION(X, 5)
+#define IFE_7(ACTION, X, ...) IFE_6(ACTION, __VA_ARGS__) ACTION(X, 6)
+#define IFE_8(ACTION, X, ...) IFE_7(ACTION, __VA_ARGS__) ACTION(X, 7)
+#define IFE_9(ACTION, X, ...) IFE_8(ACTION, __VA_ARGS__) ACTION(X, 8)
+#define IFE_10(ACTION, X, ...) IFE_9(ACTION, __VA_ARGS__) ACTION(X, 9)
+#define IFE_11(ACTION, X, ...) IFE_10(ACTION, __VA_ARGS__) ACTION(X, 10)
+#define IFE_12(ACTION, X, ...) IFE_11(ACTION, __VA_ARGS__) ACTION(X, 11)
+#define IFE_13(ACTION, X, ...) IFE_12(ACTION, __VA_ARGS__) ACTION(X, 12)
+#define IFE_14(ACTION, X, ...) IFE_13(ACTION, __VA_ARGS__) ACTION(X, 13)
+#define IFE_15(ACTION, X, ...) IFE_14(ACTION, __VA_ARGS__) ACTION(X, 14)
+#define IFE_16(ACTION, X, ...) IFE_15(ACTION, __VA_ARGS__) ACTION(X, 15)
+#define IFE_17(ACTION, X, ...) IFE_16(ACTION, __VA_ARGS__) ACTION(X, 16)
+#define IFE_18(ACTION, X, ...) IFE_17(ACTION, __VA_ARGS__) ACTION(X, 17)
+#define IFE_19(ACTION, X, ...) IFE_18(ACTION, __VA_ARGS__) ACTION(X, 18)
+#define IFE_20(ACTION, X, ...) IFE_19(ACTION, __VA_ARGS__) ACTION(X, 19)
+#define IFE_21(ACTION, X, ...) IFE_20(ACTION, __VA_ARGS__) ACTION(X, 20)
+#define IFE_22(ACTION, X, ...) IFE_21(ACTION, __VA_ARGS__) ACTION(X, 21)
+#define IFE_23(ACTION, X, ...) IFE_22(ACTION, __VA_ARGS__) ACTION(X, 22)
+#define IFE_24(ACTION, X, ...) IFE_23(ACTION, __VA_ARGS__) ACTION(X, 23)
+#define IFE_25(ACTION, X, ...) IFE_24(ACTION, __VA_ARGS__) ACTION(X, 24)
+#define IFE_26(ACTION, X, ...) IFE_25(ACTION, __VA_ARGS__) ACTION(X, 25)
+#define IFE_27(ACTION, X, ...) IFE_26(ACTION, __VA_ARGS__) ACTION(X, 26)
+#define IFE_28(ACTION, X, ...) IFE_27(ACTION, __VA_ARGS__) ACTION(X, 27)
+#define IFE_29(ACTION, X, ...) IFE_28(ACTION, __VA_ARGS__) ACTION(X, 28)
+#define IFE_30(ACTION, X, ...) IFE_29(ACTION, __VA_ARGS__) ACTION(X, 29)
+#define IFE_31(ACTION, X, ...) IFE_30(ACTION, __VA_ARGS__) ACTION(X, 30)
+#define IFE_32(ACTION, X, ...) IFE_31(ACTION, __VA_ARGS__) ACTION(X, 31)
+
+#define CIF_0(ACTION) ACTION()
+#define CIF_1(ACTION, X) ACTION(X, 0)
+#define CIF_2(ACTION, X, ...) CIF_1(ACTION, __VA_ARGS__), ACTION(X, 1)
+#define CIF_3(ACTION, X, ...) CIF_2(ACTION, __VA_ARGS__), ACTION(X, 2)
+#define CIF_4(ACTION, X, ...) CIF_3(ACTION, __VA_ARGS__), ACTION(X, 3)
+#define CIF_5(ACTION, X, ...) CIF_4(ACTION, __VA_ARGS__), ACTION(X, 4)
+#define CIF_6(ACTION, X, ...) CIF_5(ACTION, __VA_ARGS__), ACTION(X, 5)
+#define CIF_7(ACTION, X, ...) CIF_6(ACTION, __VA_ARGS__), ACTION(X, 6)
+#define CIF_8(ACTION, X, ...) CIF_7(ACTION, __VA_ARGS__), ACTION(X, 7)
+#define CIF_9(ACTION, X, ...) CIF_8(ACTION, __VA_ARGS__), ACTION(X, 8)
+#define CIF_10(ACTION, X, ...) CIF_9(ACTION, __VA_ARGS__), ACTION(X, 9)
+#define CIF_11(ACTION, X, ...) CIF_10(ACTION, __VA_ARGS__), ACTION(X, 10)
+#define CIF_12(ACTION, X, ...) CIF_11(ACTION, __VA_ARGS__), ACTION(X, 11)
+#define CIF_13(ACTION, X, ...) CIF_12(ACTION, __VA_ARGS__), ACTION(X, 12)
+#define CIF_14(ACTION, X, ...) CIF_13(ACTION, __VA_ARGS__), ACTION(X, 13)
+#define CIF_15(ACTION, X, ...) CIF_14(ACTION, __VA_ARGS__), ACTION(X, 14)
+#define CIF_16(ACTION, X, ...) CIF_15(ACTION, __VA_ARGS__), ACTION(X, 15)
+#define CIF_17(ACTION, X, ...) CIF_16(ACTION, __VA_ARGS__), ACTION(X, 16)
+#define CIF_18(ACTION, X, ...) CIF_17(ACTION, __VA_ARGS__), ACTION(X, 17)
+#define CIF_19(ACTION, X, ...) CIF_18(ACTION, __VA_ARGS__), ACTION(X, 18)
+#define CIF_20(ACTION, X, ...) CIF_19(ACTION, __VA_ARGS__), ACTION(X, 19)
+#define CIF_21(ACTION, X, ...) CIF_20(ACTION, __VA_ARGS__), ACTION(X, 20)
+#define CIF_22(ACTION, X, ...) CIF_21(ACTION, __VA_ARGS__), ACTION(X, 21)
+#define CIF_23(ACTION, X, ...) CIF_22(ACTION, __VA_ARGS__), ACTION(X, 22)
+#define CIF_24(ACTION, X, ...) CIF_23(ACTION, __VA_ARGS__), ACTION(X, 23)
+#define CIF_25(ACTION, X, ...) CIF_24(ACTION, __VA_ARGS__), ACTION(X, 24)
+#define CIF_26(ACTION, X, ...) CIF_25(ACTION, __VA_ARGS__), ACTION(X, 25)
+#define CIF_27(ACTION, X, ...) CIF_26(ACTION, __VA_ARGS__), ACTION(X, 26)
+#define CIF_28(ACTION, X, ...) CIF_27(ACTION, __VA_ARGS__), ACTION(X, 27)
+#define CIF_29(ACTION, X, ...) CIF_28(ACTION, __VA_ARGS__), ACTION(X, 28)
+#define CIF_30(ACTION, X, ...) CIF_29(ACTION, __VA_ARGS__), ACTION(X, 29)
+#define CIF_31(ACTION, X, ...) CIF_30(ACTION, __VA_ARGS__), ACTION(X, 30)
+#define CIF_32(ACTION, X, ...) CIF_31(ACTION, __VA_ARGS__), ACTION(X, 31)
 
 #define RPT_0(ACTION, ...)
 #define RPT_1(ACTION, ...) ACTION(0, __VA_ARGS__)
@@ -252,6 +303,15 @@
            SFE_7, SFE_6, SFE_5, SFE_4, SFE_3, SFE_2, SFE_1, SFE_0) \
     (ACTION, __VA_ARGS__)
 
+/* Calls ACTION(ARG_N, ARG_N_PLUS_ONE) for all of __VA_ARGS__ in ... */
+#define FOR_EACH_PAIR(ACTION, ...) \
+  GET_34TH(_0, __VA_ARGS__, \
+           FEP_32, ERROR, FEP_30, ERROR, FEP_28, ERROR, FEP_26, ERROR, \
+           FEP_24, ERROR, FEP_22, ERROR, FEP_20, ERROR, FEP_18, ERROR, \
+           FEP_16, ERROR, FEP_14, ERROR, FEP_12, ERROR, FEP_10, ERROR, \
+           FEP_8, ERROR, FEP_6, ERROR, FEP_4, ERROR, FEP_2, ERROR, ERROR) \
+    (ACTION, __VA_ARGS__)
+
 /* Calls ACTION(VA_ARG, INDEX) for each VA_ARG in ... */
 #define INDEXED_FOR_EACH(ACTION, ...) \
   GET_34TH(_0, __VA_ARGS__, IFE_32, \
@@ -259,6 +319,15 @@
            IFE_23, IFE_22, IFE_21, IFE_20, IFE_19, IFE_18, IFE_17, IFE_16, \
            IFE_15, IFE_14, IFE_13, IFE_12, IFE_11, IFE_10, IFE_9, IFE_8, \
            IFE_7, IFE_6, IFE_5, IFE_4, IFE_3, IFE_2, IFE_1, IFE_0) \
+    (ACTION, __VA_ARGS__)
+
+/* Calls ACTION(VA_ARG, INDEX) for each VA_ARG and adds `, ` as a separator. */
+#define COMMA_SEPARATED_INDEXED_FOR_EACH(ACTION, ...) \
+  GET_34TH(_0, __VA_ARGS__, CIF_32, \
+           CIF_31, CIF_30, CIF_29, CIF_28, CIF_27, CIF_26, CIF_25, CIF_24, \
+           CIF_23, CIF_22, CIF_21, CIF_20, CIF_19, CIF_18, CIF_17, CIF_16, \
+           CIF_15, CIF_14, CIF_13, CIF_12, CIF_11, CIF_10, CIF_9, CIF_8, \
+           CIF_7, CIF_6, CIF_5, CIF_4, CIF_3, CIF_2, CIF_1, CIF_0) \
     (ACTION, __VA_ARGS__)
 
 /* Calls ACTION(INDEX, __VA_ARGS__) COUNT times */
