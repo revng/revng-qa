@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "functions.h"
+#include "functions.inc"
 
 ABIDEF void *set_return_value_up(void) {
   return 0;

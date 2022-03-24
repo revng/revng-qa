@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 #include "for_each.h"
-#include "functions.h"
+#include "functions.inc"
 
 #ifdef TARGET_x86_64
 #include "platform_specific/x86_64.h"
