@@ -11,6 +11,36 @@
 #include "for_each.h"
 
 /*
+ * Determine the endianness
+ */
+#ifdef TARGET_arm
+#ifdef __BIG_ENDIAN
+#define ENDIANNESS_BIG
+#else
+#define ENDIANNESS_LITTLE
+#endif
+
+#else
+/* Default is used for all the other targets */
+#ifndef __BYTE_ORDER__
+_Static_assert(false,
+               "No know way to detect endianness!\n"
+               "(What kind of crazy compiler are you using?)\n");
+#endif
+
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define ENDIANNESS_LITTLE
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define ENDIANNESS_BIG
+#else
+_Static_assert(false,
+               "Unsupported endianness!\n"
+               "(pdp? something crazy? Memory corruption?)\n");
+#endif
+
+#endif
+
+/*
  * Helper macros
  */
 
@@ -30,72 +60,49 @@
 #define DO_NOTHING_HELPER(LHS, RHS) LHS RHS
 #define DO_NOTHING(LHS, RHS) DO_NOTHING_HELPER(LHS, RHS)
 
-static_assert(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-                || __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__,
-              "Unsupported endianness (pdp? something crazy? Memory "
-              "corruption?)");
-
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define PRINT_FUNCTION_HEADER(FUNCTION_NAME)            \
-  puts("  Function: \"" STRINGIFY(FUNCTION_NAME) "\"\n" \
-       "  IsLittleEndian: yes");
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#define PRINT_FUNCTION_HEADER(FUNCTION_NAME)            \
-  puts("  Function: \"" STRINGIFY(FUNCTION_NAME) "\"\n" \
-       "  IsLittleEndian: no");
-#endif
-
 #define UNROLL_ARGUMENT(LHS, RHS) DO_NOTHING(LHS, argument_##RHS)
 
 size_t runtime_endianness_check() {
   size_t i = 1;
   return !*((char *) &i);
 }
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define PRINT_BYTES(VARIABLE_NAME, BYTE_COUNT)           \
-  for (size_t i = BYTE_COUNT - 1; i != (size_t) -1; --i) \
-    printf("%.2x", VARIABLE_NAME[i]);
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#define PRINT_BYTES(VARIABLE_NAME, BYTE_COUNT) \
-  for (size_t i = 0; i < BYTE_COUNT; ++i)      \
-    printf("%.2x", VARIABLE_NAME[i]);
-#endif
 
-static_assert(sizeof(uint8_t) == 1, "A type with size == 1 is required.");
-#define PRINT_VALUE(TYPE, VALUE)         \
-  do {                                   \
-    typedef union {                      \
-      TYPE v;                            \
-      uint8_t a[sizeof(TYPE)];           \
-    } printing_helper;                   \
-                                         \
-    printing_helper helper;              \
-    helper.v = VALUE;                    \
-                                         \
-    PRINT_BYTES(helper.a, sizeof(TYPE)); \
-  } while (0);
+_Static_assert(sizeof(uint8_t) == 1, "A type with size == 1 is required.");
+#define MAKE_PRINT_HELPER(TYPE, POINTER, RESULT)         \
+  typedef union {                                        \
+    TYPE v;                                              \
+    uint8_t a[sizeof(TYPE)];                             \
+  } printing_helper;                                     \
+  printing_helper *RESULT = (printing_helper *) POINTER
 
-#define PRINT_VARIABLE(TYPE, VALUE)                                        \
-  do {                                                                     \
-    printf("    - Type: " #TYPE "\n      Address: 0x%0x\n      Value: 0x", \
-           &VALUE);                                                        \
-    PRINT_VALUE(TYPE, VALUE)                                               \
-    printf("\n");                                                          \
-  } while (0);
+#define PRINT_BYTES(TYPE, HELPER)                          \
+  do {                                                     \
+    printf("[ ");                                          \
+    for (int i = 0; i < sizeof(TYPE) - 1; ++i)             \
+      printf("0x%.2hhx, ", (HELPER)->a[i]);                \
+    printf("0x%.2hhx ]\n", (HELPER)->a[sizeof(TYPE) - 1]); \
+  } while (0)
+
+#define PRINT_VARIABLE(TYPE, POINTER)                   \
+  do {                                                  \
+    printf("      - Type: " #TYPE "\n        Bytes: "); \
+    MAKE_PRINT_HELPER(TYPE, POINTER, local_helper);     \
+    PRINT_BYTES(TYPE, local_helper);                    \
+  } while (0)
 
 #define UNROLL_ARGUMENTS(...) \
   COMMA_SEPARATED_INDEXED_FOR_EACH(UNROLL_ARGUMENT, __VA_ARGS__)
 
-#define PRINT_ARGUMENT(TYPE, INDEX) PRINT_VARIABLE(TYPE, argument_##INDEX)
+#define PRINT_ARGUMENT(TYPE, INDEX) PRINT_VARIABLE(TYPE, &argument_##INDEX);
 #define PRINT_ARGUMENTS(...) INDEXED_FOR_EACH(PRINT_ARGUMENT, __VA_ARGS__)
 
 #define NOINLINE_WEAK __attribute__((noinline, weak))
 #define ARGUMENT_TEST_FUNCTION(NAME, ...)                         \
   void NOINLINE_WEAK ABIDEF NAME(UNROLL_ARGUMENTS(__VA_ARGS__)) { \
-    PRINT_FUNCTION_HEADER(NAME)                                   \
-    puts("  Arguments:");                                         \
-    PRINT_ARGUMENTS(__VA_ARGS__)                                  \
-    puts("  ReturnValue:");                                       \
+    puts("    Function: \"" STRINGIFY(NAME) "\"");                \
+    puts("    Arguments:");                                       \
+    PRINT_ARGUMENTS(__VA_ARGS__);                                 \
+    puts("    ReturnValue:");                                     \
     puts("");                                                     \
   }
 
@@ -110,15 +117,30 @@ jmp_buf jump_buffer;
   TYPE __attribute__((noinline)) NAME(void) {         \
     if (setjmp(jump_buffer) == 0) {                   \
       TYPE return_value = GET_SETUP_FUNCTION(TYPE)(); \
-      puts("  ReturnValue:");                         \
-      PRINT_VARIABLE(TYPE, return_value);             \
-      PRINT_FUNCTION_HEADER(NAME);                    \
-      puts("  Arguments:");                           \
+      puts("    Function: \"" STRINGIFY(NAME) "\"");  \
+      puts("    Arguments:");                         \
+      puts("    ReturnValue:");                       \
+      PRINT_VARIABLE(TYPE, &return_value);            \
       puts("");                                       \
                                                       \
       longjmp(jump_buffer, 1);                        \
     }                                                 \
   }
+
+#ifdef __SIZEOF_INT128__
+#define INT128_T __int128_t
+#define UINT128_T __uint128_t
+#else
+typedef struct {
+  int64_t low, high;
+} replacement_for___int128_t;
+#define INT128_T replacement_for___int128_t
+
+typedef struct {
+  uint64_t low, high;
+} replacement_for___uint128_t;
+#define UINT128_T replacement_for___uint128_t
+#endif
 
 /*
  * Helper structs
@@ -158,7 +180,7 @@ ARGUMENT_TEST_FUNCTION(single_8_bit_argument, uint8_t);
 ARGUMENT_TEST_FUNCTION(single_16_bit_argument, int16_t);
 ARGUMENT_TEST_FUNCTION(single_32_bit_argument, uint32_t);
 ARGUMENT_TEST_FUNCTION(single_64_bit_argument, int64_t);
-ARGUMENT_TEST_FUNCTION(single_128_bit_argument, __uint128_t);
+ARGUMENT_TEST_FUNCTION(single_128_bit_argument, INT128_T);
 ARGUMENT_TEST_FUNCTION(single_small_struct_argument, small_struct);
 ARGUMENT_TEST_FUNCTION(single_padded_struct_argument, padded_struct);
 ARGUMENT_TEST_FUNCTION(single_array_struct_argument, array_struct);
@@ -176,24 +198,21 @@ ARGUMENT_TEST_FUNCTION(mixed_integer_arguments,
                        uint32_t,
                        int16_t,
                        uint8_t,
-                       __int128_t);
+                       UINT128_T);
 ARGUMENT_TEST_FUNCTION(mixed_int_struct_arguments,
                        int64_t,
                        padded_struct,
                        int16_t,
                        big_struct,
-                       __int128_t);
+                       INT128_T);
 ARGUMENT_TEST_FUNCTION(mixed_int_struct_pointer_arguments,
                        padded_struct *,
                        padded_struct,
-                       __int128_t *,
+                       UINT128_T *,
                        huge_struct,
                        void *);
 
-ARGUMENT_TEST_FUNCTION(six_register_test,
-                       array_struct,
-                       __int128_t,
-                       array_struct);
+ARGUMENT_TEST_FUNCTION(six_register_test, array_struct, INT128_T, array_struct);
 
 ARGUMENT_TEST_FUNCTION(multiple_stack_arguments,
                        big_struct,
@@ -252,7 +271,7 @@ RETURN_VALUE_TEST_FUNCTION(single_8_bit_return_value, uint8_t);
 RETURN_VALUE_TEST_FUNCTION(single_16_bit_return_value, int16_t);
 RETURN_VALUE_TEST_FUNCTION(single_32_bit_return_value, uint32_t);
 RETURN_VALUE_TEST_FUNCTION(single_64_bit_return_value, int64_t);
-RETURN_VALUE_TEST_FUNCTION(single_128_bit_return_value, __uint128_t);
+RETURN_VALUE_TEST_FUNCTION(single_128_bit_return_value, UINT128_T);
 
 RETURN_VALUE_TEST_FUNCTION(single_small_struct_return_value, small_struct);
 RETURN_VALUE_TEST_FUNCTION(single_padded_struct_return_value, padded_struct);

@@ -12,18 +12,23 @@
 
 #ifdef TARGET_x86_64
 #include "platform_specific/x86_64.h"
+#define TARGET "x86_64"
 #elif TARGET_x86
 #include "platform_specific/x86.h"
+#define TARGET "x86"
+#elif TARGET_arm
+#include "platform_specific/arm.h"
+#define TARGET "arm"
 #else
-#include "platform_specific/x86_64.h"
-static_assert(0, "unsupported platform architecture");
+#define TARGET "UNSUPPORTED"
+_Static_assert(0, "unsupported platform architecture");
 #endif
 
 /* LFSR generator */
 
 static uint64_t lfsr = 0xdc984ef2647af904ull;
-uint64_t get_next_lfsr(void) {
-  for (uint32_t iteration = 0; iteration < 64; ++iteration)
+uint64_t get_next_lfsr(uint32_t iteration_count) {
+  for (uint32_t iteration = 0; iteration < iteration_count; ++iteration)
     lfsr = (lfsr >> 1) | ((((lfsr >> 1) ^ (lfsr >> 2)) & 1) << 63);
   return lfsr;
 }
@@ -37,44 +42,52 @@ uint64_t get_next_lfsr(void) {
 #define STACK_VALUE_COUNT 32
 #define REGISTER_COUNT COUNT_ARGUMENTS(REGISTER_LIST)
 #define GENERATED_COUNT REGISTER_COUNT + STACK_VALUE_COUNT
+#define GENERATED_BYTE_COUNT REGISTER_SIZE * (GENERATED_COUNT)
 
 #ifdef STATE_LOCATION
 #undef STATE_LOCATION
 #endif
 #define STATE_LOCATION "randomized_state"
 
-char *register_list[REGISTER_COUNT] = {
+static char *register_list[REGISTER_COUNT] = {
   COMMA_SEPARATED_FOR_EACH(STRINGIFY, REGISTER_LIST)
 };
 
-static __attribute((used)) register_type randomized_state[GENERATED_COUNT];
+_Static_assert(sizeof(uint8_t) == 1, "A type with size == 1 is required.");
+static __attribute((used)) uint8_t randomized_state[GENERATED_BYTE_COUNT];
 void regenerate_state(void) {
-  for (uint32_t counter = 0; counter < GENERATED_COUNT; ++counter)
-    randomized_state[counter] = get_next_lfsr();
+  for (uint32_t counter = 0; counter < GENERATED_BYTE_COUNT; ++counter)
+    randomized_state[counter] = (uint8_t) get_next_lfsr(8);
 }
-void print_current_state(void) {
-  /* Dump Stack */
-  puts("- Stack:");
-  for (uint32_t index = REGISTER_COUNT; index < GENERATED_COUNT; ++index) {
-    printf("    - Offset: 0x%02x\n      Value: 0x",
-           (index - REGISTER_COUNT) * REGISTER_SIZE);
-    PRINT_VALUE(uint64_t, randomized_state[index]);
-    puts("");
-  }
 
+void print_current_state(void) {
   /* Dump registers */
-  puts("  Registers:");
+  puts("  - Registers:");
   for (uint32_t index = 0; index < REGISTER_COUNT; ++index) {
-    printf("    - Name: \"%s\"\n      Value: 0x", register_list[index]);
-    PRINT_VALUE(register_type, randomized_state[REGISTER_COUNT - index - 1]);
-    puts("");
+    typedef uint8_t single_word[REGISTER_SIZE];
+    uint32_t offset = (REGISTER_COUNT - index - 1) * REGISTER_SIZE;
+    single_word *word_ptr = (single_word *) (randomized_state + offset);
+    MAKE_PRINT_HELPER(register_type, word_ptr, word_helper);
+
+    printf("      - Name: \"%s\"\n        Value: 0x%.*zx\n",
+           register_list[index],
+           REGISTER_SIZE * 2,
+           word_helper->v);
+    printf("        Bytes: ");
+    PRINT_BYTES(register_type, word_helper);
   }
+  
+  /* Dump Stack */
+  printf("    Stack: ");
+  typedef uint8_t stack_state[STACK_VALUE_COUNT * REGISTER_SIZE];
+  uint32_t offset = (REGISTER_COUNT) * REGISTER_SIZE;
+  stack_state *state_ptr = (stack_state *) (randomized_state + offset);
+  MAKE_PRINT_HELPER(stack_state, state_ptr, stack_helper);
+  PRINT_BYTES(stack_state, stack_helper);
 }
 
 #define CALL_ITERATION_WITH(FUNCTION_NAME) \
   CONCATENATE(iteration_impl_on_, FUNCTION_NAME)
-
-#define GENERATED_BYTES ((GENERATED_COUNT) * (REGISTER_SIZE))
 
 #ifdef __APPLE__
 #define FUNCTION_NAME_PREFIX _
@@ -140,17 +153,21 @@ STRINGIFY(FUNCTION_NAME_PREFIX) "set_return_value_up:\n"
 
 SEMICOLON_SEPARATED_FOR_EACH(DEFINE_ITERATION_WITH, ARGUMENT_FUNCTION_LIST);
 int main(void) {
+  puts("---");
+  puts("TargetArchitecture: " TARGET);
 
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#ifdef ENDIANNESS_LITTLE
   assert(!runtime_endianness_check());
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+  puts("IsLittleEndian: yes");
+#elif defined(ENDIANNESS_BIG)
   assert(runtime_endianness_check());
+  puts("IsLittleEndian: no");
 #endif
 
-  puts("---");
+  puts("Iterations:");
   SEMICOLON_SEPARATED_FOR_EACH(ITERATE_ON_ARGUMENTS, ARGUMENT_FUNCTION_LIST);
   SEMICOLON_SEPARATED_FOR_EACH(ITERATE_ON_RVALUES, RETURN_VALUE_FUNCTION_LIST);
-  puts("...");
 
+  puts("...");
   return 0;
 }

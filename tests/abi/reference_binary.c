@@ -15,9 +15,9 @@ ABIDEF void *set_return_value_up(void) {
 
 int main(void) {
 
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#ifdef ENDIANNESS_LITTLE
   assert(!runtime_endianness_check());
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#elif defined(ENDIANNESS_BIG)
   assert(runtime_endianness_check());
 #endif
 
