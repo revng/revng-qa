@@ -11,23 +11,23 @@ struct __attribute__((packed)) Node {
   struct Node *next;
 };
 
-int getPrevious(struct Node *n) {
+static int getPrevious(struct Node *n) {
   if (n->prev)
     return n->prev->content_uint32;
   return 0;
 }
 
-int getNext(struct Node *n) {
+static int getNext(struct Node *n) {
   if (n->next)
     return n->next->content_uint32;
   return 0;
 }
 
-uint32_t getContent(struct Node *n) {
+static uint32_t getContent(struct Node *n) {
   return n ? n->content_uint32 : 0U;
 }
 
-void initNode(struct Node *n) {
+static void initNode(struct Node *n) {
   if (!n)
     return;
   n->prev = NULL;

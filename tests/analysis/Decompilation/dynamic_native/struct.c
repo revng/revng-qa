@@ -9,7 +9,7 @@ typedef struct __attribute__((packed)) {
   uint32_t second_uint32;
 } TestStruct;
 
-TestStruct global_struct;
+static TestStruct global_struct = {.first_uint32 = 0, .second_uint32 = 0};
 
 static TestStruct *getGlobalStruct(void) {
   return &global_struct;
