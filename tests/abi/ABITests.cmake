@@ -4,13 +4,13 @@
 
 macro(register_abi_artifacts ABI ARCHITECTURE)
 
-register_artifact_category("reference_abi_binary_${ABI}" "ON")
-register_artifact("reference_abi_binary_${ABI}" "reference_binary" "${ARCHITECTURE}" "reference_binary.c")
-register_artifact_run("reference_abi_binary_${ABI}" "reference_binary" "default" "nope")
+register_artifact_category("abi_test_function_library_${ABI}" "ON")
+register_artifact("abi_test_function_library_${ABI}" "abi_test_function_library" "${ARCHITECTURE}" "abi_test_functions.c")
+register_artifact_run("abi_test_function_library_${ABI}" "abi_test_function_library" "default" "nope")
 
-register_artifact_category("runtime_abi_analysis_${ABI}" "ON")
-register_artifact("runtime_abi_analysis_${ABI}" "analyzed_binary" "${ARCHITECTURE}" "runtime_abi_analysis.c")
-register_artifact_run("runtime_abi_analysis_${ABI}" "analyzed_binary" "default" "nope")
+register_artifact_category("describe_abi_test_functions_${ABI}" "ON")
+register_artifact("describe_abi_test_functions_${ABI}" "describe_abi_test_functions" "${ARCHITECTURE}" "describe_abi_test_functions.c")
+register_artifact_run("describe_abi_test_functions_${ABI}" "describe_abi_test_functions" "default" "nope")
 
 endmacro()
 

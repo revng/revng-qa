@@ -11,9 +11,9 @@ macro(add_prefix PREFIX PATHS OUTPUT_VARIABLE)
 endmacro()
 
 macro(category_to_path CATEGORY OUTPUT_VARIABLE)
-  if("${CATEGORY}" MATCHES "^reference_abi_binary_(.+)")
+  if("${CATEGORY}" MATCHES "^abi_test_function_library_(.+)")
     set("${OUTPUT_VARIABLE}" "tests/abi/${CMAKE_MATCH_1}")
-  elseif("${CATEGORY}" MATCHES "^runtime_abi_analysis_(.+)")
+  elseif("${CATEGORY}" MATCHES "^describe_abi_test_functions_(.+)")
     set("${OUTPUT_VARIABLE}" "tests/abi/${CMAKE_MATCH_1}")
   else()
     string(REPLACE "_" "/" "${OUTPUT_VARIABLE}" "${CATEGORY}")
@@ -37,8 +37,8 @@ macro(register_artifact CATEGORY NAME CONFIGURATION SOURCES)
   # Sources are in CATEGORY/file.c or CATEGORY/CONFIGURATION/file.S
   category_to_path("${CATEGORY}" SOURCES_PATH)
 
-  if("${CATEGORY}" MATCHES "^reference_abi_binary_.+" OR 
-     "${CATEGORY}" MATCHES "^runtime_abi_analysis_.+")
+  if("${CATEGORY}" MATCHES "^abi_test_function_library_.+" OR 
+     "${CATEGORY}" MATCHES "^describe_abi_test_functions_.+")
     get_filename_component(INPUT_PATH ${SOURCES_PATH} DIRECTORY)
   else()
     set(INPUT_PATH "${SOURCES_PATH}")
