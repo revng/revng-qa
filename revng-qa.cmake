@@ -19,6 +19,7 @@ endif()
 
 include_and_install(macros.cmake)
 include_and_install(configurations.cmake)
+include_and_install(tests/abi/ABITests.cmake)
 include_and_install(tests/runtime/RuntimeTests.cmake)
 include_and_install(tests/analysis/AnalysisTests.cmake)
 
