@@ -11,34 +11,55 @@ struct __attribute__((packed)) Node {
   struct Node *next;
 };
 
-int getPrevious(struct Node *n) {
+static int getPrevious(struct Node *n) {
   if (n->prev)
     return n->prev->content_uint32;
   return 0;
 }
-int getNext(struct Node *n) {
+
+static int getNext(struct Node *n) {
   if (n->next)
     return n->next->content_uint32;
   return 0;
 }
 
-int main() {
-  struct Node *first = (struct Node *) malloc(sizeof(struct Node));
-  first->prev = NULL;
+static uint32_t getContent(struct Node *n) {
+  return n ? n->content_uint32 : 0U;
+}
+
+static void initNode(struct Node *n) {
+  if (!n)
+    return;
+  n->prev = NULL;
+  n->next = NULL;
+  n->content_uint32 = 0U;
+}
+
+static struct Node Nodes[11] = {0};
+
+static struct Node* getGlobalNodes() {
+  return &Nodes[0];
+}
+
+int main(int argc, char **argv) {
+  struct Node *first = getGlobalNodes();
+  initNode(first);
 
   struct Node *cur = first;
   for (int i = 0; i < 10; i++) {
-    struct Node *new_node = (struct Node *) malloc(sizeof(struct Node));
-    cur->next = new_node;
-    new_node->prev = cur;
-    new_node->next = NULL;
+    struct Node *new_node = first + i + 1;
+    initNode(new_node);
     new_node->content_uint32 = i;
-    cur = cur->next;
+    new_node->prev = cur;
+
+    cur->next = new_node;
+    cur = new_node;
   }
 
   int sum = 0;
   cur = first;
   while (cur) {
+    sum += getContent(cur);
     sum += getPrevious(cur);
     sum += getNext(cur);
     cur = cur->next;

@@ -10,7 +10,7 @@ typedef struct __attribute__((packed)) {
   uint64_t second_uint64;
 } TestStruct;
 
-TestStruct global_struct[10];
+static TestStruct global_struct[10] = {0};
 
 static TestStruct *getGlobalStructArray(void) {
   return global_struct;
