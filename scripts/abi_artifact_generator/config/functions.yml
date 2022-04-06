@@ -1,0 +1,125 @@
+---
+
+helper_structs:
+  small_struct: [ "uint16_t a", "uint16_t b" ]
+  padded_struct: [ "uint8_t a", "uint16_t b" ]
+  array_struct: [ "uint32_t a[3]" ]
+  two_arrays_struct: [ "uint32_t a[3]", "uint64_t b[3]" ]
+  big_struct: [ "uint64_t a[8]" ]
+  huge_struct: [ "uint64_t a[32]" ]
+  
+argument_tests:
+  single_8_bit_argument: [ "uint8_t" ]
+  single_16_bit_argument: [ "int16_t" ]
+  single_32_bit_argument: [ "uint32_t" ]
+  single_64_bit_argument: [ "int64_t" ]
+  single_128_bit_argument: [ "INT128_T" ]
+
+  single_small_struct_argument: [ "small_struct" ]
+  single_padded_struct_argument: [ "padded_struct" ]
+  single_array_struct_argument: [ "array_struct" ]
+  single_two_arrays_struct_argument: [ "two_arrays_struct" ]
+  single_big_struct_argument: [ "big_struct" ]
+  single_huge_struct_argument: [ "huge_struct" ]
+  single_void_pointer_argument: [ "void *" ]
+  single_int_pointer_argument: [ "uint32_t *" ]
+  single_struct_pointer_argument: [ "huge_struct *" ]
+
+# TODO: floating point arguments.
+
+  mixed_integer_arguments:
+    - int64_t
+    - uint32_t
+    - int16_t
+    - uint8_t
+    - UINT128_T
+  mixed_int_struct_arguments:
+    - int64_t
+    - padded_struct
+    - int16_t
+    - big_struct
+    - INT128_T
+  mixed_int_struct_pointer_arguments:
+    - padded_struct *
+    - padded_struct
+    - UINT128_T *
+    - huge_struct
+    - void *
+
+  six_register_test:
+    - array_struct
+    - INT128_T
+    - array_struct
+
+  multiple_stack_arguments:
+    - big_struct
+    - big_struct
+    - big_struct
+
+  lots_of_arguments:
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+
+  equivalence_test_0:
+    - small_struct *
+    - small_struct
+    - uint64_t
+  equivalence_test_64_bit_1:
+    - uint64_t
+    - uint32_t
+    - uint64_t
+  equivalence_test_64_bit_2:
+    - uint64_t
+    - uint16_t
+    - uint16_t
+    - uint64_t
+  equivalence_test_32_bit_1:
+    - uint32_t
+    - uint32_t
+    - uint64_t
+  equivalence_test_32_bit_2:
+    - uint32_t
+    - uint16_t
+    - uint16_t
+    - uint64_t
+
+small_return_value_tests:
+  single_8_bit_return_value: "uint8_t"
+  single_16_bit_return_value: "int16_t"
+  single_32_bit_return_value: "uint32_t"
+  single_64_bit_return_value: "int64_t"
+  single_128_bit_return_value: "UINT128_T"
+
+  single_small_struct_return_value: "small_struct"
+  single_padded_struct_return_value: "padded_struct"
+
+  single_void_pointer_return_value: "void *"
+  single_int_pointer_return_value: "uint32_t *"
+  single_struct_pointer_return_value: "huge_struct *"
+
+# TODO: floating point return values.
+
+# TODO: returning big objects.
+
+...

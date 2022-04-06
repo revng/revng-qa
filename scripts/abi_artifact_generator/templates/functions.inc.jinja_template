@@ -1,0 +1,58 @@
+/*#-
+This template file is distributed under the MIT License. See LICENSE.md for details.
+#*/
+
+/*( generation_notice )*/
+
+#include "common.h"
+#include "revng-qa/generated/functions.h"
+
+/*
+ * Functions designed to test argument passing
+ */
+
+/*{ for name, arguments in argument_functions.items() -}*/
+void __attribute__((noinline, weak)) ABIDEF /*( name )*/(
+  /*{- for type in arguments -}*/
+  /*( type )*/ argument_/*( loop.index - 1 )*/
+  /*{- if not loop.last -}*/ , /*{ endif -}*/
+  /*{- endfor -}*/
+) {
+  puts("    Function: \"/*( name )*/\"");
+  puts("    Arguments:");
+/*{ for type in arguments }*/
+  PRINT(/*( type )*/, &argument_/*( loop.index - 1 )*/);
+/*{- endfor }*/
+
+  puts("    ReturnValue:");
+  puts("");
+}
+
+/*{ endfor -}*/
+
+/*
+ * Functions designed to test value returning
+ */
+
+/* Helps avoiding compiler warnings */
+void *typeless_setup = (void *) set_return_value_up;
+
+static jmp_buf jump_buffer;
+/*{ for name, return_value_type in return_value_functions.items() -}*/
+/*( return_value_type )*/ __attribute__((noinline)) /*( name )*/(void) {
+  if (setjmp(jump_buffer) == 0) {
+    /*( return_value_type )*/ return_value = ((
+      /*(- return_value_type )*/ ABIDEF(*)(void)) typeless_setup)();
+    puts("    Function: \"/*( name )*/\"");
+    puts("    Arguments:");
+    puts("    ReturnValue:");
+
+    PRINT(/*(- return_value_type )*/, &return_value);
+
+    puts("");
+
+    longjmp(jump_buffer, 1);
+  }
+}
+
+/*{ endfor -}*/
