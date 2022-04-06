@@ -2,12 +2,14 @@ set(ARTIFACT_CATEGORIES "")
 set(DERIVED_ARTIFACTS "")
 
 macro(add_prefix PREFIX PATHS OUTPUT_VARIABLE)
-  string(STRIP "${PATHS}" PATHS)
-  set("${OUTPUT_VARIABLE}" "")
-  foreach(PATH "${PATHS}")
-    set("${OUTPUT_VARIABLE}" "${${OUTPUT_VARIABLE}} ${PREFIX}${PATH}")
+  string(STRIP "${PREFIX}" PREFIX)
+
+  set("${OUTPUT_VARIABLE}" "THIS_LIST_ELEMENT_NEEDS_TO_BE_REMOVED")
+  foreach(PATH ${PATHS})
+    string(STRIP "${PATH}" PATH)
+    set("${OUTPUT_VARIABLE}" "${${OUTPUT_VARIABLE}};${PREFIX}${PATH}")
   endforeach()
-  string(STRIP "${${OUTPUT_VARIABLE}}" "${OUTPUT_VARIABLE}")
+  list(REMOVE_AT ${OUTPUT_VARIABLE} 0)
 endmacro()
 
 macro(category_to_path CATEGORY OUTPUT_VARIABLE)
@@ -229,7 +231,7 @@ macro(register_derived_artifact FROM_ARTIFACTS NAME SUFFIX TYPE)
             add_custom_target(
               compile-${NAME}_${ARTIFACT_CATEGORY}__${ARTIFACT}__${CONFIGURATION}
               ALL
-              DEPENDS ${OUTPUT} ${DEPEND_ON})
+              DEPENDS ${OUTPUT} ${DEPEND_ON} generated_abi_artifact_sources)
             if(DEPEND_ON)
               add_dependencies(
                 compile-${NAME}_${ARTIFACT_CATEGORY}__${ARTIFACT}__${CONFIGURATION}

@@ -44,17 +44,23 @@ set(CFLAGS_CATEGORY_tests_analysis_Decompilation -fno-inline -O2)
 set(CFLAGS_CATEGORY_tests_analysis_PromoteStackPointer
     -no-pie -fno-unroll-loops -fno-inline -O1 -fno-stack-protector)
 
+set(CFLAGS_CATEGORY_abi_test_function_library_COMMON
+    ${CFLAGS_CATEGORY_tests_runtime} -O2
+    -I${CMAKE_SOURCE_DIR}/tests/abi/include -I${CMAKE_BINARY_DIR}/include)
 set(CFLAGS_CATEGORY_abi_test_function_library_SystemV_x86_64
-    ${CFLAGS_CATEGORY_tests_runtime} -DABIDEF=)
+    ${CFLAGS_CATEGORY_abi_test_function_library_COMMON} -DABIDEF=)
 set(CFLAGS_CATEGORY_abi_test_function_library_SystemV_x86
-    ${CFLAGS_CATEGORY_tests_runtime} -DABIDEF=)
+    ${CFLAGS_CATEGORY_abi_test_function_library_COMMON} -DABIDEF=)
+set(CFLAGS_CATEGORY_abi_test_function_library_AAPCS
+    ${CFLAGS_CATEGORY_abi_test_function_library_COMMON} -DABIDEF=)
 # ...
 set(CFLAGS_CATEGORY_abi_test_function_library_Microsoft_x86_stdcall
     ${CFLAGS_CATEGORY_tests_runtime} -DABIDEF=__stdcall)
 # ...
 
+# TODO: investigate segfaults when optimizations are enabled.
 set(CFLAGS_CATEGORY_describe_abi_test_functions_COMMON
-    -O2
+    -O0
     -fno-stack-protector
     -fomit-frame-pointer
     -fno-reorder-functions
@@ -67,10 +73,14 @@ set(CFLAGS_CATEGORY_describe_abi_test_functions_COMMON
     -fno-align-functions
     -fno-optimize-sibling-calls
     -Wl,--gc-sections
-    -ffunction-sections)
+    -ffunction-sections
+    -I${CMAKE_SOURCE_DIR}/tests/abi/include
+    -I${CMAKE_BINARY_DIR}/include)
 set(CFLAGS_CATEGORY_describe_abi_test_functions_SystemV_x86_64
     ${CFLAGS_CATEGORY_describe_abi_test_functions_COMMON} -DABIDEF=)
 set(CFLAGS_CATEGORY_describe_abi_test_functions_SystemV_x86
+    ${CFLAGS_CATEGORY_describe_abi_test_functions_COMMON} -DABIDEF=)
+set(CFLAGS_CATEGORY_describe_abi_test_functions_AAPCS
     ${CFLAGS_CATEGORY_describe_abi_test_functions_COMMON} -DABIDEF=)
 # ...
 set(CFLAGS_CATEGORY_describe_abi_test_functions_Microsoft_x86_stdcall
