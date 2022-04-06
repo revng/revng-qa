@@ -5,17 +5,19 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define INTEL_ASM(name, ...) asm(".intel_syntax noprefix\n"             \
-                                 ".globl " #name "\n"                   \
-                                 ".type " #name ",@function\n"          \
-                                 #name ":\n"                            \
-                                 ".intel_syntax noprefix\n "            \
-                                 #__VA_ARGS__                           \
+// clang-format off
+#define INTEL_ASM(name, ...) asm(".intel_syntax noprefix\n"    \
+                                 ".globl " #name "\n"          \
+                                 ".type " #name ",@function\n" \
+                                 #name ":\n"                   \
+                                 ".intel_syntax noprefix\n "   \
+                                 #__VA_ARGS__                  \
                                  "\n.att_syntax\n")
 
 #define WEAK __attribute__((weak))
 
-WEAK void side_effects(void) {}
+WEAK void side_effects(void) {
+}
 
 uint32_t *escape_local32 = NULL;
 uint64_t *escape_local64 = NULL;
@@ -56,7 +58,7 @@ WEAK void stack_arguments_64(uint64_t rdi,
                              uint64_t r9,
                              uint64_t stack1,
                              uint64_t stack2,
-                             uint64_t stack3)  {
+                             uint64_t stack3) {
   *escape_local64 = stack1 * stack2 * stack3;
 
   side_effects();
@@ -105,6 +107,7 @@ INTEL_ASM(indirect_call_stack_arguments_64,
   add    rsp,0x18\n
   ret\n
 );
+// clang-format on
 
 // This function has 24 bytes of stack arguments, but until we integrate
 // ABI-specific information we'll get 20 bytes and detect only the stack1 and

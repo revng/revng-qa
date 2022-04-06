@@ -42,7 +42,7 @@ uint64_t get_next_lfsr(uint32_t iteration_count) {
 #define STACK_VALUE_COUNT 32
 #define REGISTER_COUNT COUNT_ARGUMENTS(REGISTER_LIST)
 #define GENERATED_COUNT REGISTER_COUNT + STACK_VALUE_COUNT
-#define GENERATED_BYTE_COUNT REGISTER_SIZE * (GENERATED_COUNT)
+#define GENERATED_BYTE_COUNT (REGISTER_SIZE) * (GENERATED_COUNT)
 
 #ifdef STATE_LOCATION
 #undef STATE_LOCATION
@@ -76,11 +76,11 @@ void print_current_state(void) {
     printf("        Bytes: ");
     PRINT_BYTES(register_type, word_helper);
   }
-  
+
   /* Dump Stack */
   printf("    Stack: ");
   typedef uint8_t stack_state[STACK_VALUE_COUNT * REGISTER_SIZE];
-  uint32_t offset = (REGISTER_COUNT) * REGISTER_SIZE;
+  uint32_t offset = (REGISTER_COUNT) * (REGISTER_SIZE);
   stack_state *state_ptr = (stack_state *) (randomized_state + offset);
   MAKE_PRINT_HELPER(stack_state, state_ptr, stack_helper);
   PRINT_BYTES(stack_state, stack_helper);
