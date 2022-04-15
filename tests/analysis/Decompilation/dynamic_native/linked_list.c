@@ -35,9 +35,9 @@ static void initNode(struct Node *n) {
   n->content_uint32 = 0U;
 }
 
-static struct Node Nodes[11] = {0};
+static struct Node Nodes[11] = { 0 };
 
-static struct Node* getGlobalNodes() {
+static struct Node *getGlobalNodes() {
   return &Nodes[0];
 }
 

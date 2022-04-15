@@ -25,7 +25,8 @@ include_and_install(tests/analysis/AnalysisTests.cmake)
 
 if(NOT IN_REVNG_QA)
   # Include all the derived artifacts definitions
-  file(GLOB DERIVED_ARTIFACTS_CMAKE "${CMAKE_INSTALL_PREFIX}/share/revng/qa/cmake/derived-artifacts/*.cmake")
+  file(GLOB DERIVED_ARTIFACTS_CMAKE
+       "${CMAKE_INSTALL_PREFIX}/share/revng/qa/cmake/derived-artifacts/*.cmake")
   foreach(DERIVED_ARTIFACT_CMAKE ${DERIVED_ARTIFACTS_CMAKE})
     include("${DERIVED_ARTIFACT_CMAKE}")
   endforeach()
