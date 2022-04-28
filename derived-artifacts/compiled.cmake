@@ -43,6 +43,8 @@ set(CFLAGS_CATEGORY_tests_runtime -std=c99 -fno-pic -fno-pie -ggdb3
 set(CFLAGS_CATEGORY_tests_analysis_Decompilation -fno-inline -O2)
 set(CFLAGS_CATEGORY_tests_analysis_PromoteStackPointer
     -no-pie -fno-unroll-loops -fno-inline -O1 -fno-stack-protector)
+set(CFLAGS_CATEGORY_tests_analysis_SegregateStackAccesses
+    -no-pie -fno-unroll-loops -fno-inline -O1 -fno-stack-protector)
 
 set(CFLAGS_CATEGORY_abi_test_function_library_COMMON
     ${CFLAGS_CATEGORY_tests_runtime} -O2

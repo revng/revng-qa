@@ -80,3 +80,7 @@ register_artifact("tests_analysis_Decompilation" "array_of_structs"
 register_artifact_category("tests_analysis_PromoteStackPointer" "OFF")
 register_artifact("tests_analysis_PromoteStackPointer" "stackframe"
                   "dynamic_native" "stackframe.c")
+
+register_artifact_category("tests_analysis_SegregateStackAccesses" "OFF")
+register_artifact("tests_analysis_SegregateStackAccesses" "segregate"
+                  "dynamic_native" "segregate.c")
