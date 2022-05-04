@@ -1,0 +1,66 @@
+tags:
+  - name: compiler
+    variables:
+      CFLAGS:
+      - -no-pie
+  - name: native
+    implies: [compiler]
+  - name: dynamic
+    implies: [compiler]
+  - name: static
+    variables:
+      CFLAGS:
+        - -static
+  - name: cross-compiler
+    implies: [compiler, static]
+  - name: arm
+    implies: [cross-compiler]
+    variables:
+      TRIPLE: armv7a-hardfloat-linux-uclibceabi-
+      QEMU_NAME: arm
+      CFLAGS:
+      - -Wl,-Ttext-segment=0x20000
+      - -DTARGET_arm
+  - name: x86-64
+    implies: [cross-compiler]
+    variables:
+      TRIPLE: x86_64-gentoo-linux-musl-
+      QEMU_NAME: x86_64
+      OBJDUMP_FLAGS: -Mintel
+      CFLAGS:
+        - -DTARGET_x86_64
+  - name: mips
+    implies: [cross-compiler]
+    variables:
+      TRIPLE: mips-unknown-linux-musl-
+      QEMU_NAME: mips
+      CFLAGS:
+        - -DTARGET_mips
+  - name: mipsel
+    implies: [cross-compiler]
+    variables:
+      TRIPLE: mipsel-unknown-linux-musl-
+      QEMU_NAME: mipsel
+      CFLAGS:
+        - -DTARGET_mipsel
+  - name: i386
+    implies: [cross-compiler]
+    variables:
+      TRIPLE: i386-gentoo-linux-musl-
+      QEMU_NAME: i386
+      CFLAGS:
+        - -DTARGET_x86
+  - name: s390x
+    implies: [cross-compiler]
+    variables:
+      TRIPLE: s390x-ibm-linux-musl-
+      QEMU_NAME: s390x
+      CFLAGS:
+        - -DTARGET_s390x
+  - name: aarch64
+    implies: [cross-compiler]
+    variables:
+      TRIPLE: aarch64-unknown-linux-musl-
+      QEMU_NAME: aarch64
+      CFLAGS:
+        - -DTARGET_aarch64

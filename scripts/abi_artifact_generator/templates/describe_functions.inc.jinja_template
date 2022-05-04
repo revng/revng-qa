@@ -4,8 +4,8 @@ This template file is distributed under the MIT License. See LICENSE.md for deta
 
 /*( generation_notice )*/
 
-#include "common.h"
-#include "revng-qa/generated/functions.h"
+#include "../common.h"
+#include "../functions.h"
 
 /* LFSR generator */
 

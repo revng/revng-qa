@@ -1,0 +1,10 @@
+commands:
+  - type: revng-qa.compiled
+    from:
+    - type: source
+    command: ${TRIPLE}gcc $INPUT -o $OUTPUT $CFLAGS
+  - type: revng-qa.disassembled
+    from:
+      - type: revng-qa.compiled
+    suffix: .S
+    command: ${TRIPLE}objdump $OBJDUMP_FLAGS -d $INPUT > $OUTPUT

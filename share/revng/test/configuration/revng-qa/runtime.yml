@@ -1,0 +1,40 @@
+tags:
+  - name: one-per-architecture
+  - name: for-comparison
+  - name: for-runtime
+    variables:
+      CFLAGS:
+        - -std=c99
+        - -fno-pic
+        - -fno-pie
+        - -ggdb3
+        - -fno-stack-protector
+sources:
+  - tags: [for-runtime, for-comparison]
+    repeat-for:
+    - [arm]
+    - [mips]
+    - [mipsel]
+    - [aarch64]
+    - [x86-64]
+    - [s390x]
+    - [native, dynamic]
+    - [i386]
+    members:
+    - tests/runtime/function-call.c
+    - tests/runtime/floating-point.c
+    - tests/runtime/syscall.c
+    - tests/runtime/global.c
+    - tests/runtime/printf.c
+  - tags: [for-runtime, for-comparison, one-per-architecture]
+    repeat-for:
+    - [arm]
+    - [mips]
+    - [mipsel]
+    - [aarch64]
+    - [x86-64]
+    - [s390x]
+    - [native, dynamic]
+    - [i386]
+    members:
+    - tests/runtime/calc.c

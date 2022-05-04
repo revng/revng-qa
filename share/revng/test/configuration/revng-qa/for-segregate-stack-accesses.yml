@@ -1,0 +1,12 @@
+tags:
+  - name: for-segregate-stack-accesses
+    variables:
+      CFLAGS:
+        - -fno-unroll-loops
+        - -fno-inline
+        - -O1
+        - -fno-stack-protector
+sources:
+  - tags: [dynamic, native, for-segregate-stack-accesses]
+    members:
+    - tests/analysis/SegregateStackAccesses/dynamic_native/segregate.c

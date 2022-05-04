@@ -1,0 +1,650 @@
+#!/usr/bin/env python3
+
+import argparse
+import hashlib
+import json
+import os
+import re
+import shlex
+import sys
+import yaml
+
+from dataclasses import dataclass, field, asdict
+from expandvars import expand
+from collections import defaultdict
+from typing import Union, List, Dict
+from itertools import product
+from functools import reduce
+from boolparser import BooleanParser
+from pathlib import Path
+from graphlib import TopologicalSorter
+from stat import S_IEXEC
+
+# TODO: re-enable abi
+
+# BooleanParser self-test
+assert BooleanParser("(var1 and var2) or (var2 and undefined)").evaluate({
+    "var1": True,
+    "no": False
+}) == False
+assert BooleanParser("var1 and var2").evaluate({"var1": True, "var2": True}) == True
+assert BooleanParser("var1").evaluate({"var1": True}) == True
+assert BooleanParser("!var1").evaluate({"var1": True}) == False
+assert BooleanParser("var1").evaluate({"var1": False}) == False
+assert BooleanParser("!var1").evaluate({"var1": False}) == True
+assert BooleanParser("var1").evaluate({}) == False
+assert BooleanParser("1 == 1").evaluate({}) == True
+
+verbose = False
+
+def log(message):
+    global verbose
+    if verbose:
+        sys.stderr.write(message + "\n")
+
+def warning(message):
+    sys.stderr.write(f"Warning: {message}\n")
+
+def error(message):
+    raise Exception(message)
+
+def distances(target, result):
+    result.add(target)
+    for input in target.inputs:
+        distances(input, result)
+    return result
+
+def most_similar_tuples(inputs):
+    log(json.dumps([[x.path for x in input] for input in inputs], indent=2))
+    if len(inputs) == 1:
+        return list(product(*inputs))
+
+    result = []
+
+    maximum_similarity = 0
+
+    for candidate_set in product(*inputs):
+        if len(set(candidate_set)) != len(candidate_set):
+            continue
+
+        candidate_distances = [distances(candidate, set())
+                               for candidate
+                               in candidate_set]
+
+        common_targets = reduce(lambda a, b : a & b, candidate_distances)
+
+        similarity = len(common_targets)
+
+        if similarity > maximum_similarity:
+            maximum_similarity = similarity
+            result = []
+
+        if similarity == maximum_similarity:
+            result.append(candidate_set)
+
+    return result
+
+def sort_list(entries, key, dependencies):
+    # Collect entries by key and id
+    entries_by_key = defaultdict(set)
+    entries_by_id = {}
+    for entry in entries:
+        entries_by_id[id(entry)] = entry
+        entries_by_key[key(entry)].add(id(entry))
+
+    # Create graph
+    entries_graph = defaultdict(set)
+    for entry in entries:
+        entries_graph[id(entry)].update(set().union(*[entries_by_key[dependency]
+                                                      for dependency
+                                                      in dependencies(entry)]))
+
+    # Sort the entries in reverse post-order
+    return [entries_by_id[entry_id]
+            for entry_id
+            in TopologicalSorter(entries_graph).static_order()]
+
+
+def short_hash(data):
+    return hashlib.sha256(data.encode("utf8")).hexdigest()[:8]
+
+@dataclass
+class Variables:
+    variables: dict = field(default_factory=dict)
+    private_variables: set = field(default_factory=set)
+
+    def merge(self, other):
+        for name, value in other.variables.items():
+            if name not in other.private_variables:
+                self.set_variable(name, value)
+
+    def parse(self, dictionary):
+        for name, value in dictionary.items():
+            self.set_variable(name, value)
+
+    def set_private_variable(self, name, value):
+        self.private_variables.add(name)
+        self.set_variable(name, value)
+
+    def set_variable(self, name, value):
+        value_type = type(value)
+
+        if name in self.variables and self.variables[name] == value:
+            return
+
+        if value_type is str:
+            if name in self.variables:
+                error(f"Variable {name} of type str is already defined with a "
+                      f"different value: \"{value}\" and "
+                      f"\"{self.variables[name]}\"")
+            self.variables[name] = value
+        elif value_type is list:
+            if name not in self.variables:
+                self.variables[name] = []
+            elif type(self.variables[name]) is not list:
+                error(f"Key {name} is defined with different types")
+
+            self.variables[name] += value
+        else:
+            error(f"Unexpected type for variable {name}")
+
+@dataclass
+class Tag:
+    name: str
+    implies: List["Tag"] = field(default_factory=list)
+    variables: Variables = field(default_factory=Variables)
+
+    def __hash__(self):
+        return id(self)
+
+@dataclass
+class Target:
+    type: str
+    path: str
+    source_path: str
+    derived_targets_prefix: str
+    command: str
+    tags: List[Tag]
+    inputs: List["Target"] = field(default_factory=list)
+    variables: Variables = field(default_factory=Variables)
+
+    def __hash__(self):
+        return id(self)
+
+class SafeLoaderIgnoreUnknown(yaml.SafeLoader):
+    def ignore_unknown(self, node):
+        return self.construct_mapping(node)
+
+SafeLoaderIgnoreUnknown.add_constructor(None, SafeLoaderIgnoreUnknown.ignore_unknown)
+
+class Configuration:
+    def __init__(self, data, allowed_types, filter, install_path):
+        self.tags_list = {}
+        self.targets = []
+        self.commands = {}
+        self.types = set(["source"])
+        self.install_path = install_path
+        self.allowed_types = [re.compile(allowed_type)
+                              for allowed_type
+                              in allowed_types]
+        self.filter = BooleanParser(filter)
+
+        self._load_tags(data)
+        self._load_sources(data)
+        self._load_commands(data)
+
+    def _evaluate(self, expression, tags):
+        return expression.evaluate({tag.name: True
+                                    for tag
+                                    in tags})
+
+    def is_allowed(self, target):
+        if target.type == "source":
+            return False
+
+        if not self._evaluate(self.filter, target.tags):
+            return False
+
+        if (self.allowed_types
+            and not any(allowed_type.match(target.type)
+                        for allowed_type
+                        in self.allowed_types)):
+            return False
+
+        return True
+
+    def _add_tags(self, tag, tag_set):
+        if tag not in tag_set:
+            tag_set.append(tag)
+            for implied_tag in tag.implies:
+                self._add_tags(implied_tag, tag_set)
+
+    def tags(self, tag_names):
+        result = []
+        for tag_name in tag_names:
+            tag = self.tags_list[tag_name]
+            self._add_tags(tag, result)
+        return result
+
+    def _load_tags(self, data):
+        log("Parsing tags")
+
+        def key(entry):
+            return entry.get("name", "")
+
+        def dependencies(entry):
+            result = set()
+            for implied in entry.get("implies", []):
+                result.add(implied)
+            return result
+
+        data["tags"] = sort_list(data.get("tags", []), key, dependencies)
+
+        for tag_object in data["tags"]:
+            tag_name = tag_object["name"]
+            if tag_name not in self.tags_list:
+                tag = Tag(name=tag_name,
+                          implies=self.tags(tag_object.get("implies", [])))
+                self.tags_list[tag_name] = tag
+            else:
+                tag = self.tags_list[tag_name]
+
+            tag.variables.parse(tag_object.get("variables", {}))
+
+    def _load_sources(self, data):
+        log("Parsing sources")
+
+        for group in data["sources"]:
+            self._load_source_group(group, [])
+
+    def _load_source_group(self, group, parent_tags):
+        tags = parent_tags + self.tags(group.get("tags", []))
+
+        for path in group.get("members", []):
+
+            if not (self.install_path / path).exists():
+                error(f"Can't find source file {path}")
+
+            for repetition in group.get("repeat-for", [[]]):
+                source_tags = tags + [tag
+                                      for tag
+                                      in self.tags(repetition)
+                                      if tag not in tags]
+                source_target = Target(type="source",
+                                       path=path,
+                                       source_path=path,
+                                       derived_targets_prefix=(os.path.splitext(path)[0]
+                                                               + ("-" + "-".join(repetition)
+                                                                  if repetition
+                                                                  else "")),
+                                       tags=source_tags,
+                                       command="")
+                for tag in source_tags:
+                    source_target.variables.merge(tag.variables)
+
+                self.targets.append(source_target)
+
+
+        for subgroup in group.get("groups", []):
+            self._load_source_group(subgroup, tags)
+
+    def _load_commands(self, data):
+        log("Parsing commands")
+
+        # Sort the commands
+        def key(entry):
+            return entry.get("type", "")
+
+        def dependencies(entry):
+            result = set()
+            for input_entry in entry["from"]:
+                result.add(input_entry["type"])
+            return result
+
+        data["commands"] = sort_list(data.get("commands", []), key, dependencies)
+
+        # Populate types list
+        for command in data["commands"]:
+            self.types.add(command["type"])
+
+        # Produce the targets
+        type_counts = defaultdict(lambda: 0)
+        for command in data["commands"]:
+            command_type = command.get("type", "")
+            command_suffix = command.get("suffix", "")
+
+            if command_type in type_counts:
+                type_counts[command_type] += 1
+                command_name = f"{command_type}{type_counts[command_type]}"
+            else:
+                type_counts[command_type] = 1
+                command_name = command_type
+
+            log(f"Parsing command \"{command_name}\"")
+            if command_name in self.commands:
+                error(f"We have two commands with the follwing name: {command_name}")
+
+            self.commands[command_name] = {
+                "suffix": command.get("suffix", ""),
+                "command": command["command"],
+                "scripts": command.get("scripts", {})
+            }
+
+            inputs = [
+                (
+                    input_entry["type"],
+                    BooleanParser(input_entry.get("filter", "1 == 1"))
+                )
+                for input_entry
+                in command["from"]
+            ]
+
+            output_tags = self.tags(command.get("tags", []))
+
+            input_targets = []
+            for index, (input_type, input_filter) in enumerate(inputs):
+
+                if input_type not in self.types:
+                    error(f"{command_type} requires an input of type {input_type}, which is unknown")
+
+                input_targets.append([])
+                for target in self.targets:
+                    # Filter on type first
+                    if target.type != input_type:
+                        continue
+
+                    # Evaluate filter next
+                    if self._evaluate(input_filter, target.tags):
+                        input_targets[index].append(target)
+
+            log(command_type)
+            if not all(input_targets):
+                # Not a valid candidate
+                continue
+
+            for input_targets in most_similar_tuples(input_targets):
+                self._create_target(input_targets,
+                                    output_tags,
+                                    command_name,
+                                    command_type,
+                                    command_suffix)
+
+    def _create_target(self,
+                       input_targets,
+                       output_tags,
+                       command_name,
+                       command_type,
+                       command_suffix):
+        final_tags = list(output_tags)
+        for target in input_targets:
+            for input_tag in target.tags:
+                final_tags.append(input_tag)
+
+        # OK, we have all the inputs
+        derived_targets_prefix = input_targets[0].derived_targets_prefix
+        path = ""
+        path += input_targets[0].derived_targets_prefix
+        path += f"-{command_name}"
+        if len(input_targets) > 1:
+            path += "-" + short_hash(" ".join([target.path[1:]
+                                               for target
+                                               in input_targets]))
+        path += command_suffix
+
+        log(f"Target {path} generated from:")
+        for input_target in input_targets:
+            log(f"  {input_target.path}")
+
+        new_target = Target(type=command_type,
+                            tags=final_tags,
+                            path=path,
+                            source_path=input_targets[0].source_path,
+                            derived_targets_prefix=derived_targets_prefix,
+                            command=command_name,
+                            inputs=input_targets)
+
+        # Initialize variables
+        variables = new_target.variables
+
+        for target in input_targets:
+            for tag in target.tags:
+                variables.merge(tag.variables)
+
+        for tag in final_tags:
+            variables.merge(tag.variables)
+
+        variables.set_private_variable("OUTPUT", path)
+
+        input_target_paths = []
+        for input_target in input_targets:
+            target_install_path = self.install_path / input_target.path
+            if self.is_allowed(input_target):
+                input_target_paths.append(input_target.path)
+            elif (target_install_path).exists():
+                input_target_paths.append(str(target_install_path))
+            else:
+                input_target_paths.append("UNAVAILABLE")
+
+        if len(input_target_paths) == 1:
+            variables.set_private_variable(f"INPUT", input_target_paths[0])
+        else:
+            for index, target in enumerate(input_target_paths):
+                variables.set_private_variable(f"INPUT{index+1}", target)
+
+        variables.set_private_variable("SOURCE",
+                                       str(self.install_path / input_targets[0].source_path))
+        variables.set_private_variable("SOURCES_ROOT",
+                                       str(self.install_path))
+
+        # Record target
+        self.targets.append(new_target)
+
+    def dump_state(self):
+        def fix_tags(json_input):
+            if isinstance(json_input, dict):
+                for k, v in json_input.items():
+                    if k == "tags":
+                        json_input["tags"] = [tag["name"] for tag in json_input["tags"]]
+                    elif k == "variables":
+                        json_input["variables"] = json_input["variables"]["variables"]
+                    elif k == "inputs":
+                        json_input["inputs"] = [target["path"] for target in json_input["inputs"]]
+                    else:
+                        fix_tags(v)
+            elif isinstance(json_input, list):
+                for item in json_input:
+                    fix_tags(item)
+
+        json_data = {
+            "targets": [asdict(source) for source in self.targets],
+            "commands": self.commands,
+        }
+        fix_tags(json_data)
+        log(yaml.dump(json_data, sort_keys=False))
+
+    def _collect_dependencies(self, target: Target, only_allowed, result):
+        if not only_allowed or self.is_allowed(target):
+            result.append(target)
+
+        for dependency in target.inputs:
+            self._collect_dependencies(dependency, only_allowed, result)
+
+    def collect_dependencies(self, target: Target, only_allowed=False):
+        result = []
+        self._collect_dependencies(target, only_allowed, result)
+        return set(result)
+
+def emit_ninja(config, destination):
+    destination_path = Path(destination)
+    if not destination_path.exists():
+        error("Destination path does not exist")
+
+    log("Emitting build.ninja")
+    ninja = ""
+
+    ninja += "rule clean\n"
+    ninja += "    command = rm -rf $PATHS\n"
+    ninja += "\n"
+
+    ninja += "rule clean-and-run\n"
+    ninja += "    pool = console\n"
+    ninja += "    command = ninja clean-$TARGET; ninja -k 0 $TARGET\n"
+    ninja += "\n"
+
+    for command_name, data in config.commands.items():
+        command = "set -euo pipefail; " + data["command"]
+        if data.get("suffix", "").endswith("/"):
+            command = "mkdir -p $OUTPUT; " + command
+        command = command.replace("\n", " $\n")
+        ninja += f"rule {command_name}\n"
+        ninja += f"    command = {command}\n"
+        ninja += f"    shell = /bin/bash\n"
+        ninja += "\n"
+
+        for name, content in data["scripts"].items():
+            # Write the script
+            path = destination_path / name
+            with (destination_path / name).open("w") as script_file:
+                script_file.write(content)
+
+            # Mark executable
+            path.chmod(path.stat().st_mode | S_IEXEC)
+
+    command_targets = defaultdict(list)
+    all_paths = ""
+    all_targets = ""
+    for target in config.targets:
+        if not config.is_allowed(target):
+            continue
+
+        if not target.inputs:
+            # Ignore sources
+            continue
+
+        variables = target.variables.variables
+        inputs = [value
+                  for name, value
+                  in variables.items()
+                  if name.startswith("INPUT")]
+
+        if "UNAVAILABLE" in inputs:
+            continue
+
+        input_paths = " ".join(inputs)
+        output_path = variables["OUTPUT"]
+        all_targets += " " + output_path
+
+        command = config.commands[target.command]["command"]
+        if "$OUTPUT" in command or "${OUTPUT}" in command:
+            all_paths += " " + output_path
+
+        ninja += f"build {output_path} : {target.command} {input_paths}\n"
+        command_targets[target.command].append(output_path)
+
+        for name, value in target.variables.variables.items():
+            if type(value) is list:
+                value = " ".join(value)
+            ninja += f"    {name} = {value}\n"
+
+        dependencies = " ".join([dependency.path
+                                 for dependency
+                                 in config.collect_dependencies(target,
+                                                                only_allowed=True)])
+        ninja += f"build clean-{output_path} : clean\n"
+        ninja += f"    PATHS={dependencies}\n"
+        ninja += f"build run-{output_path} : clean-and-run\n"
+        ninja += f"    TARGET={output_path}\n"
+
+        ninja += "\n"
+
+    for command_name, paths in command_targets.items():
+        clean_paths = " ".join([f"clean-{path}" for path in paths])
+        paths = " ".join(paths)
+        ninja += f"build {command_name}: phony {paths}\n"
+        ninja += f"build clean-{command_name}: phony {clean_paths}\n"
+        ninja += f"build run-{command_name}: clean-and-run\n"
+        ninja += f"    TARGET={command_name}\n"
+
+
+    ninja += f"build all: phony {all_targets}\n"
+
+    if all_paths:
+        ninja += f"rule install\n"
+        ninja += "    command = for FILE in $in; do find \"$$FILE\" -type f -exec install -D \"{}\" $$DESTDIR" + str(config.install_path) +"/{} \; ; done\n"
+        ninja += f"\n"
+        ninja += f"build install-impl: install{all_paths}\n"
+        ninja += f"\n"
+        ninja += f"build install: phony all install-impl\n"
+        ninja += f"\n"
+        ninja += f"build clean: clean\n"
+        ninja += f"    PATHS = {all_paths}\n"
+        ninja += f"\n"
+        ninja += f"build clean-all: phony clean\n"
+        ninja += f"\n"
+    else:
+        ninja += "build install: phony all\n"
+        ninja += "build clean: phony\n"
+
+    ninja += f"build run-all: clean-and-run\n"
+    ninja += "    TARGET=all\n"
+    ninja += "\n"
+    ninja += "default run-all\n"
+    ninja += "\n"
+
+    with (destination_path / "build.ninja").open("w") as build_ninja_file:
+        build_ninja_file.write(ninja)
+
+def main():
+    # Argument parsing
+    parser = argparse.ArgumentParser(description=".")
+    parser.add_argument("input",
+                        metavar="INPUT",
+                        default="/dev/stdin",
+                        nargs="+",
+                        help="The input files.")
+    parser.add_argument("--verbose",
+                        action="store_true",
+                        help="Enable logging.")
+    parser.add_argument("--install-path",
+                        metavar="INSTALL_PATH",
+                        default=".",
+                        help="Install path.")
+    parser.add_argument("--destination",
+                        metavar="DESTINATION",
+                        default=".",
+                        help="Build path.")
+    parser.add_argument("--target-type",
+                        metavar="TYPE",
+                        action="append",
+                        help="Only generate targets with type matching the regular expression.")
+    parser.add_argument("--filter-tags",
+                        metavar="EXPRESSION",
+                        default="1 == 1",
+                        help="Only generate target respecting the given "
+                        "expression.")
+    args = parser.parse_args()
+    global verbose
+    verbose = args.verbose
+    install_path = Path(args.install_path).resolve()
+
+    # Load and merge all the data
+    data = {}
+    for input_path in args.input:
+        with open(input_path, "rb") as input_file:
+            loaded = yaml.load(input_file, Loader=SafeLoaderIgnoreUnknown) or {}
+            for key, value in loaded.items():
+                if key in data:
+                    data[key] += value
+                else:
+                    data[key] = value
+
+    allowed_types = set(args.target_type or [])
+    filter = args.filter_tags
+    config = Configuration(data, allowed_types, filter, install_path)
+
+    config.dump_state()
+
+    emit_ninja(config, args.destination)
+
+if __name__ == "__main__":
+    sys.exit(main())

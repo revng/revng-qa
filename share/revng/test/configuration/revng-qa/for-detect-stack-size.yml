@@ -1,0 +1,13 @@
+tags:
+  - name: for-detect-stack-size
+    variables:
+      CFLAGS:
+        - -no-pie
+        - -fno-unroll-loops
+        - -fno-inline
+        - -O1
+        - -fno-stack-protector
+sources:
+  - tags: [dynamic, native, for-detect-stack-size]
+    members:
+    - tests/analysis/DetectStackSize/dynamic_native/stackframe.c
