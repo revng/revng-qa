@@ -2,7 +2,7 @@
  * This file is distributed under the MIT License. See LICENSE.md for details.
  */
 
-#include <malloc.h>
+#include <stddef.h>
 #include <stdint.h>
 
 struct __attribute__((packed)) Node {
@@ -63,13 +63,6 @@ int main(int argc, char **argv) {
     sum += getPrevious(cur);
     sum += getNext(cur);
     cur = cur->next;
-  }
-
-  cur = first;
-  while (cur) {
-    struct Node *next = cur->next;
-    free(cur);
-    cur = next;
   }
 
   return sum;
