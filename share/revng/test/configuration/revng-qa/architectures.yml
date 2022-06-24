@@ -1,8 +1,10 @@
 tags:
+  - name: linux
   - name: compiler
     variables:
       CFLAGS:
       - -no-pie
+    implies: [linux]
   - name: native
     implies: [compiler]
   - name: dynamic
