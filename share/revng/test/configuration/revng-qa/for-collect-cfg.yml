@@ -1,7 +1,23 @@
 tags:
   - name: for-collect-cfg
+  - name: for-analysis
+  - name: moderate-opt
+    variables:
+      CFLAGS:
+        - -O2
+        - -fno-stack-protector
+        - -fomit-frame-pointer
+        - -fno-reorder-functions
+        - -fno-unwind-tables
+        - -fno-asynchronous-unwind-tables
+        - -fno-stack-check
+        - -fno-optimize-sibling-calls
+        - -fno-inline-functions
+        - -fno-inline-small-functions
+        - -fno-align-functions
+        - -fno-optimize-sibling-calls
 sources:
-  - tags: [arm, static, for-analysis, for-collect-cfg]
+  - tags: [arm, static, nostdlib, for-analysis, for-collect-cfg]
     members:
     - tests/analysis/CollectCFG/arm/switch-addls.S
     - tests/analysis/CollectCFG/arm/switch-ldrls.S
@@ -13,11 +29,11 @@ sources:
     - tests/analysis/CollectCFG/arm/longjmp.S
     - tests/analysis/CollectCFG/arm/indirect-tail-call.S
     - tests/analysis/CollectCFG/arm/memset.S
-  - tags: [mips, static, for-analysis, for-collect-cfg]
+  - tags: [mips, static, nostdlib, for-analysis, for-collect-cfg]
     members:
     - tests/analysis/CollectCFG/mips/switch-jump-table.S
     - tests/analysis/CollectCFG/mips/jump-table-base-before-function-call.S
-  - tags: [x86-64, static, for-analysis, for-collect-cfg]
+  - tags: [x86-64, static, nostdlib, for-analysis, for-collect-cfg]
     members:
     - tests/analysis/CollectCFG/x86_64/try-catch-ehframe.S
     - tests/analysis/CollectCFG/x86_64/switch-jump-table.S
@@ -27,4 +43,6 @@ sources:
     - tests/analysis/CollectCFG/x86_64/indirect-tail-call.S
     - tests/analysis/CollectCFG/x86_64/indirect-call.S
     - tests/analysis/CollectCFG/x86_64/call.S
+  - tags: [x86-64, static, nostdlib, moderate-opt, for-analysis, for-collect-cfg]
+    members:
     - tests/analysis/CollectCFG/x86_64/fibonacci.c
