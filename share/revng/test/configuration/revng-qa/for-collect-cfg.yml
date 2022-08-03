@@ -1,7 +1,7 @@
 tags:
   - name: for-collect-cfg
 sources:
-  - tags: [arm, for-analysis, for-collect-cfg]
+  - tags: [arm, static, for-analysis, for-collect-cfg]
     members:
     - tests/analysis/CollectCFG/arm/switch-addls.S
     - tests/analysis/CollectCFG/arm/switch-ldrls.S
@@ -13,11 +13,11 @@ sources:
     - tests/analysis/CollectCFG/arm/longjmp.S
     - tests/analysis/CollectCFG/arm/indirect-tail-call.S
     - tests/analysis/CollectCFG/arm/memset.S
-  - tags: [mips, for-analysis, for-collect-cfg]
+  - tags: [mips, static, for-analysis, for-collect-cfg]
     members:
     - tests/analysis/CollectCFG/mips/switch-jump-table.S
     - tests/analysis/CollectCFG/mips/jump-table-base-before-function-call.S
-  - tags: [x86-64, for-analysis, for-collect-cfg]
+  - tags: [x86-64, static, for-analysis, for-collect-cfg]
     members:
     - tests/analysis/CollectCFG/x86_64/try-catch-ehframe.S
     - tests/analysis/CollectCFG/x86_64/switch-jump-table.S

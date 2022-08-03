@@ -8,6 +8,6 @@ tags:
         - -O1
         - -fno-stack-protector
 sources:
-  - tags: [dynamic, native, for-detect-stack-size]
+  - tags: [native, dynamic, for-detect-stack-size]
     members:
     - tests/analysis/DetectStackSize/dynamic_native/stackframe.c
