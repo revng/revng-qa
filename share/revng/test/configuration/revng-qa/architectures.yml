@@ -14,7 +14,7 @@ tags:
       CFLAGS:
         - -static
   - name: cross-compiler
-    implies: [compiler, static]
+    implies: [compiler]
   - name: arm
     implies: [cross-compiler]
     variables:

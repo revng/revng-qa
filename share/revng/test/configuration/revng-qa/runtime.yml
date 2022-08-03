@@ -12,14 +12,14 @@ tags:
 sources:
   - tags: [for-runtime, for-comparison]
     repeat-for:
-    - [arm]
-    - [mips]
-    - [mipsel]
-    - [aarch64]
-    - [x86-64]
-    - [s390x]
+    - [arm, static]
+    - [mips, static]
+    - [mipsel, static]
+    - [aarch64, static]
+    - [x86-64, static]
+    - [s390x, static]
     - [native, dynamic]
-    - [i386]
+    - [i386, static]
     members:
     - tests/runtime/function-call.c
     - tests/runtime/floating-point.c
@@ -28,13 +28,13 @@ sources:
     - tests/runtime/printf.c
   - tags: [for-runtime, for-comparison, one-per-architecture]
     repeat-for:
-    - [arm]
-    - [mips]
-    - [mipsel]
-    - [aarch64]
-    - [x86-64]
-    - [s390x]
+    - [arm, static]
+    - [mips, static]
+    - [mipsel, static]
+    - [aarch64, static]
+    - [x86-64, static]
+    - [s390x, static]
     - [native, dynamic]
-    - [i386]
+    - [i386, static]
     members:
     - tests/runtime/calc.c

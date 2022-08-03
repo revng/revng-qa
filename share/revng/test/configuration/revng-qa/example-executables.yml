@@ -2,13 +2,9 @@ tags:
   - name: example-executable-1
   - name: example-executable-2
 sources:
-  - tags: [for-runtime]
-    repeat-for:
-    - [x86-64, example-executable-1]
+  - tags: [for-runtime, x86-64, static, example-executable-1]
     members:
     - tests/runtime/calc.c
-  - tags: [for-runtime]
-    repeat-for:
-    - [x86-64, example-executable-2]
+  - tags: [for-runtime, x86-64, static, example-executable-2]
     members:
     - tests/runtime/global.c

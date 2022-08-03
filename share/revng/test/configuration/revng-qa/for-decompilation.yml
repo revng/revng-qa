@@ -5,7 +5,7 @@ tags:
         - -fno-inline
         - -O2
 sources:
-  - tags: [dynamic, native, for-decompilation]
+  - tags: [native, dynamic, for-decompilation]
     members:
     - tests/analysis/Decompilation/dynamic_native/struct.c
     - tests/analysis/Decompilation/dynamic_native/array.c
