@@ -17,6 +17,10 @@ tags:
     variables:
       CFLAGS:
         - -nostdlib
+  - name: nostartfiles
+    variables:
+      CFLAGS:
+        - -nostartfiles
   - name: cross-compiler
     implies: [compiler]
   - name: arm
