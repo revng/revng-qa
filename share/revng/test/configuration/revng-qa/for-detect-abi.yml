@@ -31,7 +31,7 @@ sources:
   members:
   - tests/abi/source/abi_test_function_library.c
 sources:
-  - tags: [x86-64, static, for-analysis, for-detect-abi]
+  - tags: [x86-64, static, nostdlib, for-analysis, for-detect-abi]
     members:
     - tests/analysis/DetectABI/x86_64/always-dead-return-value.S
     - tests/analysis/DetectABI/x86_64/dead-on-one-path.S
