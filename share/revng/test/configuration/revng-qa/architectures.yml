@@ -13,8 +13,16 @@ tags:
     variables:
       CFLAGS:
         - -static
+  - name: nostdlib
+    variables:
+      CFLAGS:
+        - -nostdlib
+  - name: nostartfiles
+    variables:
+      CFLAGS:
+        - -nostartfiles
   - name: cross-compiler
-    implies: [compiler, static]
+    implies: [compiler]
   - name: arm
     implies: [cross-compiler]
     variables:

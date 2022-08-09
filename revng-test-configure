@@ -384,7 +384,7 @@ class Configuration:
         derived_targets_prefix = input_targets[0].derived_targets_prefix
         path = ""
         path += input_targets[0].derived_targets_prefix
-        path += f"-{command_name}"
+        path += f"-{command_type}"
         if len(input_targets) > 1:
             path += "-" + short_hash(" ".join([target.path[1:]
                                                for target
@@ -474,6 +474,9 @@ class Configuration:
         self._collect_dependencies(target, only_allowed, result)
         return set(result)
 
+def produces_output(command):
+    return "$OUTPUT" in command or "${OUTPUT}" in command
+
 def emit_ninja(config, destination):
     destination_path = Path(destination)
     if not destination_path.exists():
@@ -492,12 +495,25 @@ def emit_ninja(config, destination):
     ninja += "\n"
 
     for command_name, data in config.commands.items():
-        command = "set -euo pipefail; " + data["command"]
+        command = data["command"]
+
         if data.get("suffix", "").endswith("/"):
+            # Pre-create output directory
             command = "mkdir -p $OUTPUT; " + command
+        elif produces_output(command):
+            # Ensure the output file has been produced
+            command = """trap '{ if ! test -e "$OUTPUT"; then echo "Output not produced" > /dev/stderr; exit 1; fi }' EXIT; """ + command
+
+        # Strict bash
+        command = "set -euo pipefail; " + command
+
+        # Escape new lines
         command = command.replace("\n", " $\n")
+        original_command = data["command"].replace("\n", " $\n")
+
         ninja += f"rule {command_name}\n"
         ninja += f"    command = {command}\n"
+        ninja += f"    description = {original_command}\n"
         ninja += f"    shell = /bin/bash\n"
         ninja += "\n"
 
@@ -535,9 +551,13 @@ def emit_ninja(config, destination):
         all_targets += " " + output_path
 
         command = config.commands[target.command]["command"]
-        if "$OUTPUT" in command or "${OUTPUT}" in command:
+        if produces_output(command):
             all_paths += " " + output_path
 
+        ninja += f"#\n"
+        ninja += f"# {target.command} {input_paths}\n"
+        ninja += f"#\n"
+        ninja += f"\n"
         ninja += f"build {output_path} : {target.command} {input_paths}\n"
         command_targets[target.command].append(output_path)
 
@@ -550,11 +570,14 @@ def emit_ninja(config, destination):
                                  for dependency
                                  in config.collect_dependencies(target,
                                                                 only_allowed=True)])
+        ninja += f"\n"
         ninja += f"build clean-{output_path} : clean\n"
         ninja += f"    PATHS={dependencies}\n"
+        ninja += f"\n"
         ninja += f"build run-{output_path} : clean-and-run\n"
         ninja += f"    TARGET={output_path}\n"
 
+        ninja += f"\n"
         ninja += "\n"
 
     for command_name, paths in command_targets.items():

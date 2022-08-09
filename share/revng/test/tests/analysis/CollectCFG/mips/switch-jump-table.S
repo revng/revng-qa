@@ -17,7 +17,7 @@ __start:
     lui     $gp,%hi(jumptable)
     addiu   $gp,$gp,%lo(jumptable)
     sll     $v0,$v0,2
-    add     $gp,$gp,$v0
+    addu    $gp,$gp,$v0
     lw      $t9,0($gp)
     nop
     beqz    $t9,nullptr

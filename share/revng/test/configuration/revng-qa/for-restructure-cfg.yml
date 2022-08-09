@@ -1,6 +1,6 @@
 tags:
   - name: for-restructure-cfg
 sources:
-  - tags: [x86-64, for-restructure-cfg]
+  - tags: [x86-64, static, for-restructure-cfg]
     members:
     - tests/analysis/RestructureCFGPass/x86_64/throttle.c
