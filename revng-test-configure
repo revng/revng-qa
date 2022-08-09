@@ -384,7 +384,7 @@ class Configuration:
         derived_targets_prefix = input_targets[0].derived_targets_prefix
         path = ""
         path += input_targets[0].derived_targets_prefix
-        path += f"-{command_name}"
+        path += f"-{command_type}"
         if len(input_targets) > 1:
             path += "-" + short_hash(" ".join([target.path[1:]
                                                for target
