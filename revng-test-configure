@@ -474,6 +474,9 @@ class Configuration:
         self._collect_dependencies(target, only_allowed, result)
         return set(result)
 
+def produces_output(command):
+    return "$OUTPUT" in command or "${OUTPUT}" in command
+
 def emit_ninja(config, destination):
     destination_path = Path(destination)
     if not destination_path.exists():
@@ -495,6 +498,8 @@ def emit_ninja(config, destination):
         command = "set -euo pipefail; " + data["command"]
         if data.get("suffix", "").endswith("/"):
             command = "mkdir -p $OUTPUT; " + command
+        elif produces_output(command):
+            command = "trap '{ if ! test -e $OUTPUT; then exit 1; fi }' EXIT; " + command
         command = command.replace("\n", " $\n")
         ninja += f"rule {command_name}\n"
         ninja += f"    command = {command}\n"
@@ -535,7 +540,7 @@ def emit_ninja(config, destination):
         all_targets += " " + output_path
 
         command = config.commands[target.command]["command"]
-        if "$OUTPUT" in command or "${OUTPUT}" in command:
+        if produces_output(command):
             all_paths += " " + output_path
 
         ninja += f"build {output_path} : {target.command} {input_paths}\n"
