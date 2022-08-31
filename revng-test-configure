@@ -327,7 +327,8 @@ class Configuration:
             self.commands[command_name] = {
                 "suffix": command.get("suffix", ""),
                 "command": command["command"],
-                "scripts": command.get("scripts", {})
+                "scripts": command.get("scripts", {}),
+                "pool": command.get("pool", "")
             }
 
             inputs = [
@@ -494,6 +495,17 @@ def emit_ninja(config, destination):
     ninja += "    command = ninja clean-$TARGET; ninja -k 0 $TARGET\n"
     ninja += "\n"
 
+    # Collect pools
+    pools = set()
+    for _, data in config.commands.items():
+        if data["pool"]:
+            pools.add(data["pool"])
+
+    for pool in pools:
+        ninja += f"pool {pool}\n"
+        ninja += f"    depth = 1\n"
+        ninja += "\n"
+
     for command_name, data in config.commands.items():
         command = data["command"]
 
@@ -515,6 +527,7 @@ def emit_ninja(config, destination):
         ninja += f"    command = {command}\n"
         ninja += f"    description = {original_command}\n"
         ninja += f"    shell = /bin/bash\n"
+        ninja += f"""    pool = {data["pool"]}\n"""
         ninja += "\n"
 
         for name, content in data["scripts"].items():
