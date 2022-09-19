@@ -28,7 +28,7 @@ commands:
     filter: windows
   pool: wine
   command: |-
-      x86_64-winsdk-vc16-cl z:\$INPUT /Fe$OUTPUT $CFLAGS /link $LDFLAGS
+      timeout 30 x86_64-winsdk-vc16-cl z:\$INPUT /Fe$OUTPUT $CFLAGS /link $LDFLAGS
 - type: revng-qa.generated-pdb
   from:
   - type: source
@@ -36,4 +36,4 @@ commands:
     suffix: .pdb
   pool: wine
   command: |-
-      x86_64-winsdk-vc16-cl z:\$INPUT $CFLAGS /link /pdb:$OUTPUT $LDFLAGS
+      timeout 30 x86_64-winsdk-vc16-cl z:\$INPUT $CFLAGS /link /pdb:$OUTPUT $LDFLAGS
