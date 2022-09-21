@@ -22,6 +22,10 @@ install(FILES
   DESTINATION "share/revng/test/tests/abi/source")
 
 install(FILES
+  "${CMAKE_SOURCE_DIR}/share/revng/test/tests/abi/include/common.h"
+  DESTINATION "share/revng/test/tests/abi/source")
+
+install(FILES
   "${CMAKE_BINARY_DIR}/abi_artifact_generated/x86_64/describe_functions.inc"
   DESTINATION "share/revng/test/tests/abi/source/x86_64")
 
