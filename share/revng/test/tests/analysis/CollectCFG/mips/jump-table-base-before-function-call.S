@@ -16,7 +16,7 @@ __start:
     nop
     lui     $gp,%hi(jumptable)
     addiu   $gp,$gp,%lo(jumptable)
-    jal     function
+    bal     function
     nop
     sll     $v0,$v0,2
     add     $gp,$gp,$v0

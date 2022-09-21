@@ -358,12 +358,17 @@ class Configuration:
                     if self._evaluate(input_filter, target.tags):
                         input_targets[index].append(target)
 
+            input_targets_list = most_similar_tuples(input_targets)
+
+            if not input_targets_list:
+                error(f"Could not produce any target for {command_type}")
+
             log(command_type)
             if not all(input_targets):
                 # Not a valid candidate
                 continue
 
-            for input_targets in most_similar_tuples(input_targets):
+            for input_targets in input_targets_list:
                 self._create_target(input_targets,
                                     output_tags,
                                     command_name,
