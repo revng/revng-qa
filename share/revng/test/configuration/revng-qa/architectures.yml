@@ -59,7 +59,7 @@ tags:
       TRIPLE: i386-gentoo-linux-musl-
       QEMU_NAME: i386
       CFLAGS:
-        - -DTARGET_x86
+        - -DTARGET_i386
   - name: s390x
     implies: [cross-compiler]
     variables:

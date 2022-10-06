@@ -30,5 +30,13 @@ install(FILES
   DESTINATION "share/revng/test/tests/abi/source/x86_64")
 
 install(FILES
+  "${CMAKE_BINARY_DIR}/abi_artifact_generated/i386/describe_functions.inc"
+  DESTINATION "share/revng/test/tests/abi/source/i386")
+
+install(FILES
+  "${CMAKE_BINARY_DIR}/abi_artifact_generated/aarch64/describe_functions.inc"
+  DESTINATION "share/revng/test/tests/abi/source/aarch64")
+
+install(FILES
   "${CMAKE_BINARY_DIR}/abi_artifact_generated/arm/describe_functions.inc"
   DESTINATION "share/revng/test/tests/abi/source/arm")

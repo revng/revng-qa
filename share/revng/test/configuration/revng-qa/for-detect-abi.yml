@@ -1,36 +1,120 @@
 tags:
   - name: for-detect-abi
+
   - name: abi-describe-functions
+    variables:
+      CFLAGS:
+        - -std=c99
+        - -fno-pic
+        - -fno-pie
+        - -fno-stack-protector
+        - -O1
+
   - name: abi-functions-library
+    variables:
+      CFLAGS:
+        - -std=c99
+        - -fno-pic
+        - -fno-pie
+        - -fno-stack-protector
+        - -ggdb3
+        - -O3
+
   - name: x86-64-systemv-abi
     implies: [x86-64]
     variables:
+      ABI_NAME: SystemV_x86_64
       CFLAGS:
         - -DABIDEF=
-      ABI_NAME: SystemV_x86_64
+        - -DSCALAR_SIZE_LIMIT=2
+        - -DSTRUCT_SIZE_LIMIT=2
+
   - name: i386-systemv-abi
     implies: [i386]
     variables:
+      ABI_NAME: SystemV_x86
       CFLAGS:
         - -DABIDEF=
+        - -DSCALAR_SIZE_LIMIT=2
+        - -DSTRUCT_SIZE_LIMIT=0
+
+  - name: i386-regparm-3-systemv-abi
+    implies: [i386]
+    variables:
+      ABI_NAME: SystemV_x86_regparm_3
+      CFLAGS:
+        - -DABIDEF='__attribute__((regparm(3)))'
+        - -DSCALAR_SIZE_LIMIT=2
+        - -DSTRUCT_SIZE_LIMIT=0
+
+  - name: i386-regparm-2-systemv-abi
+    implies: [i386]
+    variables:
+      ABI_NAME: SystemV_x86_regparm_2
+      CFLAGS:
+        - -DABIDEF='__attribute__((regparm(2)))'
+        - -DSCALAR_SIZE_LIMIT=2
+        - -DSTRUCT_SIZE_LIMIT=0
+
+  - name: i386-regparm-1-systemv-abi
+    implies: [i386]
+    variables:
+      ABI_NAME: SystemV_x86_regparm_1
+      CFLAGS:
+        - -DABIDEF='__attribute__((regparm(1)))'
+        - -DSCALAR_SIZE_LIMIT=2
+        - -DSTRUCT_SIZE_LIMIT=0
+
+  - name: aarch64-aapcs64-abi
+    implies: [aarch64]
+    variables:
+      ABI_NAME: AAPCS64
+      CFLAGS:
+        - -DABIDEF=
+        - -DSCALAR_SIZE_LIMIT=2
+        - -DSTRUCT_SIZE_LIMIT=2
+
+  - name: arm-aapcs-abi
+    implies: [arm]
+    variables:
+      ABI_NAME: AAPCS
+      CFLAGS:
+        - -DABIDEF=
+        - -DSCALAR_SIZE_LIMIT=4
+        - -DSTRUCT_SIZE_LIMIT=1
+
   - name: i386-microsoft-stdcall-abi
     implies: [i386]
     variables:
+      ABI_NAME: Microsoft_x86_stdcall
       CFLAGS:
         - -DABIDEF=__stdcall
+        - -DSCALAR_SIZE_LIMIT=1
+        - -DSTRUCT_SIZE_LIMIT=0
+
 sources:
-  - tags:
-      - abi-describe-functions
-  repeat-for:
-  - [x86-64-systemv-abi, static]
+  - tags: [abi-describe-functions, for-runtime, linux, static]
+    repeat-for:
+      - [x86-64-systemv-abi]
+      - [i386-systemv-abi]
+      - [i386-regparm-3-systemv-abi]
+      - [i386-regparm-2-systemv-abi]
+      - [i386-regparm-1-systemv-abi]
+      - [arm-aapcs-abi]
     members:
       - tests/abi/source/describe_functions.c
-  - tags:
-      - abi-functions-library
-      - x86-64-systemv-abi
-      - linux
+
+  - tags: [abi-functions-library, linux]
+    repeat-for:
+      - [x86-64-systemv-abi]
+      - [i386-systemv-abi]
+      - [i386-regparm-3-systemv-abi]
+      - [i386-regparm-2-systemv-abi]
+      - [i386-regparm-1-systemv-abi]
+      - [arm-aapcs-abi]
     members:
       - tests/abi/source/abi_test_function_library.c
+
   - tags:
       - x86-64
       - static
