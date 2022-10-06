@@ -63,6 +63,8 @@ def most_similar_tuples(inputs):
 
     maximum_similarity = 0
 
+    # Get the most similar set of tuples, i.e., those that share the most
+    # (transitive inputs)
     for candidate_set in product(*inputs):
         if len(set(candidate_set)) != len(candidate_set):
             continue
@@ -82,7 +84,26 @@ def most_similar_tuples(inputs):
         if similarity == maximum_similarity:
             result.append(candidate_set)
 
-    return result
+    # Further refine based on common tags
+    maximum_similarity = 0
+    result2 = []
+    for candidate_set in result:
+        candidate_tags = [set(candidate.tags)
+                          for candidate
+                          in candidate_set]
+
+        common_tags = reduce(lambda a, b : a & b, candidate_tags)
+
+        similarity = len(common_tags)
+
+        if similarity > maximum_similarity:
+            maximum_similarity = similarity
+            result2 = []
+
+        if similarity == maximum_similarity:
+            result2.append(candidate_set)
+
+    return result2
 
 def sort_list(entries, key, dependencies):
     # Collect entries by key and id
