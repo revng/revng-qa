@@ -93,9 +93,19 @@ def setup_stack(architecture, config):
     first_offset = last_offset + config["stack_byte_count"]
 
     result = str("")
+
+    # Some architectures only support pushing registers onto the stack in pairs.
+    # To work around that limitation, this introduces the `fill_two_registers`
+    # option for the templates to utilize: it lets two registers to be loaded
+    # at once, but has the limitation of feeling up twice the space - hence we
+    # need to limit the pushes, which is what the `flip_flop` flag is for:
+    # the registers are only pushed when it's set, which happens on every second
+    # iteration.
+    flip_flop = True
     for offset in range(first_offset, last_offset, -register_size):
         stack_helper_dictionary = {
             "register": architecture["register_list"][0],
+            "second_register": architecture["register_list"][1],
             "fill_a_register": fill_a_register(
                 architecture,
                 "randomized_state",
@@ -103,10 +113,30 @@ def setup_stack(architecture, config):
                 architecture["register_list"][0],
             ),
         }
+        if flip_flop:
+            stack_helper_dictionary["fill_two_registers"] = (
+                fill_a_register(
+                    architecture,
+                    "randomized_state",
+                    offset,
+                    architecture["register_list"][0],
+                )
+                + "\n"
+                + fill_a_register(
+                    architecture,
+                    "randomized_state",
+                    offset - register_size,
+                    architecture["register_list"][1],
+                )
+            )
+        else:
+            stack_helper_dictionary["fill_two_registers"] = ""
         jinja_template = jinja2.Environment().from_string(
             architecture["templates"]["push_to_stack"]
         )
         result = result + jinja_template.render(stack_helper_dictionary) + "\n"
+
+        flip_flop = not flip_flop
 
     return result
 
