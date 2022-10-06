@@ -1,5 +1,4 @@
 ---
-
 "x86_64":
   register_type: uint64_t
   register_size: 8
@@ -16,8 +15,8 @@
       push %{{register}}
     restore_stack: |
       add $({{ stack_size }}), %rsp
-    save_return_address: |
-# does nothing since the return address is already at the top of the stack
+    save_return_address: ""
+    # does nothing since the return address is already at the top of the stack
     restore_return_address: |
       push {{ stack_size }} (%rsp)
 
@@ -43,5 +42,3 @@
       push { lr }
     restore_return_address: |
       ldr lr, [sp, #{{ stack_size }}]
-
-...

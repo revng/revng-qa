@@ -1,24 +1,24 @@
 commands:
   - type: revng-qa.compiled-with-debug-info
     from:
-    - type: source
-      filter: linux
+      - type: source
+        filter: linux
     command: ${TRIPLE}gcc $INPUT -o $OUTPUT $CFLAGS
   - type: revng-qa.compiled-stripped
     from:
-    - type: revng-qa.compiled-with-debug-info
+      - type: revng-qa.compiled-with-debug-info
     command: ${TRIPLE}strip $INPUT -o $OUTPUT
   - type: revng-qa.compiled
     from:
-    - type: revng-qa.compiled-with-debug-info
+      - type: revng-qa.compiled-with-debug-info
     command: cp $INPUT $OUTPUT
   - type: revng-qa.compiled
     from:
-    - type: revng-qa.compiled-stripped
+      - type: revng-qa.compiled-stripped
     command: cp $INPUT $OUTPUT
   - type: revng-qa.disassembled
     from:
-    - type: revng-qa.compiled
-      filter: linux
+      - type: revng-qa.compiled
+        filter: linux
     suffix: .S
     command: ${TRIPLE}objdump $OBJDUMP_FLAGS -d $INPUT > $OUTPUT

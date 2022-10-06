@@ -4,7 +4,7 @@ tags:
 sources:
   - tags: [x86-64, static, example-executable-1]
     members:
-    - tests/runtime/calc.c
+      - tests/runtime/calc.c
   - tags: [x86-64, static, example-executable-2]
     members:
-    - tests/runtime/global.c
+      - tests/runtime/global.c

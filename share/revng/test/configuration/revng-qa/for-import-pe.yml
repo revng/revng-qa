@@ -3,37 +3,37 @@
 #
 
 tags:
-- name: windows
-  variables:
-    CFLAGS:
-      - /DEBUG:FULL
-      - /Z7
-      - /EHsc
-      - /WX
-      - /nologo
-    LDFLAGS:
-      - /NOLOGO
-      - /WX
+  - name: windows
+    variables:
+      CFLAGS:
+        - /DEBUG:FULL
+        - /Z7
+        - /EHsc
+        - /WX
+        - /nologo
+      LDFLAGS:
+        - /NOLOGO
+        - /WX
 sources:
-- tags: [windows]
-  members:
-  - tests/model/import/pe/main.c
-  - tests/model/import/pe/simple-cpp-class.cpp
-  - tests/model/import/pe/qsort.c
-  - tests/model/import/pe/zero-sized-class.cpp
+  - tags: [windows]
+    members:
+      - tests/model/import/pe/main.c
+      - tests/model/import/pe/simple-cpp-class.cpp
+      - tests/model/import/pe/qsort.c
+      - tests/model/import/pe/zero-sized-class.cpp
 commands:
-- type: revng-qa.compiled
-  from:
-  - type: source
-    filter: windows
-  pool: wine
-  command: |-
+  - type: revng-qa.compiled
+    from:
+      - type: source
+        filter: windows
+    pool: wine
+    command: |-
       timeout 30 x86_64-winsdk-vc16-cl z:\$INPUT /Fe$OUTPUT $CFLAGS /link $LDFLAGS
-- type: revng-qa.generated-pdb
-  from:
-  - type: source
-    filter: windows
-    suffix: .pdb
-  pool: wine
-  command: |-
+  - type: revng-qa.generated-pdb
+    from:
+      - type: source
+        filter: windows
+        suffix: .pdb
+    pool: wine
+    command: |-
       timeout 30 x86_64-winsdk-vc16-cl z:\$INPUT $CFLAGS /link /pdb:$OUTPUT $LDFLAGS

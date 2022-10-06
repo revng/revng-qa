@@ -3,9 +3,10 @@
 #
 
 import argparse
-import jinja2
 import os
 import sys
+
+import jinja2
 import yaml
 
 
@@ -71,9 +72,7 @@ def fill_a_register(architecture, location, offset, register):
         "register": register,
     }
 
-    jinja_template = jinja2.Environment().from_string(
-        architecture["templates"]["fill_a_register"]
-    )
+    jinja_template = jinja2.Environment().from_string(architecture["templates"]["fill_a_register"])
     return jinja_template.render(local_dictionary)
 
 
@@ -113,16 +112,12 @@ def setup_stack(architecture, config):
 
 
 def call_a_function(architecture, name: str):
-    jinja_template = jinja2.Environment().from_string(
-        architecture["templates"]["call_a_function"]
-    )
+    jinja_template = jinja2.Environment().from_string(architecture["templates"]["call_a_function"])
     return jinja_template.render({"function_name": name})
 
 
 def restore_stack(architecture, config):
-    jinja_template = jinja2.Environment().from_string(
-        architecture["templates"]["restore_stack"]
-    )
+    jinja_template = jinja2.Environment().from_string(architecture["templates"]["restore_stack"])
     return jinja_template.render({"stack_size": config["stack_byte_count"]})
 
 
