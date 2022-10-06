@@ -312,6 +312,8 @@ class Configuration:
         for command in data["commands"]:
             self.types.add(command["type"])
 
+        sources = set(target for target in self.targets if target.type == "source")
+
         # Produce the targets
         type_counts = defaultdict(lambda: 0)
         for command in data["commands"]:
@@ -376,11 +378,17 @@ class Configuration:
                 continue
 
             for input_targets in input_targets_list:
+                assert type(input_targets) is not set
+                sources = sources - set(input_targets)
                 self._create_target(input_targets,
                                     output_tags,
                                     command_name,
                                     command_type,
                                     command_suffix)
+
+        if sources:
+            error(f"The following sources are unused:\n  " + "\n  ".join([source.path for source in sources]))
+
 
     def _create_target(self,
                        input_targets,
