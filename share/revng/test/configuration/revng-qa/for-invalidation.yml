@@ -1,0 +1,11 @@
+tags:
+  - name: for-invalidation
+    variables:
+      CFLAGS:
+        - -fno-inline
+        - -fno-inline-small-functions
+        - -O1
+sources:
+  - tags: [native, dynamic, for-invalidation]
+    members:
+    - tests/invalidation/invalidation.c
