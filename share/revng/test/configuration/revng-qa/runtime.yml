@@ -10,6 +10,9 @@ tags:
         - -ggdb3
         - -fno-stack-protector
 sources:
+  - tags: [nostdlib, native, dynamic, shared]
+    members:
+    - tests/runtime/empty.c
   - tags: [for-runtime, for-comparison]
     repeat-for:
     - [arm, static]

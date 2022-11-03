@@ -17,6 +17,11 @@ tags:
     variables:
       CFLAGS:
         - -nostdlib
+  - name: shared
+    variables:
+      CFLAGS:
+        - -shared
+  - name: empty
   - name: nostartfiles
     variables:
       CFLAGS:
