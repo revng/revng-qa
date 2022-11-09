@@ -394,12 +394,11 @@ class Configuration:
         # OK, we have all the inputs
         derived_targets_prefix = input_targets[0].derived_targets_prefix
         path = ""
-        path += input_targets[0].derived_targets_prefix
+        path += derived_targets_prefix
         path += f"-{command_type}"
-        if len(input_targets) > 1:
-            path += "-" + short_hash(" ".join([target.path[1:]
-                                               for target
-                                               in input_targets]))
+        path += "-" + short_hash(" ".join([target.path[1:]
+                                           for target
+                                           in input_targets]))
         path += command_suffix
 
         log(f"Target {path} generated from:")
