@@ -514,15 +514,13 @@ def emit_ninja(config, destination):
     for command_name, data in config.commands.items():
         command = data["command"]
 
-        if data.get("suffix", "").endswith("/"):
-            # Pre-create output directory
-            command = "mkdir -p $OUTPUT; " + command
-        elif produces_output(command):
-            # Ensure the output file has been produced
-            command = """trap '{ if ! test -e "$OUTPUT"; then echo "Output not produced" > /dev/stderr; exit 1; fi }' EXIT; """ + command
-
-        # Strict bash
-        command = "set -euo pipefail; " + command
+        # Inject loading common.sh
+        script_path = os.path.dirname(os.path.realpath(__file__))
+        command_prefix = f"source \"{script_path}/common.sh\" \"{command_name}\""
+        if produces_output(command):
+            command_prefix += " \"${OUTPUT}\""
+        command_prefix += "; "
+        command = command_prefix + command
 
         # Escape new lines
         command = command.replace("\n", " $\n")
