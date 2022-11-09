@@ -159,6 +159,7 @@ class Tag:
 
 @dataclass
 class Target:
+    name: str
     type: str
     path: str
     source_path: str
@@ -273,7 +274,8 @@ class Configuration:
                                       for tag
                                       in self.tags(repetition)
                                       if tag not in tags]
-                source_target = Target(type="source",
+                source_target = Target(name="source",
+                                       type="source",
                                        path=path,
                                        source_path=path,
                                        derived_targets_prefix=(os.path.splitext(path)[0]
@@ -404,7 +406,8 @@ class Configuration:
         for input_target in input_targets:
             log(f"  {input_target.path}")
 
-        new_target = Target(type=command_type,
+        new_target = Target(name=command_name,
+                            type=command_type,
                             tags=final_tags,
                             path=path,
                             source_path=input_targets[0].source_path,
