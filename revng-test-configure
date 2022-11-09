@@ -243,11 +243,14 @@ class Configuration:
         for tag_object in data["tags"]:
             tag_name = tag_object["name"]
             if tag_name not in self.tags_list:
-                tag = Tag(name=tag_name,
-                          implies=self.tags(tag_object.get("implies", [])))
+                tag = Tag(name=tag_name)
                 self.tags_list[tag_name] = tag
             else:
                 tag = self.tags_list[tag_name]
+
+            for implied_tag in self.tags(tag_object.get("implies", [])):
+                if implied_tag not in tag.implies:
+                    tag.implies.append(implied_tag)
 
             tag.variables.parse(tag_object.get("variables", {}))
 
