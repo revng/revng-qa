@@ -1,7 +1,6 @@
 tags:
 - name: for-detect-abi
 - name: abi-describe-functions
-  implies: [for-runtime]
 - name: abi-functions-library
 - name: x86-64-systemv-abi
   implies: [x86-64]

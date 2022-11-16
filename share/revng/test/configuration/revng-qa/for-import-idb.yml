@@ -9,7 +9,7 @@ tags:
       - -O0
       - -g
 sources:
-- tags: [native, for-ida]
+- tags: [native, dynamic, for-ida]
   members:
   - tests/model/import/idb/simple.c
   - tests/model/import/idb/enum-type.c
@@ -21,7 +21,7 @@ sources:
 commands:
 - type: revng-qa.idb
   from:
-  - type: revng-qa.compiled
+  - type: revng-qa.compiled-with-debug-info
     filter: for-ida
   suffix: .i64
   command: |-
