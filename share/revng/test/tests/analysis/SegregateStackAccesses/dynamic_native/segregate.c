@@ -77,6 +77,22 @@ uint64_t cabi_aggregate_on_stack_and_registers(uint64_t A,
   return Unknown + Arg.A + Arg.B;
 }
 
+typedef struct {
+  uint64_t A;
+  uint64_t B;
+  uint64_t D;
+  uint64_t E;
+  uint64_t F;
+  uint64_t G;
+  uint64_t H;
+} ManyIntegers;
+
+ManyIntegers cabi_return_big_aggregate(void) {
+  ManyIntegers result;
+  result.D = 123;
+  return result;
+}
+
 uint64_t caller() {
   uint64_t Result = 0;
   Result += raw_primitives_on_registers(1, 2);
@@ -92,6 +108,7 @@ uint64_t caller() {
                                                   4,
                                                   5,
                                                   (TwoIntegers){ 1, 2 });
+  Result += cabi_return_big_aggregate().D;
   return Unknown + Result;
 }
 

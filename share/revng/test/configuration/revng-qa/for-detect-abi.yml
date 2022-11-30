@@ -1,7 +1,6 @@
 tags:
 - name: for-detect-abi
 - name: abi-describe-functions
-  implies: [for-runtime]
 - name: abi-functions-library
 - name: x86-64-systemv-abi
   implies: [x86-64]
@@ -22,16 +21,15 @@ tags:
 sources:
 - tags:
   - abi-describe-functions
-  - x86-64-systemv-abi
-  - linux
-  - x86-64
-  - static
+  - for-runtime
+  repeat-for:
+  - [x86-64-systemv-abi, static]
   members:
   - tests/abi/source/describe_functions.c
 - tags:
   - abi-functions-library
-  - x86-64-systemv-abi
-  - linux
+  repeat-for:
+  - [x86-64-systemv-abi]
   members:
   - tests/abi/source/abi_test_function_library.c
 - tags:
@@ -40,7 +38,6 @@ sources:
   - nostdlib
   - for-analysis
   - for-detect-abi
-  - linux
   members:
   - tests/analysis/DetectABI/x86_64/always-dead-return-value.S
   - tests/analysis/DetectABI/x86_64/dead-on-one-path.S
