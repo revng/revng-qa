@@ -1,0 +1,13 @@
+tags:
+   - name: for-import-types
+     variables:
+       CFLAGS:
+         - -nostartfiles
+         - -fuse-ld=bfd
+         - -Wl,--section-start=.g_uint32=0x600000
+         - -Wl,--section-start=.g_uint64=0x700000
+         - -Wl,--section-start=.g_char_100=0x800000
+sources:
+   - tags: [native, static, for-import-types]
+     members:
+     - tests/model/import/types/types.c
