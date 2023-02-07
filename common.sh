@@ -3,22 +3,23 @@ set -euo pipefail
 
 COMMAND_NAME="$1"
 OUTPUT="${2-}"
-TEMPORARIES=()
+TEMPORARIES_LOG=$(mktemp --tmpdir tmp."$COMMAND_NAME"-temp-log.XXXXXXXXXX)
 
 function temp() {
     NEW_FILE="$(mktemp --tmpdir tmp."$COMMAND_NAME".XXXXXXXXXX "$@")"
-    TEMPORARIES+=("$NEW_FILE")
+    echo "$NEW_FILE" >> "$TEMPORARIES_LOG"
     echo "$NEW_FILE"
 }
 
 function at_exit() {
     # Cleanup all temporary files created through temp
-    for TEMPORARY in "${TEMPORARIES[@]}"; do
+    while IFS= read -r TEMPORARY; do
         rm -rf "$TEMPORARY"
-    done
+    done < "$TEMPORARIES_LOG"
+    rm -f "$TEMPORARIES_LOG"
 
     # If this command has any output, ensure it has been produced
-    if test -n "$OUTPUT" && ! test -e "$OUTPUT"; then
+    if [[ -n "$OUTPUT" && ! -e "$OUTPUT" ]]; then
         echo "Output not produced" > /dev/stderr
         exit 1
     fi
