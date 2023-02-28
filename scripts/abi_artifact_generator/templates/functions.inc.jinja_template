@@ -4,6 +4,9 @@ This template file is distributed under the MIT License. See LICENSE.md for deta
 
 /*( generation_notice )*/
 
+#include <stdalign.h>
+#include <stdbool.h>
+
 #include "common.h"
 #include "functions.h"
 
@@ -37,17 +40,57 @@ void __attribute__((noinline, weak)) ABIDEF /*( name )*/(
 /* Helps avoiding compiler warnings */
 void *typeless_setup = (void *) set_return_value_up;
 
+#ifdef __SIZEOF_INT128__
+#define INT128_IS_SCALAR 1
+#else
+#define INT128_IS_SCALAR 0
+#endif
+
+#define GCC_BUILTIN_CLASSIFY_POINTER_LIKE 5
+#define IS_POINTER_LIKE(VALUE) \
+  __builtin_classify_type(VALUE) == GCC_BUILTIN_CLASSIFY_POINTER_LIKE
+#define IS_SCALAR(VALUE)                \
+  _Generic((VALUE),                     \
+           int8_t: 1,                   \
+           uint8_t: 1,                  \
+           int16_t: 1,                  \
+           uint16_t: 1,                 \
+           int32_t: 1,                  \
+           uint32_t: 1,                 \
+           int64_t: 1,                  \
+           uint64_t: 1,                 \
+           INT128_T: INT128_IS_SCALAR,  \
+           UINT128_T: INT128_IS_SCALAR, \
+           default: IS_POINTER_LIKE(VALUE) ? 1 : 0)
+
 static jmp_buf jump_buffer;
 /*{ for name, return_value_type in return_value_functions.items() -}*/
 /*( return_value_type )*/ __attribute__((noinline)) /*( name )*/(void) {
   if (setjmp(jump_buffer) == 0) {
-    /*( return_value_type )*/ return_value = ((
-      /*(- return_value_type )*/ ABIDEF(*)(void)) typeless_setup)();
-    puts("    Function: \"/*( name )*/\"");
-    puts("    Arguments:");
-    puts("    ReturnValue:");
+    fflush(stdout);
 
-    PRINT(/*(- return_value_type )*/, &return_value);
+    /*( return_value_type )*/ return_value;
+    bool IsScalar = IS_SCALAR(return_value);
+    size_t SizeLimit = IsScalar ? SCALAR_SIZE_LIMIT : STRUCT_SIZE_LIMIT;
+    bool WithinSizeLimit = sizeof(return_value) <= SizeLimit * sizeof(void *);
+    bool IsPacked = (_Alignof(return_value) == 1 && sizeof(return_value) != 1);
+    if (WithinSizeLimit && !IsPacked) {
+      return_value =
+          ((/*(- return_value_type )*/ ABIDEF(*)(void)) typeless_setup)();
+
+      puts("    Function: \"/*( name )*/\"");
+      puts("    Arguments:");
+      puts("    ReturnValue:");
+      PRINT(/*(- return_value_type )*/, &return_value);
+    } else {
+      /*( return_value_type )*/ *return_value_pointer =
+          ((/*(- return_value_type )*/ *ABIDEF(*)(void)) typeless_setup)();
+
+      puts("    Function: \"/*( name )*/\"");
+      puts("    Arguments:");
+      puts("    ReturnValue:");
+      POINTER(/*(- return_value_type )*/, &return_value_pointer);
+    }
 
     puts("");
 
