@@ -103,7 +103,7 @@ int main(void) {
 #ifdef TARGET_x86_64
   puts("TargetArchitecture: x86_64");
 #elif TARGET_i386
-  puts("TargetArchitecture: i386");
+  puts("TargetArchitecture: x86");
 #elif TARGET_aarch64
   puts("TargetArchitecture: aarch64");
 #elif TARGET_arm
