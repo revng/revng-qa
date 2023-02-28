@@ -54,20 +54,32 @@ _Static_assert(sizeof(uint8_t) == 1, "A type with size == 1 is required.");
   typedef union {                                \
     TYPE v;                                      \
     uint8_t a[sizeof(TYPE)];                     \
-  } printing_helper;                             \
-  printing_helper *RESULT = (printing_helper *) POINTER
+  } printing_##RESULT;                           \
+  printing_##RESULT *RESULT = (printing_##RESULT *) POINTER
 
 #define PRINT_BYTES(TYPE, HELPER)                          \
   do {                                                     \
     printf("[ ");                                          \
-    for (int i = 0; i < sizeof(TYPE) - 1; ++i)             \
+    for (unsigned i = 0; i < sizeof(TYPE) - 1; ++i)        \
       printf("0x%.2hhx, ", (HELPER)->a[i]);                \
     printf("0x%.2hhx ]\n", (HELPER)->a[sizeof(TYPE) - 1]); \
   } while (0)
 
-#define PRINT(TYPE, POINTER)                            \
-  do {                                                  \
-    printf("      - Type: " #TYPE "\n        Bytes: "); \
-    MAKE_PRINT_HELPER(TYPE, POINTER, local_helper);     \
-    PRINT_BYTES(TYPE, local_helper);                    \
+#define PRINT(TYPE, POINTER)                         \
+  do {                                               \
+    printf("      - Type: " #TYPE " # size = 0x%x\n" \
+           "        Bytes: ",                        \
+           sizeof(TYPE));                            \
+    MAKE_PRINT_HELPER(TYPE, POINTER, local_helper);  \
+    PRINT_BYTES(TYPE, local_helper);                 \
+  } while (0)
+
+#define POINTER(TYPE, POINTER)                        \
+  do {                                                \
+    printf("      - Type: " #TYPE " # size = 0x%x\n"  \
+           "        Pointer: 0x%x\n        Bytes: ",  \
+           sizeof(TYPE),                              \
+           POINTER);                                  \
+    MAKE_PRINT_HELPER(TYPE *, POINTER, local_helper); \
+    PRINT_BYTES(TYPE *, local_helper);                \
   } while (0)
