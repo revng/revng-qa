@@ -185,7 +185,7 @@ def render_functions(jinja_environment, config, out_dir: str):
         "generation_notice": get_generation_notice(),
         "structs": config["helper_structs"],
         "argument_functions": config["argument_tests"],
-        "return_value_functions": config["small_return_value_tests"],
+        "return_value_functions": config["return_value_tests"],
     }
 
     filename = "functions.h"
@@ -210,7 +210,7 @@ def render_function_description(jinja_env, architectures, config, functions, out
             "register_list": architecture["register_list"],
             "register_count": len(architecture["register_list"]),
             "argument_functions": functions["argument_tests"],
-            "return_value_functions": functions["small_return_value_tests"],
+            "return_value_functions": functions["return_value_tests"],
             "fill_stack_with_random_data": asm(setup_stack(architecture, config)),
             "fill_registers_with_random_data": asm(setup_registers(architecture)),
             "call_a_function": lambda n, a=architecture: asm(call_a_function(a, n)),
