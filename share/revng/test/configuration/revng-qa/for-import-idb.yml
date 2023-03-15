@@ -3,27 +3,27 @@
 #
 
 tags:
-- name: for-ida
-  variables:
-    CFLAGS:
-      - -O0
-      - -g
+  - name: for-ida
+    variables:
+      CFLAGS:
+        - -O0
+        - -g
 sources:
-- tags: [native, dynamic, for-ida]
-  members:
-  - tests/model/import/idb/simple.c
-  - tests/model/import/idb/enum-type.c
-  - tests/model/import/idb/nested-struct.c
-  - tests/model/import/idb/qsort.c
-  - tests/model/import/idb/struct-as-field-ptr.c
-  - tests/model/import/idb/struct.c
-  - tests/model/import/idb/typedef-char-to-uint32.c
+  - tags: [native, dynamic, for-ida]
+    members:
+      - tests/model/import/idb/simple.c
+      - tests/model/import/idb/enum-type.c
+      - tests/model/import/idb/nested-struct.c
+      - tests/model/import/idb/qsort.c
+      - tests/model/import/idb/struct-as-field-ptr.c
+      - tests/model/import/idb/struct.c
+      - tests/model/import/idb/typedef-char-to-uint32.c
 commands:
-- type: revng-qa.idb
-  from:
-  - type: revng-qa.compiled-with-debug-info
-    filter: for-ida
-  suffix: .i64
-  command: |-
-    idat64 -o$OUTPUT -A -B $INPUT
-    rm "$$(echo $OUTPUT | sed 's/\.i64/.asm/')"
+  - type: revng-qa.idb
+    from:
+      - type: revng-qa.compiled-with-debug-info
+        filter: for-ida
+    suffix: .i64
+    command: |-
+      idat64 -o$OUTPUT -A -B $INPUT
+      rm "$$(echo $OUTPUT | sed 's/\.i64/.asm/')"

@@ -19,42 +19,42 @@ tags:
 sources:
   - tags: [arm, dynamic, nostartfiles, for-analysis, for-collect-cfg]
     members:
-    - tests/analysis/CollectCFG/arm/dynamic-call.S
+      - tests/analysis/CollectCFG/arm/dynamic-call.S
   - tags: [arm, static, nostdlib, for-analysis, for-collect-cfg]
     members:
-    - tests/analysis/CollectCFG/arm/switch-addls.S
-    - tests/analysis/CollectCFG/arm/switch-ldrls.S
-    - tests/analysis/CollectCFG/arm/switch-disjoint-ranges.S
-    - tests/analysis/CollectCFG/arm/call.S
-    - tests/analysis/CollectCFG/arm/fake-function.S
-    # - tests/analysis/CollectCFG/arm/fake-function-without-push.S
-    - tests/analysis/CollectCFG/arm/indirect-call.S
-    - tests/analysis/CollectCFG/arm/longjmp.S
-    - tests/analysis/CollectCFG/arm/indirect-tail-call.S
-    - tests/analysis/CollectCFG/arm/memset.S
+      - tests/analysis/CollectCFG/arm/switch-addls.S
+      - tests/analysis/CollectCFG/arm/switch-ldrls.S
+      - tests/analysis/CollectCFG/arm/switch-disjoint-ranges.S
+      - tests/analysis/CollectCFG/arm/call.S
+      - tests/analysis/CollectCFG/arm/fake-function.S
+      # - tests/analysis/CollectCFG/arm/fake-function-without-push.S
+      - tests/analysis/CollectCFG/arm/indirect-call.S
+      - tests/analysis/CollectCFG/arm/longjmp.S
+      - tests/analysis/CollectCFG/arm/indirect-tail-call.S
+      - tests/analysis/CollectCFG/arm/memset.S
   - tags: [mips, dynamic, nostartfiles, for-analysis, for-collect-cfg]
     members:
-    - tests/analysis/CollectCFG/mips/dynamic-call.S
+      - tests/analysis/CollectCFG/mips/dynamic-call.S
   - tags: [mips, static, nostdlib, for-analysis, for-collect-cfg]
     members:
-    - tests/analysis/CollectCFG/mips/switch-jump-table.S
-    - tests/analysis/CollectCFG/mips/jump-table-base-before-function-call.S
+      - tests/analysis/CollectCFG/mips/switch-jump-table.S
+      - tests/analysis/CollectCFG/mips/jump-table-base-before-function-call.S
   - tags: [x86-64, dynamic, nostartfiles, for-analysis, for-collect-cfg]
     members:
-    - tests/analysis/CollectCFG/x86_64/dynamic-call.S
+      - tests/analysis/CollectCFG/x86_64/dynamic-call.S
   - tags: [x86-64, static, nostdlib, for-analysis, for-collect-cfg]
     members:
-    - tests/analysis/CollectCFG/x86_64/try-catch-ehframe.S
-    - tests/analysis/CollectCFG/x86_64/switch-jump-table.S
-    - tests/analysis/CollectCFG/x86_64/switch-jump-table-32-bit-comparison.S
-    # - tests/analysis/CollectCFG/x86_64/rda-in-memory.S
-    - tests/analysis/CollectCFG/x86_64/longjmp.S
-    - tests/analysis/CollectCFG/x86_64/indirect-tail-call.S
-    - tests/analysis/CollectCFG/x86_64/indirect-call.S
-    - tests/analysis/CollectCFG/x86_64/call.S
+      - tests/analysis/CollectCFG/x86_64/try-catch-ehframe.S
+      - tests/analysis/CollectCFG/x86_64/switch-jump-table.S
+      - tests/analysis/CollectCFG/x86_64/switch-jump-table-32-bit-comparison.S
+      # - tests/analysis/CollectCFG/x86_64/rda-in-memory.S
+      - tests/analysis/CollectCFG/x86_64/longjmp.S
+      - tests/analysis/CollectCFG/x86_64/indirect-tail-call.S
+      - tests/analysis/CollectCFG/x86_64/indirect-call.S
+      - tests/analysis/CollectCFG/x86_64/call.S
   - tags: [x86-64, static, nostdlib, moderate-opt, for-analysis, for-collect-cfg]
     members:
-    - tests/analysis/CollectCFG/x86_64/fibonacci.c
+      - tests/analysis/CollectCFG/x86_64/fibonacci.c
   - tags: [i386, dynamic, nostartfiles, for-analysis, for-collect-cfg]
     members:
-    - tests/analysis/CollectCFG/i386/dynamic-call.S
+      - tests/analysis/CollectCFG/i386/dynamic-call.S

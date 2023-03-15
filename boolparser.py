@@ -52,13 +52,13 @@ class Tokenizer:
     def nextTokenTypeIsOperator(self):
         t = self.tokenTypes[self.i]
         return (
-                t == TokenType.GT
-                or t == TokenType.GTE
-                or t == TokenType.LT
-                or t == TokenType.LTE
-                or t == TokenType.EQ
-                or t == TokenType.NEQ
-                or t == TokenType.STRWITH
+            t == TokenType.GT
+            or t == TokenType.GTE
+            or t == TokenType.LT
+            or t == TokenType.LTE
+            or t == TokenType.EQ
+            or t == TokenType.NEQ
+            or t == TokenType.STRWITH
         )
 
     def tokenize(self):
@@ -122,9 +122,7 @@ class BooleanParser:
 
     def parseExpression(self):
         andTerm1 = self.parseAndTerm()
-        while (
-                self.tokenizer.hasNext() and self.tokenizer.nextTokenType() == TokenType.OR
-        ):
+        while self.tokenizer.hasNext() and self.tokenizer.nextTokenType() == TokenType.OR:
             self.tokenizer.next()
             andTermX = self.parseAndTerm()
             andTerm = TreeNode(TokenType.OR)
@@ -135,9 +133,7 @@ class BooleanParser:
 
     def parseAndTerm(self):
         condition1 = self.parseCondition()
-        while (
-                self.tokenizer.hasNext() and self.tokenizer.nextTokenType() == TokenType.AND
-        ):
+        while self.tokenizer.hasNext() and self.tokenizer.nextTokenType() == TokenType.AND:
             self.tokenizer.next()
             conditionX = self.parseCondition()
             condition = TreeNode(TokenType.AND)
@@ -150,10 +146,7 @@ class BooleanParser:
         if self.tokenizer.hasNext() and self.tokenizer.nextTokenType() == TokenType.LP:
             self.tokenizer.next()
             expression = self.parseExpression()
-            if (
-                    self.tokenizer.hasNext()
-                    and self.tokenizer.nextTokenType() == TokenType.RP
-            ):
+            if self.tokenizer.hasNext() and self.tokenizer.nextTokenType() == TokenType.RP:
                 self.tokenizer.next()
                 return expression
             else:
@@ -191,14 +184,10 @@ class BooleanParser:
                 n.value = self.tokenizer.next()[1:-1]
                 return n
             else:
-                raise Exception(
-                    "NUM, STR, or VAR expected, but got " + self.tokenizer.next()
-                )
+                raise Exception("NUM, STR, or VAR expected, but got " + self.tokenizer.next())
 
         else:
-            raise Exception(
-                "NUM, STR, or VAR expected, but got " + self.tokenizer.next()
-            )
+            raise Exception("NUM, STR, or VAR expected, but got " + self.tokenizer.next())
 
     def evaluate(self, variable_dict):
         return self.evaluateRecursive(self.root, variable_dict)
@@ -242,13 +231,13 @@ class BooleanParser:
 if __name__ == "__main__":
     # Added .startswith operator
     p = BooleanParser('account_number .* "abc"')
-    assert p.evaluate({'account_number': 'abc123'}) == True
-    assert p.evaluate({'account_number': '1abc123'}) == False
+    assert p.evaluate({"account_number": "abc123"}) == True
+    assert p.evaluate({"account_number": "1abc123"}) == False
 
     # Bug fix in matching string + Include both "<double quoted>" and '<single quoted>' string
     double_quoted_p = BooleanParser('account_number == "abc"')
-    assert p.evaluate({'account_number': 'abc'}) == True
+    assert p.evaluate({"account_number": "abc"}) == True
 
     single_quoted_p = BooleanParser("account_number == 'abc'")
-    assert p.evaluate({'account_number': 'abc'}) == True
-    assert p.evaluate({'account_number': "abc"}) == True
+    assert p.evaluate({"account_number": "abc"}) == True
+    assert p.evaluate({"account_number": "abc"}) == True

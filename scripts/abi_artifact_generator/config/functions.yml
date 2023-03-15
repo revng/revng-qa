@@ -1,32 +1,58 @@
 ---
-
 helper_structs:
-  small_struct: [ "uint16_t a", "uint16_t b" ]
-  padded_struct: [ "uint8_t a", "uint16_t b" ]
-  array_struct: [ "uint32_t a[3]" ]
-  two_arrays_struct: [ "uint32_t a[3]", "uint64_t b[3]" ]
-  big_struct: [ "uint64_t a[8]" ]
-  huge_struct: [ "uint64_t a[32]" ]
-  
+  small_struct: ["uint16_t a", "uint16_t b"]
+  padded_struct: ["uint8_t a", "uint16_t b"]
+  array_struct: ["uint64_t a[2]"]
+  two_arrays_struct: ["uint32_t a[3]", "uint64_t b[3]"]
+  big_struct: ["uint64_t a[8]"]
+  huge_struct: ["uint64_t a[32]"]
+  double_aligned_struct: ["INT128_T a", "uint8_t b"]
+  one_byte_struct: ["uint8_t a"]
+  two_byte_struct: ["uint16_t a"]
+  small_struct_of_structs: ["two_byte_struct a", "one_byte_struct b"]
+  struct_of_structs: ["small_struct a[2]", "one_byte_struct b"]
+  padded_struct_of_structs: ["one_byte_struct a", "big_struct b"]
+  double_padded_struct_of_structs: ["one_byte_struct a", "double_aligned_struct b"]
+  __attribute__((packed)) unnaturally_aligned_struct_64:
+    ["char prepadding[2]", "uint64_t a", "char postpadding[6]"]
+  __attribute__((packed)) unnaturally_aligned_struct_32:
+    ["char prepadding[2]", "uint32_t a", "char postpadding[2]"]
+
 argument_tests:
-  single_8_bit_argument: [ "uint8_t" ]
-  single_16_bit_argument: [ "int16_t" ]
-  single_32_bit_argument: [ "uint32_t" ]
-  single_64_bit_argument: [ "int64_t" ]
-  single_128_bit_argument: [ "INT128_T" ]
+  #
+  # Simple single argument tests
+  #
 
-  single_small_struct_argument: [ "small_struct" ]
-  single_padded_struct_argument: [ "padded_struct" ]
-  single_array_struct_argument: [ "array_struct" ]
-  single_two_arrays_struct_argument: [ "two_arrays_struct" ]
-  single_big_struct_argument: [ "big_struct" ]
-  single_huge_struct_argument: [ "huge_struct" ]
-  single_void_pointer_argument: [ "void *" ]
-  single_int_pointer_argument: [ "uint32_t *" ]
-  single_struct_pointer_argument: [ "huge_struct *" ]
+  single_8_bit_argument: ["uint8_t"]
+  single_16_bit_argument: ["int16_t"]
+  single_32_bit_argument: ["uint32_t"]
+  single_64_bit_argument: ["int64_t"]
+  single_128_bit_argument: ["INT128_T"]
 
-# TODO: floating point arguments.
+  single_small_struct_argument: ["small_struct"]
+  single_padded_struct_argument: ["padded_struct"]
+  single_array_struct_argument: ["array_struct"]
+  single_two_arrays_struct_argument: ["two_arrays_struct"]
+  single_big_struct_argument: ["big_struct"]
+  single_huge_struct_argument: ["huge_struct"]
+  single_void_pointer_argument: ["void *"]
+  single_int_pointer_argument: ["uint32_t *"]
+  single_double_aligned_struct_argument: ["double_aligned_struct"]
+  single_one_byte_struct_argument: ["one_byte_struct"]
+  single_two_byte_struct_argument: ["two_byte_struct"]
+  single_padded_struct_of_structs_argument: ["padded_struct_of_structs"]
+  single_double_padded_struct_of_structs_argument: ["double_padded_struct_of_structs"]
 
+  # TODO: floating point arguments.
+
+  #
+  # Tests for the interactions between multiple differently sized arguments.
+  #
+
+  three_small_struct_arguments:
+    - small_struct
+    - small_struct
+    - small_struct
   mixed_integer_arguments:
     - int64_t
     - uint32_t
@@ -43,13 +69,17 @@ argument_tests:
     - padded_struct *
     - padded_struct
     - UINT128_T *
+    - int8_t
     - huge_struct
     - void *
-
   six_register_test:
     - array_struct
     - INT128_T
     - array_struct
+
+  #
+  # Simple stack argument tests.
+  #
 
   multiple_stack_arguments:
     - big_struct
@@ -81,45 +111,292 @@ argument_tests:
     - uint8_t
     - uint8_t
 
-  equivalence_test_0:
+  #
+  # Equivalence tests.
+  #
+
+  equivalence_test_0_ground_truth:
+    - uint64_t
     - small_struct *
     - small_struct
+  equivalence_test_1_64_bit:
     - uint64_t
-  equivalence_test_64_bit_1:
     - uint64_t
     - uint32_t
+  equivalence_test_2_64_bit:
     - uint64_t
-  equivalence_test_64_bit_2:
     - uint64_t
     - uint16_t
     - uint16_t
+  equivalence_test_1_32_bit:
     - uint64_t
-  equivalence_test_32_bit_1:
     - uint32_t
     - uint32_t
+  equivalence_test_2_32_bit:
     - uint64_t
-  equivalence_test_32_bit_2:
     - uint32_t
     - uint16_t
     - uint16_t
+
+  #
+  # Tests for non-trivially aligned stack arguments.
+  #
+
+  size_test:
+    - size_t
+  forced_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+  two_byte_aligned_struct_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - small_struct
+    - uint8_t
+    - small_struct
+  four_byte_aligned_struct_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - big_struct
+    - uint8_t
+    - big_struct
+  four_byte_aligned_scalar_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - uint64_t
+    - uint8_t
+    - uint64_t
+  eight_byte_aligned_struct_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - double_aligned_struct
+    - uint8_t
+    - double_aligned_struct
+  eight_byte_aligned_scalar_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - INT128_T
+    - uint8_t
+    - INT128_T
+
+  #
+  # Tests for nested structs.
+  #
+
+  struct_of_structs_in_registers:
+    - size_t
+    - size_t
+    - struct_of_structs
+  struct_of_structs_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - struct_of_structs
+  misaligned_struct_of_structs_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - struct_of_structs
+    - uint8_t
+    - struct_of_structs
+    - uint8_t
+    - struct_of_structs
+  small_struct_of_structs_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - small_struct_of_structs
+    - uint8_t
+    - small_struct_of_structs
+    - uint8_t
+    - small_struct_of_structs
+  padded_struct_of_structs_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - padded_struct_of_structs
+    - uint8_t
+    - padded_struct_of_structs
+    - uint8_t
+    - padded_struct_of_structs
+  double_padded_struct_of_structs_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - double_padded_struct_of_structs
+    - uint8_t
+    - double_padded_struct_of_structs
+    - uint8_t
+    - double_padded_struct_of_structs
+
+  #
+  # Tests targetting alignment issues in registers (ARM-specific).
+  #
+
+  double_aligned_scalar_on_the_stack_64:
+    - big_struct
+    - uint8_t
+    - INT128_T
+  double_aligned_scalar_on_top_of_the_stack_64:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - INT128_T
+  double_aligned_scalar_on_the_stack_32:
+    - big_struct
+    - uint8_t
     - uint64_t
 
-small_return_value_tests:
+  # NOTE: these tests would require us to increase the expressive power of RFTs
+  # double_aligned_scalar_in_registers_64:
+  #   - uint8_t
+  #   - UINT128_T
+  # double_aligned_scalar_in_registers_32:
+  #   - uint8_t
+  #   - uint64_t
+  # double_aligned_scalar_on_top_of_the_stack_32:
+  #   - size_t
+  #   - size_t
+  #   - size_t
+  #   - uint64_t
+
+  #
+  # Tests for non-naturally aligned structs.
+  #
+  # NOTE: these tests would require us to support unnatural alignment properly
+  # single_unnaturally_aligned_struct_64_argument: ["unnaturally_aligned_struct_64"]
+  # unnaturally_aligned_struct_64_in_registers:
+  #   - size_t
+  #   - size_t
+  #   - unnaturally_aligned_struct_64
+  # unnaturally_aligned_struct_64_on_stack:
+  #   - size_t
+  #   - size_t
+  #   - size_t
+  #   - size_t
+  #   - size_t
+  #   - size_t
+  #   - size_t
+  #   - size_t
+  #   - uint8_t
+  #   - unnaturally_aligned_struct_64
+  #   - uint8_t
+  #   - unnaturally_aligned_struct_64
+  # single_unnaturally_aligned_struct_32_argument: ["unnaturally_aligned_struct_32"]
+  # unnaturally_aligned_struct_32_in_registers:
+  #   - size_t
+  #   - size_t
+  #   - unnaturally_aligned_struct_32
+  # unnaturally_aligned_struct_32_on_stack:
+  #   - size_t
+  #   - size_t
+  #   - size_t
+  #   - size_t
+  #   - size_t
+  #   - size_t
+  #   - size_t
+  #   - size_t
+  #   - uint8_t
+  #   - unnaturally_aligned_struct_32
+  #   - uint8_t
+  #   - unnaturally_aligned_struct_32
+
+return_value_tests:
   single_8_bit_return_value: "uint8_t"
   single_16_bit_return_value: "int16_t"
   single_32_bit_return_value: "uint32_t"
   single_64_bit_return_value: "int64_t"
-  single_128_bit_return_value: "UINT128_T"
 
   single_small_struct_return_value: "small_struct"
   single_padded_struct_return_value: "padded_struct"
+  single_array_struct_return_value: "array_struct"
+  single_one_byte_struct_return_value: "one_byte_struct"
+  single_two_byte_struct_return_value: "two_byte_struct"
+  single_small_struct_of_structs_return_value: "small_struct_of_structs"
+  single_struct_of_structs_return_value: "struct_of_structs"
+  single_unnaturally_aligned_struct_32_return_value: "unnaturally_aligned_struct_32"
+  single_unnaturally_aligned_struct_64_return_value: "unnaturally_aligned_struct_64"
 
   single_void_pointer_return_value: "void *"
   single_int_pointer_return_value: "uint32_t *"
   single_struct_pointer_return_value: "huge_struct *"
 
-# TODO: floating point return values.
+  single_128_bit_return_value: "UINT128_T"
+  single_single_big_struct_return_value: "big_struct"
+  single_single_huge_struct_return_value: "huge_struct"
 
-# TODO: returning big objects.
-
-...
+  # TODO: floating point return values.

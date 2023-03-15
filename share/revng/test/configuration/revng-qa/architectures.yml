@@ -3,7 +3,7 @@ tags:
   - name: compiler
     variables:
       CFLAGS:
-      - -no-pie
+        - -no-pie
     implies: [linux]
   - name: native
     implies: [compiler]
@@ -29,8 +29,8 @@ tags:
       TRIPLE: armv7a-hardfloat-linux-uclibceabi-
       QEMU_NAME: arm
       CFLAGS:
-      - -Wl,-Ttext-segment=0x20000
-      - -DTARGET_arm
+        - -Wl,-Ttext-segment=0x20000
+        - -DTARGET_arm
   - name: x86-64
     implies: [cross-compiler]
     variables:
@@ -59,7 +59,7 @@ tags:
       TRIPLE: i386-gentoo-linux-musl-
       QEMU_NAME: i386
       CFLAGS:
-        - -DTARGET_x86
+        - -DTARGET_i386
   - name: s390x
     implies: [cross-compiler]
     variables:

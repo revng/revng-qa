@@ -1,55 +1,139 @@
 tags:
-- name: for-detect-abi
-- name: abi-describe-functions
-- name: abi-functions-library
-- name: x86-64-systemv-abi
-  implies: [x86-64]
-  variables:
-    CFLAGS:
-    - -DABIDEF=
-    ABI_NAME: SystemV_x86_64
-- name: i386-systemv-abi
-  implies: [i386]
-  variables:
-    CFLAGS:
-    - -DABIDEF=
-- name: i386-microsoft-stdcall-abi
-  implies: [i386]
-  variables:
-    CFLAGS:
-    - -DABIDEF=__stdcall
+  - name: for-detect-abi
+
+  - name: abi-describe-functions
+    variables:
+      CFLAGS:
+        - -std=c99
+        - -fno-pic
+        - -fno-pie
+        - -fno-stack-protector
+        - -O1
+
+  - name: abi-functions-library
+    variables:
+      CFLAGS:
+        - -std=c99
+        - -fno-pic
+        - -fno-pie
+        - -fno-stack-protector
+        - -ggdb3
+        - -O3
+
+  - name: x86-64-systemv-abi
+    implies: [x86-64]
+    variables:
+      ABI_NAME: SystemV_x86_64
+      CFLAGS:
+        - -DABIDEF=
+        - -DSCALAR_SIZE_LIMIT=2
+        - -DSTRUCT_SIZE_LIMIT=2
+
+  - name: i386-systemv-abi
+    implies: [i386]
+    variables:
+      ABI_NAME: SystemV_x86
+      CFLAGS:
+        - -DABIDEF=
+        - -DSCALAR_SIZE_LIMIT=2
+        - -DSTRUCT_SIZE_LIMIT=0
+
+  - name: i386-regparm-3-systemv-abi
+    implies: [i386]
+    variables:
+      ABI_NAME: SystemV_x86_regparm_3
+      CFLAGS:
+        - -DABIDEF='__attribute__((regparm(3)))'
+        - -DSCALAR_SIZE_LIMIT=2
+        - -DSTRUCT_SIZE_LIMIT=0
+
+  - name: i386-regparm-2-systemv-abi
+    implies: [i386]
+    variables:
+      ABI_NAME: SystemV_x86_regparm_2
+      CFLAGS:
+        - -DABIDEF='__attribute__((regparm(2)))'
+        - -DSCALAR_SIZE_LIMIT=2
+        - -DSTRUCT_SIZE_LIMIT=0
+
+  - name: i386-regparm-1-systemv-abi
+    implies: [i386]
+    variables:
+      ABI_NAME: SystemV_x86_regparm_1
+      CFLAGS:
+        - -DABIDEF='__attribute__((regparm(1)))'
+        - -DSCALAR_SIZE_LIMIT=2
+        - -DSTRUCT_SIZE_LIMIT=0
+
+  - name: aarch64-aapcs64-abi
+    implies: [aarch64]
+    variables:
+      ABI_NAME: AAPCS64
+      CFLAGS:
+        - -DABIDEF=
+        - -DSCALAR_SIZE_LIMIT=2
+        - -DSTRUCT_SIZE_LIMIT=2
+
+  - name: arm-aapcs-abi
+    implies: [arm]
+    variables:
+      ABI_NAME: AAPCS
+      CFLAGS:
+        - -DABIDEF=
+        - -DSCALAR_SIZE_LIMIT=4
+        - -DSTRUCT_SIZE_LIMIT=1
+
+  - name: i386-microsoft-stdcall-abi
+    implies: [i386]
+    variables:
+      ABI_NAME: Microsoft_x86_stdcall
+      CFLAGS:
+        - -DABIDEF=__stdcall
+        - -DSCALAR_SIZE_LIMIT=1
+        - -DSTRUCT_SIZE_LIMIT=0
+
 sources:
-- tags:
-  - abi-describe-functions
-  - for-runtime
-  repeat-for:
-  - [x86-64-systemv-abi, static]
-  members:
-  - tests/abi/source/describe_functions.c
-- tags:
-  - abi-functions-library
-  repeat-for:
-  - [x86-64-systemv-abi]
-  members:
-  - tests/abi/source/abi_test_function_library.c
-- tags:
-  - x86-64
-  - static
-  - nostdlib
-  - for-analysis
-  - for-detect-abi
-  members:
-  - tests/analysis/DetectABI/x86_64/always-dead-return-value.S
-  - tests/analysis/DetectABI/x86_64/dead-on-one-path.S
-  - tests/analysis/DetectABI/x86_64/dead-register.S
-  - tests/analysis/DetectABI/x86_64/draof.S
-  - tests/analysis/DetectABI/x86_64/drvofc.S
-  - tests/analysis/DetectABI/x86_64/raofc.S
-  # - tests/analysis/DetectABI/x86_64/recursion.S
-  - tests/analysis/DetectABI/x86_64/sometimes-dead-return-value.S
-  - tests/analysis/DetectABI/x86_64/uraof.S
-  - tests/analysis/DetectABI/x86_64/urvofc.S
-  - tests/analysis/DetectABI/x86_64/urvof.S
-  - tests/analysis/DetectABI/x86_64/push-pop.S
-  - tests/analysis/DetectABI/x86_64/indirect-call-callee-saved.S
-  # - tests/analysis/DetectABI/x86_64/return-value-to-argument.S
+  - tags: [abi-describe-functions, for-runtime, linux, static]
+    repeat-for:
+      - [x86-64-systemv-abi]
+      - [i386-systemv-abi]
+      - [i386-regparm-3-systemv-abi]
+      - [i386-regparm-2-systemv-abi]
+      - [i386-regparm-1-systemv-abi]
+      - [arm-aapcs-abi]
+    members:
+      - tests/abi/source/describe_functions.c
+
+  - tags: [abi-functions-library, linux]
+    repeat-for:
+      - [x86-64-systemv-abi]
+      - [i386-systemv-abi]
+      - [i386-regparm-3-systemv-abi]
+      - [i386-regparm-2-systemv-abi]
+      - [i386-regparm-1-systemv-abi]
+      - [arm-aapcs-abi]
+    members:
+      - tests/abi/source/abi_test_function_library.c
+
+  - tags:
+      - x86-64
+      - static
+      - nostdlib
+      - for-analysis
+      - for-detect-abi
+      - linux
+    members:
+      - tests/analysis/DetectABI/x86_64/always-dead-return-value.S
+      - tests/analysis/DetectABI/x86_64/dead-on-one-path.S
+      - tests/analysis/DetectABI/x86_64/dead-register.S
+      - tests/analysis/DetectABI/x86_64/draof.S
+      - tests/analysis/DetectABI/x86_64/drvofc.S
+      - tests/analysis/DetectABI/x86_64/raofc.S
+      # - tests/analysis/DetectABI/x86_64/recursion.S
+      - tests/analysis/DetectABI/x86_64/sometimes-dead-return-value.S
+      - tests/analysis/DetectABI/x86_64/uraof.S
+      - tests/analysis/DetectABI/x86_64/urvofc.S
+      - tests/analysis/DetectABI/x86_64/urvof.S
+      - tests/analysis/DetectABI/x86_64/push-pop.S
+      - tests/analysis/DetectABI/x86_64/indirect-call-callee-saved.S
+    # - tests/analysis/DetectABI/x86_64/return-value-to-argument.S

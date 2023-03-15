@@ -10,8 +10,10 @@
 
 #ifdef TARGET_x86_64
 #include "x86_64/describe_functions.inc"
-#elif TARGET_x86
-#include "x86/describe_functions.inc"
+#elif TARGET_i386
+#include "i386/describe_functions.inc"
+#elif TARGET_aarch64
+#include "aarch64/describe_functions.inc"
 #elif TARGET_arm
 #include "arm/describe_functions.inc"
 #else
