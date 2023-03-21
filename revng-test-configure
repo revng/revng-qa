@@ -59,8 +59,9 @@ def most_similar_tuples(inputs):
     if len(inputs) == 1:
         return list(product(*inputs))
 
-    result = []
+    fully_compatible = []
 
+    most_similar = []
     maximum_similarity = 0
 
     # Get the most similar set of tuples, i.e., those that share the most
@@ -79,15 +80,26 @@ def most_similar_tuples(inputs):
 
         if similarity > maximum_similarity:
             maximum_similarity = similarity
-            result = []
+            most_similar = []
 
         if similarity == maximum_similarity:
-            result.append(candidate_set)
+            most_similar.append(candidate_set)
+
+        for candidate in candidate_set:
+            if candidate in common_targets:
+                fully_compatible.append(candidate_set)
+                break
+
+    # For now, discard the `most_similar` list in case there are any perfect
+    # matches (perfect match is when all the inputs in the current candidate set
+    # derive from a single input present in the same set)
+    # TODO: consider if we still want to keep it.
+    selected = fully_compatible if len(fully_compatible) != 0 else most_similar
 
     # Further refine based on common tags
     maximum_similarity = 0
-    result2 = []
-    for candidate_set in result:
+    result = []
+    for candidate_set in selected:
         candidate_tags = [set(candidate.tags)
                           for candidate
                           in candidate_set]
@@ -98,12 +110,12 @@ def most_similar_tuples(inputs):
 
         if similarity > maximum_similarity:
             maximum_similarity = similarity
-            result2 = []
+            result = []
 
         if similarity == maximum_similarity:
-            result2.append(candidate_set)
+            result.append(candidate_set)
 
-    return result2
+    return result
 
 def sort_list(entries, key, dependencies):
     # Collect entries by key and id
