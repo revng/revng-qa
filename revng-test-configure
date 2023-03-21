@@ -417,10 +417,10 @@ class Configuration:
                        command_name,
                        command_type,
                        command_suffix):
-        final_tags = list(output_tags)
+        final_tags = set(output_tags)
         for target in input_targets:
             for input_tag in target.tags:
-                final_tags.append(input_tag)
+                final_tags.add(input_tag)
 
         # OK, we have all the inputs
         derived_targets_prefix = input_targets[0].derived_targets_prefix
@@ -438,7 +438,7 @@ class Configuration:
 
         new_target = Target(name=command_name,
                             type=command_type,
-                            tags=final_tags,
+                            tags=list(final_tags),
                             path=path,
                             source_path=input_targets[0].source_path,
                             derived_targets_prefix=derived_targets_prefix,
@@ -447,10 +447,6 @@ class Configuration:
 
         # Initialize variables
         variables = new_target.variables
-
-        for target in input_targets:
-            for tag in target.tags:
-                variables.merge(tag.variables)
 
         for tag in final_tags:
             variables.merge(tag.variables)
