@@ -10,7 +10,7 @@ tags:
         - -g
 sources:
   - tags: [native, dynamic, for-ida]
-    prefix: tests/model/import/idb
+    prefix: share/revng/test/tests/model/import/idb
     members:
       - simple.c
       - enum-type.c

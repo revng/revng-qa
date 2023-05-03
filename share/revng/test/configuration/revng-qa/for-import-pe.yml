@@ -16,7 +16,7 @@ tags:
         - /WX
 sources:
   - tags: [windows]
-    prefix: tests/model/import/pe
+    prefix: share/revng/test/tests/model/import/pe
     members:
       - main.c
       - simple-cpp-class.cpp

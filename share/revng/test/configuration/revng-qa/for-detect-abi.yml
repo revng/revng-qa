@@ -102,7 +102,7 @@ sources:
       - [i386-regparm-1-systemv-abi]
       - [arm-aapcs-abi]
     members:
-      - tests/abi/source/describe_functions.c
+      - share/revng/test/tests/abi/source/describe_functions.c
 
   - tags: [abi-functions-library, linux]
     repeat-for:
@@ -113,7 +113,7 @@ sources:
       - [i386-regparm-1-systemv-abi]
       - [arm-aapcs-abi]
     members:
-      - tests/abi/source/abi_test_function_library.c
+      - share/revng/test/tests/abi/source/abi_test_function_library.c
 
   - tags:
       - x86-64
@@ -122,7 +122,7 @@ sources:
       - for-analysis
       - for-detect-abi
       - linux
-    prefix: tests/analysis/DetectABI/x86_64
+    prefix: share/revng/test/tests/analysis/DetectABI/x86_64
     members:
       - always-dead-return-value.S
       - dead-on-one-path.S

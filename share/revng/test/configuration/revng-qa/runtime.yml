@@ -20,7 +20,7 @@ sources:
       - [s390x, static]
       - [native, dynamic]
       - [i386, static]
-    prefix: tests/runtime
+    prefix: share/revng/test/tests/runtime
     members:
       - function-call.c
       - floating-point.c
@@ -38,4 +38,4 @@ sources:
       - [native, dynamic]
       - [i386, static]
     members:
-      - tests/runtime/calc.c
+      - share/revng/test/tests/runtime/calc.c

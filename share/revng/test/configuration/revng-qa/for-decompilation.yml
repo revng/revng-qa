@@ -6,7 +6,7 @@ tags:
         - -O2
 sources:
   - tags: [native, dynamic, for-decompilation]
-    prefix: tests/analysis/Decompilation/dynamic_native
+    prefix: share/revng/test/tests/analysis/Decompilation/dynamic_native
     members:
       - struct.c
       - array.c

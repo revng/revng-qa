@@ -9,4 +9,4 @@ tags:
 sources:
   - tags: [native, dynamic, for-segregate-stack-accesses]
     members:
-      - tests/analysis/SegregateStackAccesses/dynamic_native/segregate.c
+      - share/revng/test/tests/analysis/SegregateStackAccesses/dynamic_native/segregate.c
