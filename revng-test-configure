@@ -284,8 +284,10 @@ class Configuration:
 
     def _load_source_group(self, group):
         tags = self.tags(group.get("tags", []))
+        prefix = group.get("prefix", "")
 
         for path in group.get("members", []):
+            path = os.path.join(prefix, path)
 
             if not (self.install_path / path).exists():
                 error(f"Can't find source file {path}")
