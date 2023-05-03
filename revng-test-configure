@@ -280,10 +280,10 @@ class Configuration:
         log("Parsing sources")
 
         for group in data["sources"]:
-            self._load_source_group(group, [])
+            self._load_source_group(group)
 
-    def _load_source_group(self, group, parent_tags):
-        tags = parent_tags + self.tags(group.get("tags", []))
+    def _load_source_group(self, group):
+        tags = self.tags(group.get("tags", []))
 
         for path in group.get("members", []):
 
@@ -310,9 +310,6 @@ class Configuration:
 
                 self.targets.append(source_target)
 
-
-        for subgroup in group.get("groups", []):
-            self._load_source_group(subgroup, tags)
 
     def _load_commands(self, data):
         log("Parsing commands")
