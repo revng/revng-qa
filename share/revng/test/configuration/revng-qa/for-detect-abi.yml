@@ -122,18 +122,19 @@ sources:
       - for-analysis
       - for-detect-abi
       - linux
+    prefix: tests/analysis/DetectABI/x86_64
     members:
-      - tests/analysis/DetectABI/x86_64/always-dead-return-value.S
-      - tests/analysis/DetectABI/x86_64/dead-on-one-path.S
-      - tests/analysis/DetectABI/x86_64/dead-register.S
-      - tests/analysis/DetectABI/x86_64/draof.S
-      - tests/analysis/DetectABI/x86_64/drvofc.S
-      - tests/analysis/DetectABI/x86_64/raofc.S
-      # - tests/analysis/DetectABI/x86_64/recursion.S
-      - tests/analysis/DetectABI/x86_64/sometimes-dead-return-value.S
-      - tests/analysis/DetectABI/x86_64/uraof.S
-      - tests/analysis/DetectABI/x86_64/urvofc.S
-      - tests/analysis/DetectABI/x86_64/urvof.S
-      - tests/analysis/DetectABI/x86_64/push-pop.S
-      - tests/analysis/DetectABI/x86_64/indirect-call-callee-saved.S
-    # - tests/analysis/DetectABI/x86_64/return-value-to-argument.S
+      - always-dead-return-value.S
+      - dead-on-one-path.S
+      - dead-register.S
+      - draof.S
+      - drvofc.S
+      - raofc.S
+      # - recursion.S
+      - sometimes-dead-return-value.S
+      - uraof.S
+      - urvofc.S
+      - urvof.S
+      - push-pop.S
+      - indirect-call-callee-saved.S
+      # - return-value-to-argument.S
