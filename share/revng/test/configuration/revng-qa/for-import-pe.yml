@@ -16,11 +16,12 @@ tags:
         - /WX
 sources:
   - tags: [windows]
+    prefix: share/revng/test/tests/model/import/pe
     members:
-      - tests/model/import/pe/main.c
-      - tests/model/import/pe/simple-cpp-class.cpp
-      - tests/model/import/pe/qsort.c
-      - tests/model/import/pe/zero-sized-class.cpp
+      - main.c
+      - simple-cpp-class.cpp
+      - qsort.c
+      - zero-sized-class.cpp
 commands:
   - type: revng-qa.compiled
     from:

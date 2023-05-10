@@ -10,4 +10,4 @@ tags:
 sources:
   - tags: [native, dynamic, for-detect-stack-size]
     members:
-      - tests/analysis/DetectStackSize/dynamic_native/stackframe.c
+      - share/revng/test/tests/analysis/DetectStackSize/dynamic_native/stackframe.c

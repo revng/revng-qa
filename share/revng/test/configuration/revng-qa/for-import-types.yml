@@ -8,4 +8,4 @@ tags:
 sources:
    - tags: [native, static, for-import-types]
      members:
-     - tests/model/import/types/types.c
+     - share/revng/test/tests/model/import/types/types.c
