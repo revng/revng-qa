@@ -1,0 +1,19 @@
+tags:
+  - name: well-known
+    variables:
+      CFLAGS:
+        - -Wl,--entry=0x1000
+        - -ggdb
+sources:
+  - tags: [well-known, nostdlib]
+    repeat-for:
+      - [arm, static]
+      - [mips, static]
+      - [mipsel, static]
+      - [aarch64, static]
+      - [x86-64, static]
+      - [s390x, static]
+      - [i386, static]
+    prefix: share/revng/test/tests/well-known-models
+    members:
+      - libc.c
