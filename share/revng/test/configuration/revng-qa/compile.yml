@@ -1,3 +1,6 @@
+tags:
+  - name: stripped
+  - name: with-debug-info
 commands:
   - type: revng-qa.compiled-with-debug-info
     from:
@@ -9,10 +12,12 @@ commands:
       - type: revng-qa.compiled-with-debug-info
     command: ${TRIPLE}strip $INPUT -o $OUTPUT
   - type: revng-qa.compiled
+    tags: [with-debug-info]
     from:
       - type: revng-qa.compiled-with-debug-info
     command: cp $INPUT $OUTPUT
   - type: revng-qa.compiled
+    tags: [stripped]
     from:
       - type: revng-qa.compiled-stripped
     command: cp $INPUT $OUTPUT
