@@ -54,56 +54,55 @@ def distances(target, result):
         distances(input, result)
     return result
 
-def most_similar_tuples(inputs):
+def most_similar_tuples(inputs, command_type):
     log(json.dumps([[x.path for x in input] for input in inputs], indent=2))
     if len(inputs) == 1:
         return list(product(*inputs))
 
+    longest_input = 0
+    for index, input in enumerate(inputs):
+        if len(inputs) > len(inputs[longest_input]):
+            longest_input = index
+
     result = []
+    tuple_size = len(inputs)
+    used_inputs = set()
+    for reference_index, reference in enumerate(inputs[longest_input]):
+        entry = [None] * tuple_size
+        entry[longest_input] = reference
+        used_inputs.add((longest_input, reference_index))
 
-    maximum_similarity = 0
+        for index in range(len(inputs)):
+            if index == longest_input:
+                continue
 
-    # Get the most similar set of tuples, i.e., those that share the most
-    # (transitive inputs)
-    for candidate_set in product(*inputs):
-        if len(set(candidate_set)) != len(candidate_set):
-            continue
+            # A list of (has_different_source, -common_tags_count, index)
+            scores = []
+            for candidate_index, candidate in enumerate(inputs[index]):
+                scores.append((reference.source_path != candidate.source_path,
+                               -len(set(reference.tags) & set(candidate.tags)),
+                               candidate_index))
+            scores = sorted(scores)
 
-        candidate_distances = [distances(candidate, set())
-                               for candidate
-                               in candidate_set]
+            if len(scores) > 1 and scores[0][:-1] == scores[1][:-1]:
+                error(f"While emitting {command_type}, {reference.path} has multiple good matches for index #{index}:\n  {inputs[index][scores[0][2]].path}\n  {inputs[index][scores[1][2]].path}")
 
-        common_targets = reduce(lambda a, b : a & b, candidate_distances)
+            if not scores:
+                error(f"While emitting {command_type}, cannot match {reference.path} with any other target for input #{index}")
 
-        similarity = len(common_targets)
+            used_inputs.add((index, scores[0][2]))
+            entry[index] = inputs[index][scores[0][2]]
 
-        if similarity > maximum_similarity:
-            maximum_similarity = similarity
-            result = []
+        result.append(entry)
 
-        if similarity == maximum_similarity:
-            result.append(candidate_set)
+    log(json.dumps([[x.path for x in input] for input in result], indent=2))
 
-    # Further refine based on common tags
-    maximum_similarity = 0
-    result2 = []
-    for candidate_set in result:
-        candidate_tags = [set(candidate.tags)
-                          for candidate
-                          in candidate_set]
+    for input_index, input in enumerate(inputs):
+        for target_index, target in enumerate(input):
+            if (input_index, target_index) not in used_inputs:
+                error(f"Target {target.path} has not been used!")
 
-        common_tags = reduce(lambda a, b : a & b, candidate_tags)
-
-        similarity = len(common_tags)
-
-        if similarity > maximum_similarity:
-            maximum_similarity = similarity
-            result2 = []
-
-        if similarity == maximum_similarity:
-            result2.append(candidate_set)
-
-    return result2
+    return result
 
 def sort_list(entries, key, dependencies):
     # Collect entries by key and id
@@ -168,6 +167,7 @@ class Variables:
             self.variables[name] += value
         else:
             error(f"Unexpected type for variable {name}")
+
 
 @dataclass
 class Tag:
@@ -387,7 +387,7 @@ class Configuration:
                     if self._evaluate(input_filter, target.tags):
                         input_targets[index].append(target)
 
-            input_targets_list = most_similar_tuples(input_targets)
+            input_targets_list = most_similar_tuples(input_targets, command_type)
 
             if not input_targets_list:
                 error(f"Could not produce any target for {command_type}")

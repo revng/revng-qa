@@ -15,11 +15,21 @@ sources:
       - [arm, static]
       - [mips, static]
       - [mipsel, static]
-      - [aarch64, static]
+      # - [aarch64, static]
       - [x86-64, static]
       - [s390x, static]
       - [native, dynamic]
       - [i386, static]
+    prefix: share/revng/test/tests/runtime
+    members:
+      - function-call.c
+      - floating-point.c
+      - syscall.c
+      - global.c
+      - printf.c
+  - tags: []
+    repeat-for:
+      - [aarch64, static]
     prefix: share/revng/test/tests/runtime
     members:
       - function-call.c
@@ -32,10 +42,15 @@ sources:
       - [arm, static]
       - [mips, static]
       - [mipsel, static]
-      - [aarch64, static]
+      # - [aarch64, static]
       - [x86-64, static]
       - [s390x, static]
       - [native, dynamic]
       - [i386, static]
+    members:
+      - share/revng/test/tests/runtime/calc.c
+  - tags: [one-per-architecture]
+    repeat-for:
+      - [aarch64, static]
     members:
       - share/revng/test/tests/runtime/calc.c
