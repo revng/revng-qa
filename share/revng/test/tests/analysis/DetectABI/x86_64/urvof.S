@@ -11,7 +11,7 @@ _start:
 
 .type urvof, @function
 urvof:
-    # This is a dead assingment to a register, therefore it has to be a return
+    # This is a dead assignment to a register, therefore it has to be a return
     # value
     mov rax,42
     ret
