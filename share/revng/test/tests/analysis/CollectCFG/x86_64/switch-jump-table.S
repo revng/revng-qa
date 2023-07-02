@@ -4,7 +4,7 @@
 
     .intel_syntax noprefix
     .type _start, @function
-	.globl	_start
+    .globl _start
 _start:
     cmp    rax,0x3
     ja     end
