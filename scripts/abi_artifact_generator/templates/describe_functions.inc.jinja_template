@@ -44,7 +44,7 @@ void print_current_state(void) {
     printf("        Bytes: ");
     PRINT_BYTES(/*( register_type )*/, word_printing_helper);
   }
-  
+
   /* Dump Stack */
   printf("    Stack: ");
   typedef uint8_t stack_state[/*( stack_byte_count )*/];
@@ -68,7 +68,7 @@ void describe_/*( name )*/(void) {
       /*( restore_stack )*/
     );
 
-    longjmp(jump_buffer, 1); 
+    longjmp(jump_buffer, 1);
   }
 }
 
