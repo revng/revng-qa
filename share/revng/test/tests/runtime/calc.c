@@ -17,7 +17,11 @@
 
 typedef int value_t;
 
-typedef enum { none, positive, negative } literal_status;
+typedef enum {
+  none,
+  positive,
+  negative
+} literal_status;
 
 typedef struct {
   uint8_t operator;
