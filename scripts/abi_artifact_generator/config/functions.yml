@@ -300,7 +300,7 @@ argument_tests:
     - double_padded_struct_of_structs
 
   #
-  # Tests targetting alignment issues in registers (ARM-specific).
+  # Tests targeting alignment issues in registers (ARM-specific).
   #
 
   double_aligned_scalar_on_the_stack_64:

@@ -32,7 +32,7 @@
 regular_function_1:
     nop
     # The following instruction is referenced by global data, but the
-  	# instruction is already part of a more robust function
+    # instruction is already part of a more robust function
     # 0xAB00000005 (must not match)
     ret
 
@@ -84,17 +84,17 @@ _start:
 .section .rodata
 
 jump_table:
-.quad 4b
+    .quad 4b
 
 # Reference to part of a function
 reference_to_part_of_regular_function_1:
-.quad regular_function_1 + 1
+    .quad regular_function_1 + 1
 
 # Aligned reference to function 0
 aligned_reference_to_function_0:
-.quad 0b
+    .quad 0b
 
 # Misaligned reference to function 1
 mialigned_reference_to_function_1:
-.byte 0x42
-.quad 1b
+    .byte 0x42
+    .quad 1b

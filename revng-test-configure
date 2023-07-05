@@ -349,7 +349,7 @@ class Configuration:
 
             log(f"Parsing command \"{command_name}\"")
             if command_name in self.commands:
-                error(f"We have two commands with the follwing name: {command_name}")
+                error(f"We have two commands with the following name: {command_name}")
 
             self.commands[command_name] = {
                 "suffix": command.get("suffix", ""),

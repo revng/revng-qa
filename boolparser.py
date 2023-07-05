@@ -1,5 +1,5 @@
 """
-Grammer:
+Grammar:
 
 Expression --> AndTerm { OR AndTerm}+
 AndTerm --> Condition { AND Condition}+
