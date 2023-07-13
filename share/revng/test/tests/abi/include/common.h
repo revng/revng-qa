@@ -65,18 +65,18 @@ _Static_assert(sizeof(uint8_t) == 1, "A type with size == 1 is required.");
     printf("0x%.2hhx ]\n", (HELPER)->a[sizeof(TYPE) - 1]); \
   } while (0)
 
-#define PRINT(TYPE, POINTER)                         \
-  do {                                               \
-    printf("      - Type: " #TYPE " # size = 0x%x\n" \
-           "        Bytes: ",                        \
-           sizeof(TYPE));                            \
-    MAKE_PRINT_HELPER(TYPE, POINTER, local_helper);  \
-    PRINT_BYTES(TYPE, local_helper);                 \
+#define PRINT(TYPE, POINTER)                        \
+  do {                                              \
+    printf("      - Type: " #TYPE " # size = %u\n"  \
+           "        Bytes: ",                       \
+           sizeof(TYPE));                           \
+    MAKE_PRINT_HELPER(TYPE, POINTER, local_helper); \
+    PRINT_BYTES(TYPE, local_helper);                \
   } while (0)
 
 #define POINTER(TYPE, POINTER)                        \
   do {                                                \
-    printf("      - Type: " #TYPE " # size = 0x%x\n"  \
+    printf("      - Type: " #TYPE " # size = %u\n"    \
            "        Pointer: 0x%x\n        Bytes: ",  \
            sizeof(TYPE),                              \
            POINTER);                                  \
