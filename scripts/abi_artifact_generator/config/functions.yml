@@ -396,7 +396,7 @@ return_value_tests:
   single_struct_pointer_return_value: "huge_struct *"
 
   single_128_bit_return_value: "UINT128_T"
-  single_single_big_struct_return_value: "big_struct"
-  single_single_huge_struct_return_value: "huge_struct"
+  single_big_struct_return_value: "big_struct"
+  single_huge_struct_return_value: "huge_struct"
 
   # TODO: floating point return values.
