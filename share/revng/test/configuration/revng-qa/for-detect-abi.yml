@@ -102,7 +102,7 @@ sources:
       - [i386-regparm-1-systemv-abi]
       - [arm-aapcs-abi]
     members:
-      - share/revng/test/tests/abi/source/describe_functions.c
+      - share/revng/test/tests/abi/describe_functions.c
 
   - tags: [abi-functions-library, linux]
     repeat-for:
@@ -113,7 +113,7 @@ sources:
       - [i386-regparm-1-systemv-abi]
       - [arm-aapcs-abi]
     members:
-      - share/revng/test/tests/abi/source/abi_test_function_library.c
+      - share/revng/test/tests/abi/abi_test_function_library.c
 
   - tags:
       - x86-64
