@@ -71,7 +71,8 @@ static jmp_buf jump_buffer;
 
     /*( return_value_type )*/ return_value;
     bool IsScalar = IS_SCALAR(return_value);
-    size_t SizeLimit = IsScalar ? SCALAR_SIZE_LIMIT : STRUCT_SIZE_LIMIT;
+    size_t SizeLimit = IsScalar ? MaximumGPRsPerScalarReturnValue :
+                                  MaximumGPRsPerAggregateReturnValue;
     bool WithinSizeLimit = sizeof(return_value) <= SizeLimit * sizeof(void *);
     bool IsPacked = (_Alignof(return_value) == 1 && sizeof(return_value) != 1);
     if (WithinSizeLimit && !IsPacked) {

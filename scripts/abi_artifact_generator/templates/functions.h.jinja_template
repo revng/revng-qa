@@ -8,6 +8,8 @@ This template file is distributed under the MIT License. See LICENSE.md for deta
 
 #include <stdint.h>
 
+#include "abi.h"
+
 /*
  * Define an empty `ABIDEF` if it's undefined
  */
