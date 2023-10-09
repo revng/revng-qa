@@ -9,16 +9,16 @@
     return_from_function: |
       ret
     fill_a_register: |
-      mov {{ location }} + {{ offset }}, %{{ register }}
+      mov {{ register }}, qword ptr [{{ location }} + {{ offset }}]
     push_to_stack: |
       {{ fill_a_register }}
-      push %{{register}}
+      push {{ register }}
     restore_stack: |
-      add $({{ stack_size }}), %rsp
+      add rsp, {{ stack_size }}
     save_return_address: ""
     # no need to do anything since the return address is already at the top of the stack
     restore_return_address: |
-      push {{ stack_size }} (%rsp)
+      push qword ptr [rsp + {{ stack_size }}]
 
 "i386":
   register_type: uint32_t
@@ -30,16 +30,16 @@
     return_from_function: |
       ret
     fill_a_register: |
-      mov {{ location }} + {{ offset }}, %{{ register }}
+      mov {{ register }}, dword ptr [{{ location }} + {{ offset }}]
     push_to_stack: |
       {{ fill_a_register }}
-      push %{{register}}
+      push {{ register }}
     restore_stack: |
-      add $({{ stack_size }}), %esp
+      add esp, {{ stack_size }}
     save_return_address: ""
     # no need to do anything since the return address is already at the top of the stack
     restore_return_address: |
-      push {{ stack_size }} (%esp)
+      push dword ptr [esp + {{ stack_size }}]
 
 "aarch64":
   register_type: uint64_t

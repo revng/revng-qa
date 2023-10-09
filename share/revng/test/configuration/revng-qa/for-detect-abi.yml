@@ -9,6 +9,7 @@ tags:
         - -fno-pie
         - -fno-stack-protector
         - -O1
+        - -masm=intel
 
   - name: abi-functions-library
     variables:
