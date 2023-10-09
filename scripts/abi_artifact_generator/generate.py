@@ -65,14 +65,14 @@ def render_helper(env, template_name: str, result_path: str, variable_dictionary
         file.write(jinja_template.render(variable_dictionary))
 
 
-def fill_a_register(architecture, location, offset, register):
+def load_a_register(architecture, location, offset, register):
     local_dictionary = {
         "location": location,
         "offset": offset,
         "register": register,
     }
 
-    jinja_template = jinja2.Environment().from_string(architecture["templates"]["fill_a_register"])
+    jinja_template = jinja2.Environment().from_string(architecture["templates"]["load_a_register"])
     return jinja_template.render(local_dictionary)
 
 
@@ -82,7 +82,7 @@ def setup_registers(architecture):
     for index, register in enumerate(reversed(architecture["register_list"])):
         location = "randomized_state"
         offset = (register_count - index - 1) * architecture["register_size"]
-        current = fill_a_register(architecture, location, offset, register)
+        current = load_a_register(architecture, location, offset, register)
         result = result + current + "\n"
     return result
 
@@ -95,9 +95,9 @@ def setup_stack(architecture, config):
     result = str("")
 
     # Some architectures only support pushing registers onto the stack in pairs.
-    # To work around that limitation, this introduces the `fill_two_registers`
+    # To work around that limitation, this introduces the `load_two_registers`
     # option for the templates to utilize: it lets two registers to be loaded
-    # at once, but has the limitation of feeling up twice the space - hence we
+    # at once, but has the limitation of using up twice the space - hence we
     # need to limit the pushes, which is what the `flip_flop` flag is for:
     # the registers are only pushed when it's set, which happens on every second
     # iteration.
@@ -106,7 +106,7 @@ def setup_stack(architecture, config):
         stack_helper_dictionary = {
             "register": architecture["register_list"][0],
             "second_register": architecture["register_list"][1],
-            "fill_a_register": fill_a_register(
+            "load_a_register": load_a_register(
                 architecture,
                 "randomized_state",
                 offset,
@@ -114,15 +114,15 @@ def setup_stack(architecture, config):
             ),
         }
         if flip_flop:
-            stack_helper_dictionary["fill_two_registers"] = (
-                fill_a_register(
+            stack_helper_dictionary["load_two_registers"] = (
+                load_a_register(
                     architecture,
                     "randomized_state",
                     offset,
                     architecture["register_list"][0],
                 )
                 + "\n"
-                + fill_a_register(
+                + load_a_register(
                     architecture,
                     "randomized_state",
                     offset - register_size,
@@ -130,7 +130,7 @@ def setup_stack(architecture, config):
                 )
             )
         else:
-            stack_helper_dictionary["fill_two_registers"] = ""
+            stack_helper_dictionary["load_two_registers"] = ""
         jinja_template = jinja2.Environment().from_string(
             architecture["templates"]["push_to_stack"]
         )
