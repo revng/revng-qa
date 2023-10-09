@@ -218,9 +218,23 @@ def render_functions(jinja_environment, config, out_dir: str):
         "packed_structs": config["packed_structs"],
         "argument_functions": config["argument_tests"],
         "return_value_functions": config["return_value_tests"],
+        "supported_primitives": [
+            "int8_t",
+            "int16_t",
+            "int32_t",
+            "int64_t",
+            "uint8_t",
+            "uint16_t",
+            "uint32_t",
+            "uint64_t",
+        ],
     }
 
     filename = "functions.h"
+    result_path = out_dir + "/" + filename
+    render_helper(jinja_environment, filename, result_path, dictionary)
+
+    filename = "types.h"
     result_path = out_dir + "/" + filename
     render_helper(jinja_environment, filename, result_path, dictionary)
 

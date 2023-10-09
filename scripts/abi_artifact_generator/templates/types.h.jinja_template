@@ -1,0 +1,42 @@
+#pragma once
+/*( _ )*/
+
+/*#-
+This template file is distributed under the MIT License. See LICENSE.md for details.
+#*/
+
+/*(- generation_notice )*/
+
+#ifdef __SIZEOF_INT128__
+#define INT128_IS_SCALAR 1
+#else
+#define INT128_IS_SCALAR 0
+#endif
+
+#define IS_SCALAR(TYPE, VALUE) \
+  _Generic((VALUE), \
+    /*{- for type in supported_primitives }*/
+           /*( type )*/: 1, \
+           /*( type )*/ *: 1, \
+    /*{- endfor }*/
+    /*{- for name, fields in structs.items() }*/
+           /*( name )*/: 0, \
+           /*( name )*/ *: 1, \
+    /*{- endfor }*/
+    /*{- for name, fields in packed_structs.items() }*/
+           /*( name )*/: 0, \
+           /*( name )*/ *: 1, \
+    /*{- endfor }*/
+           INT128_T: INT128_IS_SCALAR, \
+           INT128_T *: 1, \
+           UINT128_T: INT128_IS_SCALAR, \
+           UINT128_T *: 1, \
+           void *: 1)
+
+#define IS_PACKED(TYPE) (_Alignof(TYPE) == 1 && sizeof(TYPE) != 1)
+
+#define ARGUMENT_SIZE_LIMIT(TYPE, VALUE) \
+  (sizeof(void *) * (IS_SCALAR(TYPE, VALUE) ? MaximumGPRsPerScalarArgument : MaximumGPRsPerAggregateArgument))
+#define RETURN_VALUE_SIZE_LIMIT(TYPE, VALUE) \
+  (sizeof(void *) * (IS_SCALAR(TYPE, VALUE) ? MaximumGPRsPerScalarReturnValue : MaximumGPRsPerAggregateReturnValue))
+
