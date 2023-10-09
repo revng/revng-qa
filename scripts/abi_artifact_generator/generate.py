@@ -152,14 +152,27 @@ def restore_stack(architecture, config):
 
 
 def save_return_address(architecture):
-    return architecture["templates"]["save_return_address"]
+    local_dictionary = {
+        "location": "saved_return_address",
+        "register": architecture["register_list"][0],
+    }
+
+    jinja_template = jinja2.Environment().from_string(
+        architecture["templates"]["save_return_address"]
+    )
+    return jinja_template.render(local_dictionary)
 
 
 def restore_return_address(architecture, config):
+    local_dictionary = {
+        "location": "saved_return_address",
+        "register": architecture["register_list"][0],
+    }
+
     jinja_template = jinja2.Environment().from_string(
         architecture["templates"]["restore_return_address"]
     )
-    return jinja_template.render({"stack_size": config["stack_byte_count"]})
+    return jinja_template.render(local_dictionary)
 
 
 def return_from_function(architecture, config):

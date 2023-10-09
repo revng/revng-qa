@@ -134,3 +134,5 @@ int main(void) {
   puts("...");
   return 0;
 }
+
+void *saved_return_address;

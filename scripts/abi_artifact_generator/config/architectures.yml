@@ -15,10 +15,12 @@
       push {{ register }}
     restore_stack: |
       add rsp, {{ stack_size }}
-    save_return_address: ""
-    # no need to do anything since the return address is already at the top of the stack
+    save_return_address: |
+      pop {{ register }}
+      mov qword ptr [{{ location }}], {{ register }}
     restore_return_address: |
-      push qword ptr [rsp + {{ stack_size }}]
+      mov {{ register }}, qword ptr [{{ location }}]
+      push {{ register }}
 
 "i386":
   register_type: uint32_t
@@ -36,10 +38,12 @@
       push {{ register }}
     restore_stack: |
       add esp, {{ stack_size }}
-    save_return_address: ""
-    # no need to do anything since the return address is already at the top of the stack
+    save_return_address: |
+      pop {{ register }}
+      mov dword ptr [{{ location }}], {{ register }}
     restore_return_address: |
-      push dword ptr [esp + {{ stack_size }}]
+      mov {{ register }}, dword ptr [{{ location }}]
+      push {{ register }}
 
 "aarch64":
   register_type: uint64_t
@@ -60,9 +64,13 @@
     restore_stack: |
       add sp, sp, #{{ stack_size }}
     save_return_address: |
-      str lr, [sp, #-16]!
+      adrp {{ register }}, {{ location }}
+      add {{ register }}, {{ register }}, #:lo12:{{ location }}
+      str lr, [{{ register }}]
     restore_return_address: |
-      ldr lr, [sp, #{{ stack_size }}]
+      adrp {{ register }}, {{ location }}
+      add {{ register }}, {{ register }}, #:lo12:{{ location }}
+      ldr lr, [{{ register }}]
 
 "arm":
   register_type: uint32_t
@@ -83,6 +91,10 @@
     restore_stack: |
       add sp, sp, #{{ stack_size }}
     save_return_address: |
-      push { lr }
+      movw {{ register }}, #:lower16:{{ location }}
+      movt {{ register }}, #:upper16:{{ location }}
+      str lr, [{{ register }}]
     restore_return_address: |
-      ldr lr, [sp, #{{ stack_size }}]
+      movw {{ register }}, #:lower16:{{ location }}
+      movt {{ register }}, #:upper16:{{ location }}
+      ldr lr, [{{ register }}]
