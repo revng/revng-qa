@@ -10,7 +10,7 @@ tags:
         - -ggdb3
         - -fno-stack-protector
 sources:
-  - tags: [for-runtime, for-comparison]
+  - tags: [simple-executable, for-runtime, for-comparison]
     repeat-for:
       - [arm, static]
       - [mips, static]
@@ -27,7 +27,7 @@ sources:
       - syscall.c
       - global.c
       - printf.c
-  - tags: []
+  - tags: [simple-executable]
     repeat-for:
       - [aarch64, static]
     prefix: share/revng/test/tests/runtime
@@ -37,7 +37,7 @@ sources:
       - syscall.c
       - global.c
       - printf.c
-  - tags: [for-runtime, for-comparison, one-per-architecture]
+  - tags: [simple-executable, for-runtime, for-comparison, one-per-architecture]
     repeat-for:
       - [arm, static]
       - [mips, static]
@@ -49,7 +49,7 @@ sources:
       - [i386, static]
     members:
       - share/revng/test/tests/runtime/calc.c
-  - tags: [one-per-architecture]
+  - tags: [simple-executable, one-per-architecture]
     repeat-for:
       - [aarch64, static]
     members:

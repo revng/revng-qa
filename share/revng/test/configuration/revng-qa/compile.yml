@@ -1,11 +1,13 @@
 tags:
+  - name: simple-executable
+
   - name: stripped
   - name: with-debug-info
 commands:
   - type: revng-qa.compiled-with-debug-info
     from:
       - type: source
-        filter: linux
+        filter: linux and simple-executable
     command: ${TRIPLE}gcc $INPUT -o $OUTPUT $CFLAGS
   - type: revng-qa.compiled-stripped
     from:

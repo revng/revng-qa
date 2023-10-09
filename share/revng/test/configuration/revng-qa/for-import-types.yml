@@ -6,6 +6,6 @@ tags:
         - -fuse-ld=bfd
         - -Wl,--section-start=.custom_data=0xf00000
 sources:
-  - tags: [native, static, for-import-types]
+  - tags: [simple-executable, native, static, for-import-types]
     members:
       - share/revng/test/tests/model/import/types/types.c

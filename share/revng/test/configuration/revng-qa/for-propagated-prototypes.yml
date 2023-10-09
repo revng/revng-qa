@@ -1,6 +1,6 @@
 tags:
   - name: for-propagated-prototypes
 sources:
-  - tags: [native, for-propagated-prototypes]
+  - tags: [simple-executable, native, for-propagated-prototypes]
     members:
       - share/revng/test/tests/analysis/DetectABI/x86_64/propagate.S

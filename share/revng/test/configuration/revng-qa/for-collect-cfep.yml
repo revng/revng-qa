@@ -6,6 +6,6 @@ tags:
         - -fuse-ld=bfd
         - -Wl,--section-start=.text=0xAB00000000
 sources:
-  - tags: [native, static, for-collect-cfep]
+  - tags: [simple-executable, native, static, for-collect-cfep]
     members:
       - share/revng/test/tests/analysis/CollectFunctions/functions.S

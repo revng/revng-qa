@@ -5,7 +5,7 @@ tags:
         - -fno-inline
         - -O2
 sources:
-  - tags: [native, dynamic, for-decompilation]
+  - tags: [simple-executable, native, dynamic, for-decompilation]
     prefix: share/revng/test/tests/analysis/Decompilation/dynamic_native
     members:
       - struct.c

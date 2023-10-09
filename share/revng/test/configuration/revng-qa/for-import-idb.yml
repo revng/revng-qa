@@ -9,7 +9,7 @@ tags:
         - -O0
         - -g
 sources:
-  - tags: [native, dynamic, for-ida]
+  - tags: [simple-executable, native, dynamic, for-ida]
     prefix: share/revng/test/tests/model/import/idb
     members:
       - simple.c
