@@ -5,12 +5,22 @@
  */
 
 #include <assert.h>
-#include <setjmp.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
 
 #include "abi.h"
+
+#ifdef TARGET_x86_64
+#include "x86_64/constants.h"
+#elif TARGET_i386
+#include "i386/constants.h"
+#elif TARGET_aarch64
+#include "aarch64/constants.h"
+#elif TARGET_arm
+#include "arm/constants.h"
+#else
+#error "Impossible to find sources because the target architecture is unknown."
+#endif
 
 /*
  * Determine the endianness
@@ -57,38 +67,3 @@
 #undef BEO
 
 #endif
-
-_Static_assert(sizeof(uint8_t) == 1, "A type with size == 1 is required.");
-#define MAKE_PRINT_HELPER(TYPE, POINTER, RESULT) \
-  typedef union {                                \
-    TYPE v;                                      \
-    uint8_t a[sizeof(TYPE)];                     \
-  } printing_##RESULT;                           \
-  printing_##RESULT *RESULT = (printing_##RESULT *) POINTER
-
-#define PRINT_BYTES(TYPE, HELPER)                          \
-  do {                                                     \
-    printf("[ ");                                          \
-    for (unsigned i = 0; i < sizeof(TYPE) - 1; ++i)        \
-      printf("0x%.2hhx, ", (HELPER)->a[i]);                \
-    printf("0x%.2hhx ]\n", (HELPER)->a[sizeof(TYPE) - 1]); \
-  } while (0)
-
-#define PRINT(TYPE, POINTER)                        \
-  do {                                              \
-    printf("      - Type: " #TYPE " # size = %u\n"  \
-           "        Bytes: ",                       \
-           sizeof(TYPE));                           \
-    MAKE_PRINT_HELPER(TYPE, POINTER, local_helper); \
-    PRINT_BYTES(TYPE, local_helper);                \
-  } while (0)
-
-#define POINTER(TYPE, POINTER)                        \
-  do {                                                \
-    printf("      - Type: " #TYPE " # size = %u\n"    \
-           "        Pointer: 0x%x\n        Bytes: ",  \
-           sizeof(TYPE),                              \
-           POINTER);                                  \
-    MAKE_PRINT_HELPER(TYPE *, POINTER, local_helper); \
-    PRINT_BYTES(TYPE *, local_helper);                \
-  } while (0)

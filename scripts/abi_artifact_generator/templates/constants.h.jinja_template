@@ -1,0 +1,17 @@
+#pragma once
+/*( _ )*/
+
+/*#-
+This template file is distributed under the MIT License. See LICENSE.md for details.
+#*/
+
+/*(- generation_notice )*/
+
+static struct {
+  uint64_t seed, iteration_count, stack_byte_count, generated_byte_count;
+} constants = {
+  .seed = /*( lfsr_seed )*/,
+  .iteration_count = /*( iteration_count )*/,
+  .stack_byte_count = /*( stack_byte_count )*/,
+  .generated_byte_count = /*( generated_byte_count )*/
+};

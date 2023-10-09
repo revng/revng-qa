@@ -90,14 +90,14 @@ def load_a_register(architecture, location, offset, register):
 
 
 def setup_registers(architecture):
-    result = str("")
+    result = architecture["comment"] + " fill the registers with random data\n"
     register_count = len(architecture["register_list"])
     for index, register in enumerate(reversed(architecture["register_list"])):
         location = "randomized_state"
         offset = (register_count - index - 1) * architecture["register_size"]
         current = load_a_register(architecture, location, offset, register)
         result = result + current + "\n"
-    return result
+    return result + "\n"
 
 
 def setup_stack(architecture, config):
@@ -105,7 +105,7 @@ def setup_stack(architecture, config):
     last_offset = (len(architecture["register_list"]) - 1) * register_size
     first_offset = last_offset + config["stack_byte_count"]
 
-    result = str("")
+    result = architecture["comment"] + " fill the stack with random data\n"
 
     # Some architectures only support pushing registers onto the stack in pairs.
     # To work around that limitation, this introduces the `load_two_registers`
@@ -151,17 +151,7 @@ def setup_stack(architecture, config):
 
         flip_flop = not flip_flop
 
-    return result
-
-
-def call_a_function(architecture, name: str):
-    jinja_template = jinja2.Environment().from_string(architecture["templates"]["call_a_function"])
-    return jinja_template.render({"function_name": name})
-
-
-def restore_stack(architecture, config):
-    jinja_template = jinja2.Environment().from_string(architecture["templates"]["restore_stack"])
-    return jinja_template.render({"stack_size": config["stack_byte_count"]})
+    return result + "\n"
 
 
 def save_return_address(architecture):
@@ -171,7 +161,10 @@ def save_return_address(architecture):
     }
 
     jinja_template = jinja2.Environment().from_string(
-        architecture["templates"]["save_return_address"]
+        architecture["comment"]
+        + " save the return address\n"
+        + architecture["templates"]["save_return_address"]
+        + "\n\n"
     )
     return jinja_template.render(local_dictionary)
 
@@ -183,20 +176,43 @@ def restore_return_address(architecture, config):
     }
 
     jinja_template = jinja2.Environment().from_string(
-        architecture["templates"]["restore_return_address"]
+        architecture["comment"]
+        + " restore the return address\n"
+        + architecture["templates"]["restore_return_address"]
+        + "\n\n"
     )
     return jinja_template.render(local_dictionary)
 
 
+def setup_prologue(architecture, config):
+    return (
+        save_return_address(architecture)
+        + setup_stack(architecture, config)
+        + setup_registers(architecture)
+    )
+
+
+def call_a_function(architecture, name: str):
+    jinja_template = jinja2.Environment().from_string(architecture["templates"]["call_a_function"])
+    return jinja_template.render({"function_name": name}) + "\n\n"
+
+
+def restore_stack(architecture, config):
+    jinja_template = jinja2.Environment().from_string(architecture["templates"]["restore_stack"])
+    return jinja_template.render({"stack_size": config["stack_byte_count"]}) + "\n\n"
+
+
 def return_from_function(architecture, config):
+    result = restore_return_address(architecture, config)
+
     jinja_template = jinja2.Environment().from_string(
         architecture["templates"]["return_from_function"]
     )
-    return jinja_template.render({"stack_size": config["stack_byte_count"]})
+    return result + jinja_template.render({"stack_size": config["stack_byte_count"]})
 
 
-def asm(input: str):
-    return '"' + '\\n"\n      "'.join(input.splitlines()) + '\\n"'
+def asm(text: str):
+    return "\n  ".join(text.splitlines())
 
 
 def get_generation_notice():
@@ -259,12 +275,9 @@ def render_function_description(jinja_env, architectures, config, functions, out
             "stack_pointer": architecture["stack_pointer"],
             "argument_functions": functions["argument_tests"],
             "return_value_functions": functions["return_value_tests"],
-            "fill_stack_with_random_data": asm(setup_stack(architecture, config)),
-            "fill_registers_with_random_data": asm(setup_registers(architecture)),
+            "setup_prologue": asm(setup_prologue(architecture, config)),
             "call_a_function": lambda n, a=architecture: asm(call_a_function(a, n)),
             "restore_stack": asm(restore_stack(architecture, config)),
-            "save_return_address": asm(save_return_address(architecture)),
-            "restore_return_address": asm(restore_return_address(architecture, config)),
             "return_from_function": asm(return_from_function(architecture, config)),
         }
 
@@ -272,11 +285,15 @@ def render_function_description(jinja_env, architectures, config, functions, out
         dictionary["generated_byte_count"] = dictionary["stack_byte_count"] + combined
         assert dictionary["generated_byte_count"] % dictionary["register_size"] == 0
 
+        filename = "constants.h"
+        path = out_dir + "/" + architecture_name + "/" + filename
+        render_helper(jinja_env, filename, path, dictionary)
+
         filename = "printers.inc"
         path = out_dir + "/" + architecture_name + "/" + filename
         render_helper(jinja_env, filename, path, dictionary)
 
-        filename = "describe_functions.inc"
+        filename = "setup_return_values.inc"
         path = out_dir + "/" + architecture_name + "/" + filename
         render_helper(jinja_env, filename, path, dictionary)
 
@@ -286,6 +303,10 @@ def render_function_description(jinja_env, architectures, config, functions, out
 
             if current_style == "msvc":
                 style_specific_dictionary["generation_notice"] = get_masm_style_generation_notice()
+
+            filename = "setup_arguments.S"
+            path = out_dir + "/" + architecture_name + "/" + current_style + "/" + filename
+            render_helper(jinja_env, filename, path, style_specific_dictionary)
 
 
 def main():
