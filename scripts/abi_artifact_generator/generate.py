@@ -183,7 +183,8 @@ def get_generation_notice():
 def render_functions(jinja_environment, config, out_dir: str):
     dictionary = {
         "generation_notice": get_generation_notice(),
-        "structs": config["helper_structs"],
+        "structs": config["structs"],
+        "packed_structs": config["packed_structs"],
         "argument_functions": config["argument_tests"],
         "return_value_functions": config["return_value_tests"],
     }

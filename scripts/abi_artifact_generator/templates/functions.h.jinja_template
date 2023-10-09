@@ -48,6 +48,22 @@ typedef struct {
 
 /*{ endfor -}*/
 
+// There's a slight difference in the way this pragma impacts the structs
+// between msvc and gcc, but it shouldn't be relevant in our case: since all
+// we care about is that these structs are emitted as "unnaturally aligned",
+// without any regard to their specific size.
+#pragma pack(push, 1)
+
+/*{ for name, fields in packed_structs.items() -}*/
+typedef struct {
+/*{ for field in fields -}*/
+  /*( field | indent(2, true) )*/;
+/*{ endfor -}*/
+} /*( name )*/;
+
+/*{ endfor -}*/
+#pragma pack(pop)
+
 /*
  * Functions designed to test argument passing
  */
