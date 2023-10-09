@@ -1,0 +1,116 @@
+tags:
+  - name: x86-64-systemv-abi
+    implies: [x86-64]
+    variables:
+      ABI_NAME: SystemV_x86_64
+      CFLAGS:
+        - -DABI_SystemV_x86_64
+
+  - name: x86-64-microsoft-abi
+    implies: [x86-64]
+    variables:
+      ABI_NAME: Microsoft_x86_64
+      CFLAGS:
+        - -DABI_Microsoft_x86_64
+        - -maccumulate-outgoing-args
+
+  - name: i386-systemv-abi
+    implies: [i386]
+    variables:
+      ABI_NAME: SystemV_x86
+      CFLAGS:
+        - -DABI_SystemV_x86
+
+  - name: i386-regparm-3-systemv-abi
+    implies: [i386]
+    variables:
+      ABI_NAME: SystemV_x86_regparm_3
+      CFLAGS:
+        - -DABI_SystemV_x86_regparm_3
+
+  - name: i386-regparm-2-systemv-abi
+    implies: [i386]
+    variables:
+      ABI_NAME: SystemV_x86_regparm_2
+      CFLAGS:
+        - -DABI_SystemV_x86_regparm_2
+
+  - name: i386-regparm-1-systemv-abi
+    implies: [i386]
+    variables:
+      ABI_NAME: SystemV_x86_regparm_1
+      CFLAGS:
+        - -DABI_SystemV_x86_regparm_1
+
+  - name: i386-cdecl-microsoft-abi
+    implies: [i386]
+    variables:
+      ABI_NAME: Microsoft_x86_cdecl
+      CFLAGS:
+        - -DABI_Microsoft_x86_cdecl
+
+  - name: i386-fastcall-microsoft-abi
+    implies: [i386]
+    variables:
+      ABI_NAME: Microsoft_x86_fastcall
+      CFLAGS:
+        - -DABI_Microsoft_x86_fastcall
+
+  - name: i386-stdcall-microsoft-abi
+    implies: [i386]
+    variables:
+      ABI_NAME: Microsoft_x86_stdcall
+      CFLAGS:
+        - -DABI_Microsoft_x86_stdcall
+
+  - name: aarch64-aapcs64-abi
+    implies: [aarch64]
+    variables:
+      ABI_NAME: AAPCS64
+      CFLAGS:
+        - -DABI_AAPCS64
+
+  - name: arm-aapcs-abi
+    implies: [arm]
+    variables:
+      ABI_NAME: AAPCS
+      CFLAGS:
+        - -DABI_AAPCS
+
+  - name: for-runtime-abi-tests
+    variables:
+      CFLAGS:
+        - -std=c99
+        - -fno-pic
+        - -fno-pie
+        - -fno-stack-protector
+
+sources:
+  - tags: [for-runtime-abi-tests]
+    repeat-for:
+      - [x86-64-systemv-abi]
+      - [i386-systemv-abi]
+      - [i386-regparm-3-systemv-abi]
+      - [i386-regparm-2-systemv-abi]
+      - [i386-regparm-1-systemv-abi]
+      - [i386-cdecl-microsoft-abi]
+      - [i386-fastcall-microsoft-abi]
+      - [i386-stdcall-microsoft-abi]
+      # - [aarch64-aapcs64-abi]
+      - [arm-aapcs-abi]
+    members:
+      - share/revng/test/tests/abi/
+
+commands:
+  - type: revng-qa.runtime-abi-tests
+    from:
+      - type: source
+        filter: for-runtime-abi-tests
+    suffix: /
+    command: |-
+      "${INPUT}/build_abi_test_binaries.sh"
+        "${INPUT}"
+        "${OUTPUT}"
+        "${TRIPLE}"
+        "${CFLAGS}"
+        "${OBJDUMP_FLAGS}"
