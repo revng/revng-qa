@@ -270,6 +270,11 @@ def render_function_description(jinja_env, architectures, config, functions, out
 
         combined = dictionary["register_count"] * dictionary["register_size"]
         dictionary["generated_byte_count"] = dictionary["stack_byte_count"] + combined
+        assert dictionary["generated_byte_count"] % dictionary["register_size"] == 0
+
+        filename = "printers.inc"
+        path = out_dir + "/" + architecture_name + "/" + filename
+        render_helper(jinja_env, filename, path, dictionary)
 
         filename = "describe_functions.inc"
         path = out_dir + "/" + architecture_name + "/" + filename

@@ -6,13 +6,20 @@
 
 #include <assert.h>
 #include <setjmp.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
+
+#include "abi.h"
 
 /*
  * Determine the endianness
  */
+
+#ifdef _MSC_VER
+#define ENDIANNESS_LITTLE
+#else
+
 #if defined(__BYTE_ORDER__)
 #define BO __BYTE_ORDER__
 #elif defined(__BYTE_ORDER)
@@ -48,6 +55,8 @@
 #undef BO
 #undef LEO
 #undef BEO
+
+#endif
 
 _Static_assert(sizeof(uint8_t) == 1, "A type with size == 1 is required.");
 #define MAKE_PRINT_HELPER(TYPE, POINTER, RESULT) \
