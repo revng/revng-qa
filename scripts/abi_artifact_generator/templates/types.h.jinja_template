@@ -7,11 +7,22 @@ This template file is distributed under the MIT License. See LICENSE.md for deta
 
 /*(- generation_notice )*/
 
+/**
+ * Due to not wanting to lock ourselves into a single compiler ecosystem, we
+ * are not able to rely on the compiler-specific data type logic, which leads
+ * to having to generate a "universal" solution based on the data we already
+ * have within the generator script.
+ */
+
 #ifdef __SIZEOF_INT128__
 #define INT128_IS_SCALAR 1
 #else
 #define INT128_IS_SCALAR 0
 #endif
+
+// Using `1` and `0`s instead of `true`/`false` for initialization of `_Bool`s
+// because of inconsistencies in how different compilers handle `stdbool.h`
+// header.
 
 #define IS_SCALAR(TYPE, VALUE) \
   _Generic((VALUE), \

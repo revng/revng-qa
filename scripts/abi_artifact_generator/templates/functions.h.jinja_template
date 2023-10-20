@@ -7,6 +7,14 @@ This template file is distributed under the MIT License. See LICENSE.md for deta
 
 /*(- generation_notice )*/
 
+/**
+ * Provides the prototypes of all the structs and functions defined in
+ * `function.yml` configuration file.
+ *
+ * There are two functions per test: `setup_X` (runner entry point) and
+ * `test_X` (the callee to be analyzed).
+ */
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -56,6 +64,14 @@ typedef struct {
 // between msvc and gcc, but it shouldn't be relevant in our case: since all
 // we care about is that these structs are emitted as "unnaturally aligned",
 // without any regard to their specific size.
+//
+// When forcing them to be unaligned, compiler is definitely putting them onto
+// the stack (he doesn't want to deal with it either). So, in essence, these
+// tests are only there so we can verify that function types layouts are aware
+// that some stuff is bound to only use stack based on its type.
+//
+// Note: we opted to use `pragma pack` under every compiler because that's
+// the only approach msvc supports.
 #pragma pack(push, 1)
 
 /*{ for name, fields in packed_structs.items() -}*/

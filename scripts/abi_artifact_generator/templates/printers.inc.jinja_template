@@ -4,6 +4,15 @@ This template file is distributed under the MIT License. See LICENSE.md for deta
 
 /*(- generation_notice )*/
 
+/**
+ * Provides the way to decode information "dumped" by the functions from
+ * `functions.inc` into the final yaml format on a test-by-test basis.
+ *
+ * Note that it provides a dispatcher-style function `"print"` which takes
+ * function name as an argument to pass the decoding to the corresponding
+ * printer function.
+ */
+
 #include <stdio.h>
 #include <string.h>
 

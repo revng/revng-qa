@@ -4,6 +4,11 @@
  * This file is distributed under the MIT License. See LICENSE.md for details.
  */
 
+/**
+ * This file contains some common shared macro definition to avoid having
+ * to place them in more than one place.
+ */
+
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>

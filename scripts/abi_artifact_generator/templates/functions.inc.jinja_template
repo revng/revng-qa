@@ -4,6 +4,10 @@ This template file is distributed under the MIT License. See LICENSE.md for deta
 
 /*(- generation_notice )*/
 
+/**
+ * Provides the bodies of all the `test_{{ TEST_NAME }}` functions.
+ */
+
 #ifndef _MSC_VER
 #include <stdalign.h>
 #endif
