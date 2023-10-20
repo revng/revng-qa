@@ -12,6 +12,9 @@ This template file is distributed under the MIT License. See LICENSE.md for deta
 #endif
 /*{- elif current_style == 'msvc' -}*/
 ifndef rax
+;; for now only use `flat, c` (`cdecl`) abi for all the functions defined
+;; in this file.
+;; TODO: extend to support `stdcall` and `fastcall` properly.
 .model flat, c
 endif
 

@@ -4,6 +4,28 @@
 
 /* RUN-default: nope */
 
+/**
+ * This file ties together the whole suite by providing a single entry point
+ * for the execution.
+ *
+ * It accepts a path to another binary as the first argument. The file is then
+ * mmap'ed and the addresses from within the `gathered_symbols.h` header are
+ * used to temporarily replace some of the instructions with interrupts at which
+ * the installed interrupt handler saves the state of all the registers and some
+ * subset of the stack adjacent to the stack pointer into a predefined location.
+ *
+ * After saving the state in a specific location, the underlying instruction is
+ * restored to its original value, and the execution continues from the same PC
+ * (executes the instruction at the same address again without any changes
+ * to the state).
+ *
+ * All the gathered state data (`stored_state` array) is then dumped thanks
+ * to external `print_a_register` and `print_stack` helpers.
+ *
+ * Similarly, all the output data from the tests themselves is printed using
+ * the `print` dispatcher (see the docs related to `printers.c` template).
+ */
+
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
