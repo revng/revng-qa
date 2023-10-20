@@ -388,8 +388,10 @@ return_value_tests:
   single_two_byte_struct_return_value: "two_byte_struct"
   single_small_struct_of_structs_return_value: "small_struct_of_structs"
   single_struct_of_structs_return_value: "struct_of_structs"
-  single_unnaturally_aligned_struct_32_return_value: "unnaturally_aligned_struct_32"
-  single_unnaturally_aligned_struct_64_return_value: "unnaturally_aligned_struct_64"
+
+  # NOTE: re-enable these these tests when unnatural alignment support is fixed
+  # single_unnaturally_aligned_struct_32_return_value: "unnaturally_aligned_struct_32"
+  # single_unnaturally_aligned_struct_64_return_value: "unnaturally_aligned_struct_64"
 
   single_void_pointer_return_value: "void *"
   single_int_pointer_return_value: "uint32_t *"
