@@ -5,7 +5,10 @@ project(revng-qa NONE)
 install(PROGRAMS revng-test-configure boolparser.py common.sh
         DESTINATION libexec/revng)
 
-install(DIRECTORY share/ DESTINATION share/)
+install(
+  DIRECTORY share/
+  DESTINATION share/
+  USE_SOURCE_PERMISSIONS)
 
 add_custom_target(
   generated_abi_artifact_sources ALL
