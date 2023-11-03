@@ -2,9 +2,9 @@ tags:
   - name: example-executable-1
   - name: example-executable-2
 sources:
-  - tags: [x86-64, static, example-executable-1]
+  - tags: [simple-executable, x86-64, static, example-executable-1]
     members:
       - share/revng/test/tests/runtime/calc.c
-  - tags: [x86-64, static, example-executable-2]
+  - tags: [simple-executable, x86-64, static, example-executable-2]
     members:
       - share/revng/test/tests/runtime/global.c

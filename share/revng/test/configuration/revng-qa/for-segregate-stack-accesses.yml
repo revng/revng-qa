@@ -7,6 +7,6 @@ tags:
         - -O1
         - -fno-stack-protector
 sources:
-  - tags: [native, dynamic, for-segregate-stack-accesses]
+  - tags: [simple-executable, native, dynamic, for-segregate-stack-accesses]
     members:
       - share/revng/test/tests/analysis/SegregateStackAccesses/dynamic_native/segregate.c

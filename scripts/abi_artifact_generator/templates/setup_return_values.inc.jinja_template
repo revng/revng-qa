@@ -1,0 +1,36 @@
+/*#-
+This template file is distributed under the MIT License. See LICENSE.md for details.
+#*/
+
+/*(- generation_notice )*/
+
+#include "../functions.h"
+
+uint8_t randomized_state[/*( generated_byte_count )*/] = { 1 };
+uint8_t printable_location[/*( generated_byte_count )*/] = { 1 };
+
+// A place to safely store tested function return addresses, so they can be
+// recovered no matter how much stack and registers are modified.
+void *saved_return_address = (void *) 1;
+
+/* NOTE: Unused initial values are provided to prevent these from ending up
+ *       in `.bss`. These values should *never* be relied upon.
+ */
+
+/*{ for name, return_value_type in return_value_functions.items() -}*/
+void setup_/*( name )*/(void) {
+  typedef /*( return_value_type )*/ return_value_type;
+
+  // Call the tested function.
+  return_value_type returned = test_/*( name )*/();
+
+  // Write the pointer to the received values into a safe location,
+  *(return_value_type **) printable_location = &returned;
+
+  // Then write the value to it as well.
+  *(return_value_type *) (printable_location + 8) = returned;
+}
+
+/*{ endfor }*/
+
+int main() { return 0; }

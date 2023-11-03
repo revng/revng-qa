@@ -1,0 +1,151 @@
+/*#-
+This template file is distributed under the MIT License. See LICENSE.md for details.
+#*/
+
+/*(- generation_notice )*/
+
+/**
+ * Provides the way to decode information "dumped" by the functions from
+ * `functions.inc` into the final yaml format on a test-by-test basis.
+ *
+ * Note that it provides a dispatcher-style function `"print"` which takes
+ * function name as an argument to pass the decoding to the corresponding
+ * printer function.
+ */
+
+#include <stdio.h>
+#include <string.h>
+
+#include "../common.h"
+#include "../functions.h"
+#include "../types.h"
+
+_Static_assert(sizeof(uint8_t) == 1, "A type with size == 1 is required.");
+#define MAKE_PRINT_HELPER(TYPE, POINTER, RESULT) \
+  typedef union {                                \
+    TYPE v;                                      \
+    uint8_t a[sizeof(TYPE)];                     \
+  } printing_##RESULT;                           \
+  printing_##RESULT *RESULT = (printing_##RESULT *) (POINTER)
+
+#define PRINT_BYTES(TYPE, HELPER)                          \
+  do {                                                     \
+    printf("[ ");                                          \
+    for (unsigned i = 0; i < sizeof(TYPE) - 1; ++i)        \
+      printf("0x%.2hhx, ", (HELPER)->a[i]);                \
+    printf("0x%.2hhx ]\n", (HELPER)->a[sizeof(TYPE) - 1]); \
+  } while (0)
+
+void print_a_register(const char *name, const uint8_t *value) {
+  MAKE_PRINT_HELPER(/*( register_type )*/, value, word_printing_helper);
+  printf("        - Name: \"%s\"\n"
+         "          Value: 0x%0/*( register_size * 2 )*/zx\n",
+         name,
+         word_printing_helper->v);
+  printf("          Bytes: ");
+  PRINT_BYTES(/*( register_type )*/, word_printing_helper);
+}
+
+void print_stack(uint8_t *data) {
+  typedef uint8_t stack_state[/*( stack_byte_count )*/];
+  stack_state *state_ptr = (stack_state *) data;
+  MAKE_PRINT_HELPER(stack_state, state_ptr, stack_printing_helper);
+  PRINT_BYTES(stack_state, stack_printing_helper);
+}
+
+#define PRINT(TYPE, POINTER)                        \
+  do {                                              \
+    printf("      - Type: " #TYPE " # size = %zu\n" \
+           "        Bytes: ",                       \
+           sizeof(TYPE));                           \
+    MAKE_PRINT_HELPER(TYPE, POINTER, local_helper); \
+    PRINT_BYTES(TYPE, local_helper);                \
+  } while (0)
+
+#define POINTER(TYPE, POINTER)                        \
+  do {                                                \
+    printf("      - Type: " #TYPE " # size = %zu\n"   \
+           "        Pointer: 0x%zx\n        Bytes: ", \
+           sizeof(TYPE),                              \
+           (/*( register_type )*/) POINTER);          \
+    MAKE_PRINT_HELPER(TYPE *, POINTER, local_helper); \
+    PRINT_BYTES(TYPE *, local_helper);                \
+  } while (0)
+
+#define ARGUMENT(TYPE, NAME, LOCATION, OFFSET) \
+  do {                                                                         \
+    TYPE NAME; (void) NAME;                                                    \
+    if (sizeof(TYPE) <= ARGUMENT_SIZE_LIMIT(TYPE, NAME) && !IS_PACKED(TYPE)) { \
+      PRINT(TYPE, (LOCATION) + (OFFSET));                                      \
+      (OFFSET) += sizeof(TYPE);                                                \
+    } else {                                                                   \
+      POINTER(TYPE, (LOCATION) + (OFFSET));                                    \
+      (OFFSET) += sizeof(TYPE *);                                              \
+    }                                                                          \
+  } while (0)
+
+ptrdiff_t current_offset = 0;
+/*{ for name, arguments in argument_functions.items() -}*/
+static void ABIDEF print_/*( name )*/(const uint8_t *output) {
+  current_offset = 0;
+  puts("    Arguments:");
+  /*{- for type in arguments }*/
+  ARGUMENT(/*( type )*/, argument_/*( loop.index - 1 )*/, output, current_offset);
+  /*{- endfor }*/
+}
+
+/*{ endfor -}*/
+
+/*{ for name, return_value_type in return_value_functions.items() -}*/
+static void print_/*( name )*/(const uint8_t *input, const uint8_t *output) {
+  puts("    ReturnValueAddress:");
+  print_a_register("/*( return_value_type )*/ *", output);
+  puts("    ReturnValue:");
+  PRINT(/*( return_value_type )*/, (output + 8));
+  puts("    ExpectedReturnValue:");
+  PRINT(/*( return_value_type )*/, input);
+}
+
+/*{ endfor -}*/
+
+/* Dispatches to the current printer call based on the test name */
+void print(const char *name, const uint8_t *input, const uint8_t *output) {
+  /*{ for name, arguments in argument_functions.items() -}*/
+  if (strcmp("/*( name )*/", name) == 0)
+    return print_/*( name )*/(output);
+  /*{ endfor -}*/
+  /*{ for name, return_value_type in return_value_functions.items() -}*/
+  if (strcmp("/*( name )*/", name) == 0)
+    return print_/*( name )*/(input, output);
+  /*{ endfor -}*/
+
+  assert((0, "unknown test"));
+}
+
+static size_t runtime_endianness_check() {
+  size_t i = 1;
+  return !*((uint8_t *) &i);
+}
+
+void print_header(void) {
+#ifdef TARGET_x86_64
+  puts("TargetArchitecture: x86_64");
+#elif TARGET_i386
+  puts("TargetArchitecture: x86");
+#elif TARGET_aarch64
+  puts("TargetArchitecture: aarch64");
+#elif TARGET_arm
+  puts("TargetArchitecture: arm");
+#else
+  puts("TargetArchitecture: UNSUPPORTED");
+  _Static_assert(0, "unsupported platform architecture");
+#endif
+
+#ifdef ENDIANNESS_LITTLE
+  assert(!runtime_endianness_check() && "little endianness expected!");
+  puts("IsLittleEndian: yes");
+#elif defined(ENDIANNESS_BIG)
+  assert(runtime_endianness_check() && "big endianness expected!");
+  puts("IsLittleEndian: no");
+#endif
+}

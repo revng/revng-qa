@@ -5,7 +5,7 @@ tags:
         - -Wl,--entry=0x1000
         - -ggdb
 sources:
-  - tags: [well-known, nostdlib]
+  - tags: [simple-executable, well-known, nostdlib]
     repeat-for:
       - [arm, static]
       - [mips, static]

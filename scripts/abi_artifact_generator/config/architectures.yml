@@ -3,86 +3,110 @@
   register_type: uint64_t
   register_size: 8
   register_list: [rax, rbx, rcx, rdx, rsi, rdi, r8, r9, r10, r11, r12, r13, r14, r15]
+  stack_pointer: rsp
+  comment: ;;#
+  styles: [gcc, msvc]
   templates:
     call_a_function: |
       call {{ function_name }}
     return_from_function: |
       ret
-    fill_a_register: |
-      mov {{ location }} + {{ offset }}, %{{ register }}
+    load_a_register: |
+      mov {{ register }}, qword ptr [{{ location }} + {{ offset }}]
     push_to_stack: |
-      {{ fill_a_register }}
-      push %{{register}}
+      {{ load_a_register }}
+      push {{ register }}
     restore_stack: |
-      add $({{ stack_size }}), %rsp
-    save_return_address: ""
-    # no need to do anything since the return address is already at the top of the stack
+      add rsp, {{ stack_size }}
+    save_return_address: |
+      pop {{ register }}
+      mov qword ptr [{{ location }}], {{ register }}
     restore_return_address: |
-      push {{ stack_size }} (%rsp)
+      mov {{ register }}, qword ptr [{{ location }}]
+      push {{ register }}
 
 "i386":
   register_type: uint32_t
   register_size: 4
   register_list: [eax, ebx, ecx, edx, esi, edi]
+  comment: ;;#
+  styles: [gcc, msvc]
+  stack_pointer: esp
   templates:
     call_a_function: |
       call {{ function_name }}
     return_from_function: |
       ret
-    fill_a_register: |
-      mov {{ location }} + {{ offset }}, %{{ register }}
+    load_a_register: |
+      mov {{ register }}, dword ptr [{{ location }} + {{ offset }}]
     push_to_stack: |
-      {{ fill_a_register }}
-      push %{{register}}
+      {{ load_a_register }}
+      push {{ register }}
     restore_stack: |
-      add $({{ stack_size }}), %esp
-    save_return_address: ""
-    # no need to do anything since the return address is already at the top of the stack
+      add esp, {{ stack_size }}
+    save_return_address: |
+      pop {{ register }}
+      mov dword ptr [{{ location }}], {{ register }}
     restore_return_address: |
-      push {{ stack_size }} (%esp)
+      mov {{ register }}, dword ptr [{{ location }}]
+      push {{ register }}
 
 "aarch64":
   register_type: uint64_t
   register_size: 8
   register_list: [x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29]
+  stack_pointer: sp
+  comment: //
+  styles: [gcc]
   templates:
     call_a_function: |
       bl {{ function_name }}
     return_from_function: |
       ret
-    fill_a_register: |
-      adrp {{ register }}, {{location}}
+    load_a_register: |
+      adrp {{ register }}, {{ location }}
       add {{ register }}, {{ register }}, #:lo12:{{ location }}
       ldr {{ register }}, [{{ register }}, #{{ offset }}]
     push_to_stack: |
-      {{ fill_two_registers }}
+      {{ load_two_registers }}
       stp {{ register }}, {{ second_register }}, [sp, #-16]!
     restore_stack: |
-      add sp, sp,  #{{ stack_size }}
+      add sp, sp, #{{ stack_size }}
     save_return_address: |
-      str lr, [sp, #-16]!
+      adrp {{ register }}, {{ location }}
+      add {{ register }}, {{ register }}, #:lo12:{{ location }}
+      str lr, [{{ register }}]
     restore_return_address: |
-      ldr lr, [sp, #{{ stack_size }}]
+      adrp {{ register }}, {{ location }}
+      add {{ register }}, {{ register }}, #:lo12:{{ location }}
+      ldr lr, [{{ register }}]
 
 "arm":
   register_type: uint32_t
   register_size: 4
   register_list: [r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12]
+  stack_pointer: sp
+  comment: "@"
+  styles: [gcc]
   templates:
     call_a_function: |
       bl {{ function_name }}
     return_from_function: |
       bx lr
-    fill_a_register: |
+    load_a_register: |
       movw {{ register }}, #:lower16:{{ location }}
       movt {{ register }}, #:upper16:{{ location }}
       ldr {{ register }}, [{{ register }}, #{{ offset }}]
     push_to_stack: |
-      {{ fill_a_register }}
+      {{ load_a_register }}
       push {{ "{ " + register + " }" }}
     restore_stack: |
       add sp, sp, #{{ stack_size }}
     save_return_address: |
-      push { lr }
+      movw {{ register }}, #:lower16:{{ location }}
+      movt {{ register }}, #:upper16:{{ location }}
+      str lr, [{{ register }}]
     restore_return_address: |
-      ldr lr, [sp, #{{ stack_size }}]
+      movw {{ register }}, #:lower16:{{ location }}
+      movt {{ register }}, #:upper16:{{ location }}
+      ldr lr, [{{ register }}]

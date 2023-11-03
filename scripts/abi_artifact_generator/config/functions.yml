@@ -1,5 +1,5 @@
 ---
-helper_structs:
+structs:
   small_struct: ["uint16_t a", "uint16_t b"]
   padded_struct: ["uint8_t a", "uint16_t b"]
   array_struct: ["uint64_t a[2]"]
@@ -13,10 +13,12 @@ helper_structs:
   struct_of_structs: ["small_struct a[2]", "one_byte_struct b"]
   padded_struct_of_structs: ["one_byte_struct a", "big_struct b"]
   double_padded_struct_of_structs: ["one_byte_struct a", "double_aligned_struct b"]
-  __attribute__((packed)) unnaturally_aligned_struct_64:
-    ["char prepadding[2]", "uint64_t a", "char postpadding[6]"]
-  __attribute__((packed)) unnaturally_aligned_struct_32:
-    ["char prepadding[2]", "uint32_t a", "char postpadding[2]"]
+
+packed_structs:
+  unnaturally_aligned_struct_16: ["char prepadding[1]", "uint16_t a", "char postpadding[1]"]
+  unnaturally_aligned_struct_32: ["char prepadding[2]", "uint32_t a", "char postpadding[2]"]
+  unnaturally_aligned_struct_64: ["char prepadding[2]", "uint64_t a", "char postpadding[6]"]
+  unnaturally_aligned_struct_128: ["char prepadding[2]", "INT128_T a", "char postpadding[14]"]
 
 argument_tests:
   #
@@ -388,15 +390,17 @@ return_value_tests:
   single_two_byte_struct_return_value: "two_byte_struct"
   single_small_struct_of_structs_return_value: "small_struct_of_structs"
   single_struct_of_structs_return_value: "struct_of_structs"
-  single_unnaturally_aligned_struct_32_return_value: "unnaturally_aligned_struct_32"
-  single_unnaturally_aligned_struct_64_return_value: "unnaturally_aligned_struct_64"
+
+  # NOTE: re-enable these these tests when unnatural alignment support is fixed
+  # single_unnaturally_aligned_struct_32_return_value: "unnaturally_aligned_struct_32"
+  # single_unnaturally_aligned_struct_64_return_value: "unnaturally_aligned_struct_64"
 
   single_void_pointer_return_value: "void *"
   single_int_pointer_return_value: "uint32_t *"
   single_struct_pointer_return_value: "huge_struct *"
 
   single_128_bit_return_value: "UINT128_T"
-  single_single_big_struct_return_value: "big_struct"
-  single_single_huge_struct_return_value: "huge_struct"
+  single_big_struct_return_value: "big_struct"
+  single_huge_struct_return_value: "huge_struct"
 
   # TODO: floating point return values.

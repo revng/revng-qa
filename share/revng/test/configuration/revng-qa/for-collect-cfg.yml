@@ -17,11 +17,11 @@ tags:
         - -fno-align-functions
         - -fno-optimize-sibling-calls
 sources:
-  - tags: [arm, dynamic, nostartfiles, for-analysis, for-collect-cfg]
+  - tags: [simple-executable, arm, dynamic, nostartfiles, for-analysis, for-collect-cfg]
     prefix: share/revng/test/tests/analysis/CollectCFG/arm
     members:
       - dynamic-call.S
-  - tags: [arm, static, nostdlib, for-analysis, for-collect-cfg]
+  - tags: [simple-executable, arm, static, nostdlib, for-analysis, for-collect-cfg]
     prefix: share/revng/test/tests/analysis/CollectCFG/arm
     members:
       - switch-addls.S
@@ -34,20 +34,20 @@ sources:
       - longjmp.S
       - indirect-tail-call.S
       - memset.S
-  - tags: [mips, dynamic, nostartfiles, for-analysis, for-collect-cfg]
+  - tags: [simple-executable, mips, dynamic, nostartfiles, for-analysis, for-collect-cfg]
     prefix: share/revng/test/tests/analysis/CollectCFG/mips
     members:
       - dynamic-call.S
-  - tags: [mips, static, nostdlib, for-analysis, for-collect-cfg]
+  - tags: [simple-executable, mips, static, nostdlib, for-analysis, for-collect-cfg]
     prefix: share/revng/test/tests/analysis/CollectCFG/mips
     members:
       - switch-jump-table.S
       - jump-table-base-before-function-call.S
-  - tags: [x86-64, dynamic, nostartfiles, for-analysis, for-collect-cfg]
+  - tags: [simple-executable, x86-64, dynamic, nostartfiles, for-analysis, for-collect-cfg]
     prefix: share/revng/test/tests/analysis/CollectCFG/x86_64
     members:
       - dynamic-call.S
-  - tags: [x86-64, static, nostdlib, for-analysis, for-collect-cfg]
+  - tags: [simple-executable, x86-64, static, nostdlib, for-analysis, for-collect-cfg]
     prefix: share/revng/test/tests/analysis/CollectCFG/x86_64
     members:
       - try-catch-ehframe.S
@@ -58,11 +58,11 @@ sources:
       - indirect-tail-call.S
       - indirect-call.S
       - call.S
-  - tags: [x86-64, static, nostdlib, moderate-opt, for-analysis, for-collect-cfg]
+  - tags: [simple-executable, x86-64, static, nostdlib, moderate-opt, for-analysis, for-collect-cfg]
     prefix: share/revng/test/tests/analysis/CollectCFG/x86_64
     members:
       - fibonacci.c
-  - tags: [i386, dynamic, nostartfiles, for-analysis, for-collect-cfg]
+  - tags: [simple-executable, i386, dynamic, nostartfiles, for-analysis, for-collect-cfg]
     prefix: share/revng/test/tests/analysis/CollectCFG/i386
     members:
       - dynamic-call.S

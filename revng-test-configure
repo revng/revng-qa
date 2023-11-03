@@ -297,14 +297,17 @@ class Configuration:
                                       for tag
                                       in self.tags(repetition)
                                       if tag not in tags]
+                derived_targets_prefix = os.path.splitext(path)[0]
+                assert len(derived_targets_prefix) > 0
+                if repetition:
+                    if derived_targets_prefix[-1] != '/':
+                        derived_targets_prefix = derived_targets_prefix + "-"
+                    derived_targets_prefix = derived_targets_prefix + "-".join(repetition)
                 source_target = Target(name="source",
                                        type="source",
                                        path=path,
                                        source_path=path,
-                                       derived_targets_prefix=(os.path.splitext(path)[0]
-                                                               + ("-" + "-".join(repetition)
-                                                                  if repetition
-                                                                  else "")),
+                                       derived_targets_prefix=derived_targets_prefix,
                                        tags=source_tags,
                                        command="")
                 for tag in source_tags:
