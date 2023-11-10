@@ -35,21 +35,32 @@ mkdir -p "${OUTPUT_DIRECTORY}"
   ${CFLAGS} -O3 -static \
   -Wl,--section-start=.text=0x2000000 \
   -fno-zero-initialized-in-bss \
-  "${INPUT_DIRECTORY}/gcc/setup_arguments.S" \
-  "${INPUT_DIRECTORY}/setup_return_values.c" \
+  "${INPUT_DIRECTORY}/setup.c" \
   -o "${OUTPUT_DIRECTORY}/foreign-executable"
 
 # Run `objdump` on it
 "${TRIPLE}objdump" \
   ${OBJDUMP_FLAGS} \
-  --wide --no-show-raw-insn -h -t -d \
+  --wide -h \
   "${OUTPUT_DIRECTORY}/foreign-executable" \
-  > "${OUTPUT_DIRECTORY}/foreign-executable.S"
+  > "${OUTPUT_DIRECTORY}/foreign-executable-sections.txt"
+${TRIPLE}objdump \
+  ${OBJDUMP_FLAGS} \
+  --wide -t \
+  "${OUTPUT_DIRECTORY}/foreign-executable" \
+  > "${OUTPUT_DIRECTORY}/foreign-executable-symbols.txt"
+${TRIPLE}objdump \
+  ${OBJDUMP_FLAGS} \
+  --wide --no-show-raw-insn -d \
+  "${OUTPUT_DIRECTORY}/foreign-executable" \
+  > "${OUTPUT_DIRECTORY}/foreign-executable-disassembly.txt"
 
 # Run `gather_symbols.py`
 python3 "${INPUT_DIRECTORY}/gather_symbols.py" \
-  "expected_state value_dumps" \
-  < "${OUTPUT_DIRECTORY}/foreign-executable.S" \
+  "expected_state value_dumps address_dumps size_dumps" \
+  "${OUTPUT_DIRECTORY}/foreign-executable-sections.txt" \
+  "${OUTPUT_DIRECTORY}/foreign-executable-symbols.txt" \
+  "${OUTPUT_DIRECTORY}/foreign-executable-disassembly.txt" \
   > "${OUTPUT_DIRECTORY}/gathered_symbols.h"
 
 # Build the `runner`
