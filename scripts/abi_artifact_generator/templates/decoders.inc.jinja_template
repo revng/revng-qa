@@ -18,7 +18,6 @@ This template file is distributed under the MIT License. See LICENSE.md for deta
 
 #include "../common.h"
 #include "../functions.h"
-#include "../types.h"
 
 void print_bytes(const uint8_t *value, uint32_t count) {
   printf("[ ");

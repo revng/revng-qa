@@ -91,153 +91,10 @@ def intel_register_type(register_size: str):
         raise Exception("unsupported register size")
 
 
-def load_a_register(architecture, location, offset, register):
-    local_dictionary = {
-        "location": location,
-        "offset": offset,
-        "register": register,
-    }
-
-    jinja_template = jinja2.Environment().from_string(architecture["templates"]["load_a_register"])
-    return jinja_template.render(local_dictionary)
-
-
-def setup_registers(architecture):
-    result = architecture["comment"] + " fill the registers with random data\n"
-    register_count = len(architecture["register_list"])
-    for index, register in enumerate(reversed(architecture["register_list"])):
-        location = "expected_state"
-        offset = (register_count - index - 1) * architecture["register_size"]
-        current = load_a_register(architecture, location, offset, register)
-        result = result + current + "\n"
-    return result + "\n"
-
-
-def setup_stack(architecture, config):
-    register_size = architecture["register_size"]
-    last_offset = (len(architecture["register_list"]) - 1) * register_size
-    first_offset = last_offset + config["stack_byte_count"]
-
-    result = architecture["comment"] + " fill the stack with random data\n"
-
-    # Some architectures only support pushing registers onto the stack in pairs.
-    # To work around that limitation, this introduces the `load_two_registers`
-    # option for the templates to utilize: it lets two registers to be loaded
-    # at once, but has the limitation of using up twice the space - hence we
-    # need to limit the pushes, which is what the `flip_flop` flag is for:
-    # the registers are only pushed when it's set, which happens on every second
-    # iteration.
-    flip_flop = True
-    for offset in range(first_offset, last_offset, -register_size):
-        stack_helper_dictionary = {
-            "register": architecture["register_list"][0],
-            "second_register": architecture["register_list"][1],
-            "load_a_register": load_a_register(
-                architecture,
-                "expected_state",
-                offset,
-                architecture["register_list"][0],
-            ),
-        }
-        if flip_flop:
-            stack_helper_dictionary["load_two_registers"] = (
-                load_a_register(
-                    architecture,
-                    "expected_state",
-                    offset,
-                    architecture["register_list"][0],
-                )
-                + "\n"
-                + load_a_register(
-                    architecture,
-                    "expected_state",
-                    offset - register_size,
-                    architecture["register_list"][1],
-                )
-            )
-        else:
-            stack_helper_dictionary["load_two_registers"] = ""
-        jinja_template = jinja2.Environment().from_string(
-            architecture["templates"]["push_to_stack"]
-        )
-        result = result + jinja_template.render(stack_helper_dictionary) + "\n"
-
-        flip_flop = not flip_flop
-
-    return result + "\n"
-
-
-def save_return_address(architecture):
-    local_dictionary = {
-        "location": "saved_return_address",
-        "register": architecture["register_list"][0],
-    }
-
-    jinja_template = jinja2.Environment().from_string(
-        architecture["comment"]
-        + " save the return address\n"
-        + architecture["templates"]["save_return_address"]
-        + "\n\n"
-    )
-    return jinja_template.render(local_dictionary)
-
-
-def restore_return_address(architecture, config):
-    local_dictionary = {
-        "location": "saved_return_address",
-        "register": architecture["register_list"][0],
-    }
-
-    jinja_template = jinja2.Environment().from_string(
-        architecture["comment"]
-        + " restore the return address\n"
-        + architecture["templates"]["restore_return_address"]
-        + "\n\n"
-    )
-    return jinja_template.render(local_dictionary)
-
-
-def setup_prologue(architecture, config):
-    return (
-        save_return_address(architecture)
-        + setup_stack(architecture, config)
-        + setup_registers(architecture)
-    )
-
-
-def call_a_function(architecture, name: str):
-    jinja_template = jinja2.Environment().from_string(architecture["templates"]["call_a_function"])
-    return jinja_template.render({"function_name": name}) + "\n\n"
-
-
-def restore_stack(architecture, config):
-    jinja_template = jinja2.Environment().from_string(architecture["templates"]["restore_stack"])
-    return jinja_template.render({"stack_size": config["stack_byte_count"]}) + "\n\n"
-
-
-def return_from_function(architecture, config):
-    result = restore_return_address(architecture, config)
-
-    jinja_template = jinja2.Environment().from_string(
-        architecture["templates"]["return_from_function"]
-    )
-    return result + jinja_template.render({"stack_size": config["stack_byte_count"]})
-
-
-def asm(text: str):
-    return "\n  ".join(text.splitlines())
-
-
 def get_generation_notice():
     return """/* This file was autogenerated. DO NOT MODIFY!
  * It is distributed under the MIT License. See LICENSE.md for details.
  */"""
-
-
-def get_masm_style_generation_notice():
-    return """;; This file was autogenerated. DO NOT MODIFY!
-;; It is distributed under the MIT License. See LICENSE.md for details.
-"""
 
 
 def render_functions(jinja_environment, config, functions, out_dir: str):
@@ -249,23 +106,9 @@ def render_functions(jinja_environment, config, functions, out_dir: str):
         "packed_structs": functions["packed_structs"],
         "argument_functions": functions["argument_tests"],
         "return_value_functions": functions["return_value_tests"],
-        "supported_primitives": [
-            "int8_t",
-            "int16_t",
-            "int32_t",
-            "int64_t",
-            "uint8_t",
-            "uint16_t",
-            "uint32_t",
-            "uint64_t",
-        ],
     }
 
     filename = "functions.h"
-    result_path = out_dir + "/" + filename
-    render_helper(jinja_environment, filename, result_path, dictionary)
-
-    filename = "types.h"
     result_path = out_dir + "/" + filename
     render_helper(jinja_environment, filename, result_path, dictionary)
 
@@ -289,13 +132,8 @@ def render_function_description(jinja_env, architectures, config, functions, out
             "register_size": architecture["register_size"],
             "register_list": architecture["register_list"],
             "register_count": len(architecture["register_list"]),
-            "stack_pointer": architecture["stack_pointer"],
             "argument_functions": functions["argument_tests"],
             "return_value_functions": functions["return_value_tests"],
-            "setup_prologue": asm(setup_prologue(architecture, config)),
-            "call_a_function": lambda n, a=architecture: asm(call_a_function(a, n)),
-            "restore_stack": asm(restore_stack(architecture, config)),
-            "return_from_function": asm(return_from_function(architecture, config)),
         }
 
         combined_registers = dictionary["register_count"] * dictionary["register_size"]

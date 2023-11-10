@@ -4,8 +4,6 @@
 
 /* RUN-default: nope */
 
-#include "functions.h"
-
 #ifdef TARGET_x86_64
 #include "x86_64/decoders.inc"
 #elif TARGET_i386
