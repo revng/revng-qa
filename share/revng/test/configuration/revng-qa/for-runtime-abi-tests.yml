@@ -3,79 +3,92 @@ tags:
     implies: [x86-64]
     variables:
       ABI_NAME: SystemV_x86_64
-      GCC_CFLAGS:
-        - -DABI_SystemV_x86_64
+      MSVC_CFLAGS:
+        # Safeguard in case somebody tries using it with msvc
+        - -DABIDEF=UNSUPPORTED
 
   - name: x86-64-microsoft-abi
     implies: [x86-64]
     variables:
       ABI_NAME: Microsoft_x86_64
       GCC_CFLAGS:
-        - -DABI_Microsoft_x86_64
+        - -DABIDEF=__attribute__((ms_abi))
         - -maccumulate-outgoing-args
 
   - name: i386-systemv-abi
     implies: [i386]
     variables:
       ABI_NAME: SystemV_x86
-      GCC_CFLAGS:
-        - -DABI_SystemV_x86
+      MSVC_CFLAGS:
+        # Safeguard in case somebody tries using it with msvc
+        - -DABIDEF=UNSUPPORTED
 
   - name: i386-regparm-3-systemv-abi
     implies: [i386]
     variables:
       ABI_NAME: SystemV_x86_regparm_3
       GCC_CFLAGS:
-        - -DABI_SystemV_x86_regparm_3
+        - -DABIDEF=__attribute__((regparm(3)))
+      MSVC_CFLAGS:
+        # Safeguard in case somebody tries using it with msvc
+        - -DABIDEF=UNSUPPORTED
 
   - name: i386-regparm-2-systemv-abi
     implies: [i386]
     variables:
       ABI_NAME: SystemV_x86_regparm_2
       GCC_CFLAGS:
-        - -DABI_SystemV_x86_regparm_2
+        - -DABIDEF=__attribute__((regparm(2)))
+      MSVC_CFLAGS:
+        # Safeguard in case somebody tries using it with msvc
+        - -DABIDEF=UNSUPPORTED
 
   - name: i386-regparm-1-systemv-abi
     implies: [i386]
     variables:
       ABI_NAME: SystemV_x86_regparm_1
       GCC_CFLAGS:
-        - -DABI_SystemV_x86_regparm_1
+        - -DABIDEF=__attribute__((regparm(1)))
+      MSVC_CFLAGS:
+        # Safeguard in case somebody tries using it with msvc
+        - -DABIDEF=UNSUPPORTED
 
   - name: i386-cdecl-microsoft-abi
     implies: [i386]
     variables:
       ABI_NAME: Microsoft_x86_cdecl
       GCC_CFLAGS:
-        - -DABI_Microsoft_x86_cdecl
+        - -DABIDEF=__attribute__((ms_abi,cdecl))
+      MSVC_CFLAGS:
+        - -DABIDEF=__cdecl
 
   - name: i386-fastcall-microsoft-abi
     implies: [i386]
     variables:
       ABI_NAME: Microsoft_x86_fastcall
       GCC_CFLAGS:
-        - -DABI_Microsoft_x86_fastcall
+        - -DABIDEF=__attribute__((ms_abi,fastcall))
+      MSVC_CFLAGS:
+        - -DABIDEF=__fastcall
 
   - name: i386-stdcall-microsoft-abi
     implies: [i386]
     variables:
       ABI_NAME: Microsoft_x86_stdcall
       GCC_CFLAGS:
-        - -DABI_Microsoft_x86_stdcall
+        - -DABIDEF=__attribute__((ms_abi,stdcall))
+      MSVC_CFLAGS:
+        - -DABIDEF=__stdcall
 
   - name: aarch64-aapcs64-abi
     implies: [aarch64]
     variables:
       ABI_NAME: AAPCS64
-      GCC_CFLAGS:
-        - -DABI_AAPCS64
 
   - name: arm-aapcs-abi
     implies: [arm]
     variables:
       ABI_NAME: AAPCS
-      GCC_CFLAGS:
-        - -DABI_AAPCS
 
   - name: for-runtime-abi-tests
     variables:

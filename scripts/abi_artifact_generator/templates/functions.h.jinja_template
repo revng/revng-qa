@@ -18,7 +18,9 @@ This template file is distributed under the MIT License. See LICENSE.md for deta
 #include <stddef.h>
 #include <stdint.h>
 
-#include "abi.h"
+#ifndef ABIDEF
+#define ABIDEF
+#endif
 
 /*
  * Define a `NOINLINE` specifier

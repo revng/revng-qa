@@ -13,8 +13,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "abi.h"
-
 #ifdef TARGET_x86_64
 #include "x86_64/constants.h"
 #elif TARGET_i386
