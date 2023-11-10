@@ -1,5 +1,16 @@
 tags:
   - name: linux
+  - name: windows
+    variables:
+      MSVC_CFLAGS:
+        - -WX # treats warnings as errors
+        - -nologo # supresses startup banner
+      MSVC_LDFLAGS:
+        # Sadly, msvc linker only supports `/`-style parameters.
+        - /debug # creates debug information
+        - /nologo # supresses startup banner
+        - /wx # treats warnings as errors
+
   - name: compiler
     variables:
       GCC_CFLAGS:
