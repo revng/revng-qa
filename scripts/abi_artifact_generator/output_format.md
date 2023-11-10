@@ -5,8 +5,10 @@ This document outlines the structure of said output.
 
 ```mermaid
 graph TB
+graph TB
   linkStyle default stroke: #888
   classDef black fill: #fff, stroke: #000, stroke-width: 2px
+  classDef grey fill: #fff, stroke: #ccc, stroke-width: 2px
   classDef red fill: #fff, stroke: #f55, stroke-width: 2px
   classDef blue fill: #fff, stroke: #55f, stroke-width: 2px
 
@@ -20,7 +22,7 @@ graph TB
   StateAfterTheCall(StateAfterTheCall)
   StateAfterTheReturn(StateAfterTheReturn)
   Registers(Registers)
-  Stack("Stack (bytes only)")
+  Stack("Stack")
   Type(Type)
   Bytes(Bytes)
   Name(Name)
@@ -30,10 +32,20 @@ graph TB
   Arguments(Arguments)
   class Arguments red
 
-  ExpectedReturnValue(ExpectedReturnValue)
-  ReturnValue(ReturnValue)
-  ReturnValueAddress(ReturnValueAddress)
-  class ExpectedReturnValue,ReturnValue,ReturnValueAddress blue
+  ReturnValues(ReturnValues)
+  class ReturnValues blue
+
+  Type(Type)
+  Address(Address)
+  AddressBytes(AddressBytes)
+  ExpectedBytes(ExpectedBytes)
+  FoundBytes(FoundBytes)
+  class Type,Address,AddressBytes,ExpectedBytes,FoundBytes black
+  
+  String(String)
+  Integer(Integer)
+  ByteArray(ByteArray)
+  class String,Integer,ByteArray grey
 
   yaml --> TargetArchitecture
   yaml --> IsLittleEndian
@@ -43,92 +55,48 @@ graph TB
   Iterations --> Iteration
   Iterations --> Arguments
   linkStyle 5 stroke: #f55
-  Iterations --> ExpectedReturnValue
-  Iterations --> ReturnValue
-  Iterations --> ReturnValueAddress
-  linkStyle 6,7,8 stroke: #55f
+  Iterations --> ReturnValues
+  linkStyle 6 stroke: #55f
+
+  ReturnValues --> Type
+  ReturnValues --> Address
+  ReturnValues --> AddressBytes
+  ReturnValues --> ExpectedBytes
+  ReturnValues --> FoundBytes
 
   Arguments --> Type
-  Arguments --> Bytes
+  Arguments --> Address
+  Arguments --> AddressBytes
+  Arguments --> ExpectedBytes
+  Arguments --> FoundBytes
 
-  ReturnValueAddress --> Name
-  ReturnValueAddress --> Value
-  ReturnValueAddress --> Bytes
-
-  ReturnValue --> Type
-  ReturnValue --> Bytes
-
-  ExpectedReturnValue --> Type
-  ExpectedReturnValue --> Bytes
+  Type --> String
+  Address --> Integer
+  AddressBytes --> ByteArray
+  ExpectedBytes --> ByteArray
+  FoundBytes --> ByteArray
 
   Iterations --> StateBeforeTheCall --> Registers
   Iterations --> StateAfterTheCall --> Registers
   Iterations --> StateAfterTheReturn --> Registers
+  StateBeforeTheCall --> Stack
+  StateAfterTheCall --> Stack
+  StateAfterTheReturn --> Stack
 
   Registers --> Name
   Registers --> Value
   Registers --> Bytes
 
-  StateBeforeTheCall --> Stack
-  StateAfterTheCall --> Stack
-  StateAfterTheReturn --> Stack
-
-  Stack --> Bytes
+  Name --> String
+  Value --> Integer
+  Bytes --> ByteArray
+  Stack --> ByteArray
 ```
-
-<details>
-  <summary>(graphviz)</summary>
-
-```graphviz
-strict digraph {
-    "stdout (yaml)"
-    "stdout (yaml)" -> "TargetArchitecture"
-    "stdout (yaml)" -> "IsLittleEndian"
-    "stdout (yaml)" -> "Iterations"
-
-    "Arguments" [color=red]
-    "ExpectedReturnValue" [color=blue]
-    "ReturnValue" [color=blue]
-    "ReturnValueAddress" [color=blue]
-    "Iterations" -> "Function (name)"
-    "Iterations" -> "Iteration (index)"
-    "Iterations" -> "Arguments" [color=red]
-    "Iterations" -> "ExpectedReturnValue" [color=blue]
-    "Iterations" -> "ReturnValue" [color=blue]
-    "Iterations" -> "ReturnValueAddress" [color=blue]
-
-    "Arguments" -> "Type"
-    "Arguments" -> "Bytes"
-
-    "ReturnValueAddress" -> "Name"
-    "ReturnValueAddress" -> "Value"
-    "ReturnValueAddress" -> "Bytes"
-
-    "ReturnValue" -> "Type"
-    "ReturnValue" -> "Bytes"
-
-    "ExpectedReturnValue" -> "Type"
-    "ExpectedReturnValue" -> "Bytes"
-
-    "Iterations" -> "StateBeforeTheCall" -> "Registers"
-    "Iterations" -> "StateAfterTheCall" -> "Registers"
-    "Iterations" -> "StateAfterTheReturn" -> "Registers"
-
-    "Registers" -> "Name"
-    "Registers" -> "Value"
-    "Registers" -> "Bytes"
-
-    "StateBeforeTheCall" -> "Stack (bytes only)"
-    "StateAfterTheCall" -> "Stack (bytes only)"
-    "StateAfterTheReturn" -> "Stack (bytes only)"
-}
-```
-
-</details>
 
 Legend:
-* red arrow - this link is only present in argument tests.
-* blue arrow - this link is only present in return value tests.
+* red - this link is only present in argument tests.
+* blue - this link is only present in return value tests.
+* grey - contextual "type" of the relevant data.
 
 To summarize, each iteration contains three "state" points extracted:
 * Right before the call: at the address of the call instruction.
@@ -140,31 +108,41 @@ It also contains the configured (see [here](./config/README.md#commonyml)) numbe
 
 On top of that, it also provides the values of the arguments OR return values (depending on the test type, see [here](./config/functions.yml)) of the functions generated in `functions.inc` (see [here](./templates/README.md#functionsinc)).
 
-For argument functions, only a serialized type (carried over from the original [config](./config/README.md#functionsyml)) and an array of raw bytes of the value are provided
-Which should be equivalent to the output of a function like this:
+For argument functions, the output is equivalent to something like this:
 ```cpp
-void function(type_0 arg_0, type_1 arg_1, {{ and so on }}) {
-  puts("- Type: type_0\n  Bytes: [{{ arg_0 bytes }}]");
-  puts("- Type: type_1\n  Bytes: [{{ arg_1 bytes }}]");
+void test_function(type_0 arg_0, type_1 arg_1, {{ and so on }}) {
+  printf("- Type: %s\n", TYPE_TO_STRING(type_0));
+  printf("  Address: 0x%x\n", TO_HEX_STRING(&arg_0));
+  printf("  AddressBytes: [ %s ]\n", TO_BYTE_STRING(&arg_0));
+  printf("  ExpectedBytes: [ %s ]\n", EXPECTED_BYTES(arg_0));
+  printf("  FoundBytes: [ %s ]\n", FOUND_BYTES(arg_0));
+
+  printf("- Type: %s\n", TYPE_TO_STRING(type_1));
+  printf("  Address: 0x%x\n", TO_HEX_STRING(&arg_1));
+  printf("  AddressBytes: [ %s ]\n", TO_BYTE_STRING(&arg_1));
+  printf("  ExpectedBytes: [ %s ]\n", EXPECTED_BYTES(arg_1));
+  printf("  FoundBytes: [ %s ]\n", FOUND_BYTES(arg_1));
+
   // and so on for each remaining argument.
 }
 ```
 
-For return value function, on top of the value setup function (callsite) emitted, its address (to detect the cases when the value is returned as a pointer) as well as the original value that was returned are output.
-Which should be equivalent to the output of a set of functions like this:
+For return value function, it's very similar:
 ```cpp
-{{ return_value_type }} callee_function(void) {
-  {{ return_value_type }} return_value;
+return_value_type test_function(void) {
+  return_value_type return_value;
 
-  return_value = {{ copy_random_data_in }};
-  puts("ExpectedReturnValue:\n-Type: {{ return_value_type }}\n  Bytes: [{{ bytes copied in }}]");
+  return_value = fill_with_deterministic_but_random_data();
 
   return return_value;
 }
 
-void caller_function(void) {
-  {{ return_value_type }} return_value = callee_function();
-  printf("ReturnValueAddress:\n- Name: {{ return_value_type }}\n  Value: 0x%x\n  Bytes: [{{ pointer bytes }}]\n", &return_value);
-  puts("ReturnValue:\n- Type: {{ return_value_type }}\n  Bytes: [{{ return value bytes }}]");
+void setup_function(void) {
+  return_value_type return_value = test_function();
+  printf("- Type: %s\n", TYPE_TO_STRING(return_value_type));
+  printf("  Address: 0x%x\n", TO_HEX_STRING(&return_value));
+  printf("  AddressBytes: [ %s ]\n", TO_BYTE_STRING(&return_value));
+  printf("  ExpectedBytes: [ %s ]\n", EXPECTED_BYTES(return_value));
+  printf("  FoundBytes: [ %s ]\n", FOUND_BYTES(return_value));
 }
 ```
