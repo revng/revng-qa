@@ -1,7 +1,7 @@
 tags:
   - name: well-known
     variables:
-      CFLAGS:
+      GCC_CFLAGS:
         - -Wl,--entry=0x1000
         - -ggdb
 sources:

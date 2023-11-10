@@ -1,7 +1,7 @@
 tags:
   - name: for-import-types
     variables:
-      CFLAGS:
+      GCC_CFLAGS:
         - -nostartfiles
         - -fuse-ld=bfd
         - -Wl,--section-start=.custom_data=0xf00000

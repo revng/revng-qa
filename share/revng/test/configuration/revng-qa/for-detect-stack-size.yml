@@ -1,7 +1,7 @@
 tags:
   - name: for-detect-stack-size
     variables:
-      CFLAGS:
+      GCC_CFLAGS:
         - -no-pie
         - -fno-unroll-loops
         - -fno-inline

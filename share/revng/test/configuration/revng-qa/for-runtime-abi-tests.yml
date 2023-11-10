@@ -3,14 +3,14 @@ tags:
     implies: [x86-64]
     variables:
       ABI_NAME: SystemV_x86_64
-      CFLAGS:
+      GCC_CFLAGS:
         - -DABI_SystemV_x86_64
 
   - name: x86-64-microsoft-abi
     implies: [x86-64]
     variables:
       ABI_NAME: Microsoft_x86_64
-      CFLAGS:
+      GCC_CFLAGS:
         - -DABI_Microsoft_x86_64
         - -maccumulate-outgoing-args
 
@@ -18,68 +18,68 @@ tags:
     implies: [i386]
     variables:
       ABI_NAME: SystemV_x86
-      CFLAGS:
+      GCC_CFLAGS:
         - -DABI_SystemV_x86
 
   - name: i386-regparm-3-systemv-abi
     implies: [i386]
     variables:
       ABI_NAME: SystemV_x86_regparm_3
-      CFLAGS:
+      GCC_CFLAGS:
         - -DABI_SystemV_x86_regparm_3
 
   - name: i386-regparm-2-systemv-abi
     implies: [i386]
     variables:
       ABI_NAME: SystemV_x86_regparm_2
-      CFLAGS:
+      GCC_CFLAGS:
         - -DABI_SystemV_x86_regparm_2
 
   - name: i386-regparm-1-systemv-abi
     implies: [i386]
     variables:
       ABI_NAME: SystemV_x86_regparm_1
-      CFLAGS:
+      GCC_CFLAGS:
         - -DABI_SystemV_x86_regparm_1
 
   - name: i386-cdecl-microsoft-abi
     implies: [i386]
     variables:
       ABI_NAME: Microsoft_x86_cdecl
-      CFLAGS:
+      GCC_CFLAGS:
         - -DABI_Microsoft_x86_cdecl
 
   - name: i386-fastcall-microsoft-abi
     implies: [i386]
     variables:
       ABI_NAME: Microsoft_x86_fastcall
-      CFLAGS:
+      GCC_CFLAGS:
         - -DABI_Microsoft_x86_fastcall
 
   - name: i386-stdcall-microsoft-abi
     implies: [i386]
     variables:
       ABI_NAME: Microsoft_x86_stdcall
-      CFLAGS:
+      GCC_CFLAGS:
         - -DABI_Microsoft_x86_stdcall
 
   - name: aarch64-aapcs64-abi
     implies: [aarch64]
     variables:
       ABI_NAME: AAPCS64
-      CFLAGS:
+      GCC_CFLAGS:
         - -DABI_AAPCS64
 
   - name: arm-aapcs-abi
     implies: [arm]
     variables:
       ABI_NAME: AAPCS
-      CFLAGS:
+      GCC_CFLAGS:
         - -DABI_AAPCS
 
   - name: for-runtime-abi-tests
     variables:
-      CFLAGS:
+      GCC_CFLAGS:
         - -std=c99
         - -fno-pic
         - -fno-pie
@@ -112,5 +112,5 @@ commands:
         "${INPUT}"
         "${OUTPUT}"
         "${TRIPLE}"
-        "${CFLAGS}"
+        "${GCC_CFLAGS} ${COMMON_CFLAGS}"
         "${OBJDUMP_FLAGS}"

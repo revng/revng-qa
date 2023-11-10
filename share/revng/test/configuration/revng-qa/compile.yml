@@ -8,7 +8,7 @@ commands:
     from:
       - type: source
         filter: linux and simple-executable
-    command: ${TRIPLE}gcc $INPUT -o $OUTPUT $CFLAGS
+    command: ${TRIPLE}gcc $INPUT -o $OUTPUT $GCC_CFLAGS $COMMON_CFLAGS
   - type: revng-qa.compiled-stripped
     from:
       - type: revng-qa.compiled-with-debug-info

@@ -5,7 +5,7 @@
 tags:
   - name: for-ida
     variables:
-      CFLAGS:
+      GCC_CFLAGS:
         - -O0
         - -g
 sources:

@@ -2,7 +2,7 @@ tags:
   - name: linux
   - name: compiler
     variables:
-      CFLAGS:
+      GCC_CFLAGS:
         - -no-pie
     implies: [linux]
   - name: native
@@ -13,15 +13,15 @@ tags:
     implies: [compiler]
   - name: static
     variables:
-      CFLAGS:
+      GCC_CFLAGS:
         - -static
   - name: nostdlib
     variables:
-      CFLAGS:
+      GCC_CFLAGS:
         - -nostdlib
   - name: nostartfiles
     variables:
-      CFLAGS:
+      GCC_CFLAGS:
         - -nostartfiles
   - name: cross-compiler
     implies: [compiler]
@@ -31,8 +31,9 @@ tags:
       TRIPLE: armv7a-hardfloat-linux-uclibceabi-
       POINTER_SIZE: "32"
       QEMU_NAME: arm
-      CFLAGS:
+      GCC_CFLAGS:
         - -Wl,-Ttext-segment=0x20000
+      COMMON_CFLAGS:
         - -DTARGET_arm
   - name: x86-64
     implies: [cross-compiler]
@@ -41,7 +42,7 @@ tags:
       POINTER_SIZE: "64"
       QEMU_NAME: x86_64
       OBJDUMP_FLAGS: -Mintel
-      CFLAGS:
+      COMMON_CFLAGS:
         - -DTARGET_x86_64
   - name: mips
     implies: [cross-compiler]
@@ -49,7 +50,7 @@ tags:
       TRIPLE: mips-unknown-linux-musl-
       POINTER_SIZE: "32"
       QEMU_NAME: mips
-      CFLAGS:
+      COMMON_CFLAGS:
         - -DTARGET_mips
   - name: mipsel
     implies: [cross-compiler]
@@ -57,7 +58,7 @@ tags:
       TRIPLE: mipsel-unknown-linux-musl-
       POINTER_SIZE: "32"
       QEMU_NAME: mipsel
-      CFLAGS:
+      COMMON_CFLAGS:
         - -DTARGET_mipsel
   - name: i386
     implies: [cross-compiler]
@@ -65,7 +66,7 @@ tags:
       TRIPLE: i386-gentoo-linux-musl-
       POINTER_SIZE: "32"
       QEMU_NAME: i386
-      CFLAGS:
+      COMMON_CFLAGS:
         - -DTARGET_i386
   - name: s390x
     implies: [cross-compiler]
@@ -73,7 +74,7 @@ tags:
       TRIPLE: s390x-ibm-linux-musl-
       POINTER_SIZE: "64"
       QEMU_NAME: s390x
-      CFLAGS:
+      COMMON_CFLAGS:
         - -DTARGET_s390x
   - name: aarch64
     implies: [cross-compiler]
@@ -81,5 +82,5 @@ tags:
       TRIPLE: aarch64-unknown-linux-musl-
       POINTER_SIZE: "64"
       QEMU_NAME: aarch64
-      CFLAGS:
+      COMMON_CFLAGS:
         - -DTARGET_aarch64
