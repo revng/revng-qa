@@ -93,7 +93,7 @@ tags:
   - name: for-runtime-abi-tests
     variables:
       GCC_CFLAGS:
-        - -std=c99
+        - -std=c11
         - -fno-pic
         - -fno-pie
         - -fno-stack-protector
