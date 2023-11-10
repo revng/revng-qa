@@ -15,6 +15,16 @@ tags:
         - -DABIDEF=__attribute__((ms_abi))
         - -maccumulate-outgoing-args
 
+  - name: x86-64-vectorcall-microsoft-abi
+    implies: [x86-64]
+    variables:
+      ABI_NAME: Microsoft_x86_64_vectorcall
+      CFLAGS:
+        # Safeguard in case somebody tries using gcc
+        - -DABIDEF=UNSUPPORTED
+      MSVC_CFLAGS:
+        - -DABIDEF=__vectorcall
+
   - name: i386-systemv-abi
     implies: [i386]
     variables:
@@ -79,6 +89,16 @@ tags:
         - -DABIDEF=__attribute__((ms_abi,stdcall))
       MSVC_CFLAGS:
         - -DABIDEF=__stdcall
+
+  - name: i386-vectorcall-microsoft-abi
+    implies: [i386]
+    variables:
+      ABI_NAME: Microsoft_x86_vectorcall
+      CFLAGS:
+        # Safeguard in case somebody tries using it with gcc
+        - -DABIDEF=UNSUPPORTED
+      MSVC_CFLAGS:
+        - -DABIDEF=__vectorcall
 
   - name: aarch64-aapcs64-abi
     implies: [aarch64]
