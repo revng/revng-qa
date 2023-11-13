@@ -6,7 +6,7 @@ This template file is distributed under the MIT License. See LICENSE.md for deta
 
 #include "../functions.h"
 
-uint8_t randomized_state[/*( generated_byte_count )*/] = { 1 };
+uint8_t expected_state[/*( generated_byte_count )*/] = { 1 };
 uint8_t printable_location[/*( generated_byte_count )*/] = { 1 };
 
 // A place to safely store tested function return addresses, so they can be

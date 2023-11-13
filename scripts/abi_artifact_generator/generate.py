@@ -106,7 +106,7 @@ def setup_registers(architecture):
     result = architecture["comment"] + " fill the registers with random data\n"
     register_count = len(architecture["register_list"])
     for index, register in enumerate(reversed(architecture["register_list"])):
-        location = "randomized_state"
+        location = "expected_state"
         offset = (register_count - index - 1) * architecture["register_size"]
         current = load_a_register(architecture, location, offset, register)
         result = result + current + "\n"
@@ -134,7 +134,7 @@ def setup_stack(architecture, config):
             "second_register": architecture["register_list"][1],
             "load_a_register": load_a_register(
                 architecture,
-                "randomized_state",
+                "expected_state",
                 offset,
                 architecture["register_list"][0],
             ),
@@ -143,14 +143,14 @@ def setup_stack(architecture, config):
             stack_helper_dictionary["load_two_registers"] = (
                 load_a_register(
                     architecture,
-                    "randomized_state",
+                    "expected_state",
                     offset,
                     architecture["register_list"][0],
                 )
                 + "\n"
                 + load_a_register(
                     architecture,
-                    "randomized_state",
+                    "expected_state",
                     offset - register_size,
                     architecture["register_list"][1],
                 )

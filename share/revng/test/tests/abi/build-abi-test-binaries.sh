@@ -48,7 +48,7 @@ mkdir -p "${OUTPUT_DIRECTORY}"
 
 # Run `gather_symbols.py`
 python3 "${INPUT_DIRECTORY}/gather_symbols.py" \
-  "randomized_state printable_location" \
+  "expected_state printable_location" \
   < "${OUTPUT_DIRECTORY}/foreign-executable.S" \
   > "${OUTPUT_DIRECTORY}/gathered_symbols.h"
 

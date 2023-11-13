@@ -18,7 +18,7 @@ ifndef rax
 .model flat, c
 endif
 
-extern randomized_state: /*( intel_register_type )*/
+extern expected_state: /*( intel_register_type )*/
 extern printable_data: /*( intel_register_type )*/
 extern saved_return_address: /*( intel_register_type )*/
 

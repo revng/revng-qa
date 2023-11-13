@@ -52,7 +52,7 @@ static uint64_t get_next_lfsr(uint32_t iteration_count) {
 }
 
 _Static_assert(sizeof(uint8_t) == 1, "A type with size == 1 is required.");
-static void regenerate_the_randomized_state(uint8_t *location) {
+static void regenerate_the_expected_state(uint8_t *location) {
   for (uint32_t offset = 0; offset < constants.generated_byte_count; ++offset)
     location[offset] = (uint8_t) get_next_lfsr(8);
 }
@@ -226,8 +226,8 @@ int main(int argc, char **argv) {
   print_header();
   puts("Iterations:");
 
-  const struct memory *state = select_a_variable("randomized_state");
-  uint8_t *randomized_state = (uint8_t *) (size_t) state->address;
+  const struct memory *state = select_a_variable("expected_state");
+  uint8_t *expected_state = (uint8_t *) (size_t) state->address;
 
   const struct memory *printable = select_a_variable("printable_location");
   uint8_t *printable_location = (uint8_t *) (size_t) printable->address;
@@ -238,13 +238,13 @@ int main(int argc, char **argv) {
   const uint64_t count = sizeof(input.functions) / sizeof(struct function);
   for (uint32_t function = 0; function < count; ++function) {
     for (uint32_t i = 0; i < constants.iteration_count; ++i) {
-      regenerate_the_randomized_state(randomized_state);
+      regenerate_the_expected_state(expected_state);
 
       printf("  - Function: \"%s\"\n", input.functions[function].name);
       printf("    Iteration: %d\n", i);
       test_function(&input.functions[function]);
       print(input.functions[function].name,
-            randomized_state,
+            expected_state,
             printable_location);
       print_saved_state();
       puts("");

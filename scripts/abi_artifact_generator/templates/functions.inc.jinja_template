@@ -23,7 +23,7 @@ This template file is distributed under the MIT License. See LICENSE.md for deta
  */
 
 // Temporary locations to store data that needs to be preserved across a test.
-extern uint8_t randomized_state[];
+extern uint8_t expected_state[];
 extern uint8_t printable_location[];
 
 // A variable used for temporary storage of offsets while iterating one of the
@@ -69,7 +69,7 @@ NOINLINE void ABIDEF test_/*( name )*/(
 /*{ for name, return_value_type in return_value_functions.items() -}*/
 NOINLINE /*( return_value_type )*/ ABIDEF test_/*( name )*/(void) {
   typedef /*( return_value_type )*/ return_value_type;
-  return_value_type returned = *(return_value_type *) randomized_state;
+  return_value_type returned = *(return_value_type *) expected_state;
   return returned;
 }
 
