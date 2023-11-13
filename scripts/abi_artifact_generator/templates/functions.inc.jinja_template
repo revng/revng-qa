@@ -28,30 +28,6 @@ extern uint8_t value_dumps[];
 extern uint64_t size_dumps[];
 extern uint64_t address_dumps[];
 
-// A variable used for temporary storage of offsets while iterating one of the
-// locations above.
-ptrdiff_t current_offset = 0;
-
-// Stores the values (or pointers to, depending on the type) of all
-// the arguments at specially dedicated `value_dumps`, so that they
-// can be dumped later on.
-#define SAVE_ARGUMENT_VALUE(TYPE, INDEX)                                                     \
-  do {                                                                                       \
-    if (sizeof(TYPE) <= ARGUMENT_SIZE_LIMIT(TYPE, argument_ ## INDEX) && !IS_PACKED(TYPE)) { \
-      /* If the argument is passed by value, save the value, */                              \
-      *(TYPE *) (value_dumps + current_offset) = argument_ ## INDEX;                         \
-      size_dumps[INDEX] = sizeof(TYPE);                                                      \
-      address_dumps[INDEX] = (uint64_t) (size_t) &argument_ ## INDEX;                        \
-      current_offset += sizeof(TYPE);                                                        \
-    } else {                                                                                 \
-      /* Otherwise, save a pointer to it. */                                                 \
-      *(TYPE **) (value_dumps + current_offset) = &argument_ ## INDEX;                       \
-      size_dumps[INDEX] = sizeof(TYPE *);                                                    \
-      address_dumps[INDEX] = (uint64_t) (size_t) &argument_ ## INDEX;                        \
-      current_offset += sizeof(TYPE *);                                                      \
-    }                                                                                        \
-  } while (0)
-
 /*{ for name, arguments in argument_functions.items() -}*/
 NOINLINE void ABIDEF test_/*( name )*/(
   /*{- for type in arguments -}*/
@@ -59,10 +35,14 @@ NOINLINE void ABIDEF test_/*( name )*/(
   /*{- if not loop.last -}*/ , /*{ endif -}*/
   /*{- endfor -}*/
 ) {
-  current_offset = 0;
+  _Static_assert(/*( arguments | length )*/ < /*( maximum_argument_count )*/,
+                 "Number of arguments exceeds the allowed maximum.");
 
+  uint64_t current_offset = 0;
   /*{- for type in arguments }*/
-  SAVE_ARGUMENT_VALUE(/*( type )*/, /*( loop.index - 1 )*/);
+  address_dumps[/*( loop.index - 1 )*/] = (uint64_t) (size_t) &argument_/*( loop.index - 1 )*/;
+  *(/*( type )*/ *) (value_dumps + current_offset) = argument_/*( loop.index - 1 )*/;
+  current_offset += sizeof(/*( type )*/);
   /*{- endfor }*/
 }
 
@@ -74,8 +54,10 @@ NOINLINE void ABIDEF test_/*( name )*/(
 
 /*{ for name, return_value_type in return_value_functions.items() -}*/
 NOINLINE /*( return_value_type )*/ ABIDEF test_/*( name )*/(void) {
-  typedef /*( return_value_type )*/ return_value_type;
-  return_value_type returned = *(return_value_type *) expected_state;
+  size_dumps[0] = sizeof(/*( return_value_type )*/);
+  _Static_assert(sizeof(/*( return_value_type )*/) <= /*( maximum_argument_size )*/,
+                 "Size of the return value exceeds the allowed maximum.");
+  /*( return_value_type )*/ returned = *(/*( return_value_type )*/ *) expected_state;
   return returned;
 }
 

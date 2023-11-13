@@ -313,20 +313,9 @@ def render_function_description(jinja_env, architectures, config, functions, out
         path = out_dir + "/" + architecture_name + "/" + filename
         render_helper(jinja_env, filename, path, dictionary)
 
-        filename = "setup_return_values.inc"
+        filename = "setup.inc"
         path = out_dir + "/" + architecture_name + "/" + filename
         render_helper(jinja_env, filename, path, dictionary)
-
-        for current_style in architecture["styles"]:
-            style_specific_dictionary = dictionary
-            style_specific_dictionary["current_style"] = current_style
-
-            if current_style == "msvc":
-                style_specific_dictionary["generation_notice"] = get_masm_style_generation_notice()
-
-            filename = "setup_arguments.S"
-            path = out_dir + "/" + architecture_name + "/" + current_style + "/" + filename
-            render_helper(jinja_env, filename, path, style_specific_dictionary)
 
 
 def main():
