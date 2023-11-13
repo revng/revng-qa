@@ -20,10 +20,10 @@
  * to the state).
  *
  * All the gathered state data (`stored_state` array) is then dumped thanks
- * to external `print_a_register` and `print_stack` helpers.
+ * to external `decode_a_register` and `decode_stack` helpers.
  *
  * Similarly, all the output data from the tests themselves is printed using
- * the `print` dispatcher (see the docs related to `printers.c` template).
+ * the `decode` dispatcher (see the docs related to `decoders.c` template).
  */
 
 #include <assert.h>
@@ -155,28 +155,28 @@ void handler(int signal, siginfo_t *info, void *context) {
     current_state = 0;
 }
 
-void print_a_register(const char *name, uint8_t *value);
-void print_stack(uint8_t *data);
-static void print_single_state(uint8_t *data) {
+void decode_a_register(const char *name, uint8_t *value);
+void decode_stack(uint8_t *data);
+static void decode_single_state(uint8_t *data) {
   puts("      Registers:");
   for (uint32_t i = 0; i < REGISTER_COUNT; ++i)
-    print_a_register(register_names[i], data + sizeof(size_t) * i);
+    decode_a_register(register_names[i], data + sizeof(size_t) * i);
 
   printf("      Stack: ");
-  print_stack(data + sizeof(size_t) * REGISTER_COUNT);
+  decode_stack(data + sizeof(size_t) * REGISTER_COUNT);
 }
 
-static void print_saved_state(void) {
+static void decode_saved_state(void) {
   puts("    StateBeforeTheCall:");
-  print_single_state(stored_state[0]);
+  decode_single_state(stored_state[0]);
   puts("    StateAfterTheCall:");
-  print_single_state(stored_state[1]);
+  decode_single_state(stored_state[1]);
   puts("    StateAfterTheReturn:");
-  print_single_state(stored_state[2]);
+  decode_single_state(stored_state[2]);
 }
 
 void print_header(void);
-void print(const char *name, const uint8_t *input, const uint8_t *output);
+void decode(const char *name, const struct encoded value);
 
 int main(int argc, char **argv) {
   /* Setup signal handling */
@@ -243,8 +243,8 @@ int main(int argc, char **argv) {
       printf("  - Function: \"%s\"\n", input.functions[function].name);
       printf("    Iteration: %d\n", i);
       test_function(&input.functions[function]);
-      print(input.functions[function].name, expected_state, value_dumps);
-      print_saved_state();
+      decode(input.functions[function].name, expected_state, value_dumps);
+      decode_saved_state();
       puts("");
     }
   }

@@ -57,5 +57,5 @@ python3 "${INPUT_DIRECTORY}/gather_symbols.py" \
   ${CFLAGS} -O3 -D_GNU_SOURCE -static \
   -I"${OUTPUT_DIRECTORY}" \
   "${INPUT_DIRECTORY}/runner.c" \
-  "${INPUT_DIRECTORY}/printers.c" \
+  "${INPUT_DIRECTORY}/decoders.c" \
   -o "${OUTPUT_DIRECTORY}/probe-calls"

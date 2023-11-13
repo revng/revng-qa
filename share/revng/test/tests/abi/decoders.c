@@ -7,13 +7,13 @@
 #include "functions.h"
 
 #ifdef TARGET_x86_64
-#include "x86_64/printers.inc"
+#include "x86_64/decoders.inc"
 #elif TARGET_i386
-#include "i386/printers.inc"
+#include "i386/decoders.inc"
 #elif TARGET_aarch64
-#include "aarch64/printers.inc"
+#include "aarch64/decoders.inc"
 #elif TARGET_arm
-#include "arm/printers.inc"
+#include "arm/decoders.inc"
 #else
 #error "Impossible to find sources because the target architecture is unknown."
 #endif

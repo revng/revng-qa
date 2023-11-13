@@ -302,7 +302,7 @@ def render_function_description(jinja_env, architectures, config, functions, out
         path = out_dir + "/" + architecture_name + "/" + filename
         render_helper(jinja_env, filename, path, dictionary)
 
-        filename = "printers.inc"
+        filename = "decoders.inc"
         path = out_dir + "/" + architecture_name + "/" + filename
         render_helper(jinja_env, filename, path, dictionary)
 
