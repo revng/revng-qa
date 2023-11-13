@@ -8,6 +8,8 @@ This template file is distributed under the MIT License. See LICENSE.md for deta
 
 uint8_t expected_state[/*( generated_byte_count )*/] = { 1 };
 uint8_t value_dumps[/*( generated_byte_count )*/] = { 1 };
+uint64_t size_dumps[/*( generated_byte_count )*/] = { 1 };
+uint64_t address_dumps[/*( generated_byte_count )*/] = { 1 };
 
 // A place to safely store tested function return addresses, so they can be
 // recovered no matter how much stack and registers are modified.
@@ -24,11 +26,12 @@ void setup_/*( name )*/(void) {
   // Call the tested function.
   return_value_type returned = test_/*( name )*/();
 
-  // Write the pointer to the received values into a safe location,
-  *(return_value_type **) value_dumps = &returned;
+  // Write the pointer and size of the received value into safe locations,
+  size_dumps[0] = sizeof(return_value_type);
+  address_dumps[0] = &returned;
 
   // Then write the value to it as well.
-  *(return_value_type *) (value_dumps + 8) = returned;
+  *(return_value_type *) value_dumps = returned;
 }
 
 /*{ endfor }*/
