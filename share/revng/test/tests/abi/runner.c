@@ -226,24 +226,30 @@ int main(int argc, char **argv) {
   print_header();
   puts("Iterations:");
 
-  const struct memory *state = select_a_variable("expected_state");
-  uint8_t *expected_state = (uint8_t *) (size_t) state->address;
-
+  const struct memory *expected = select_a_variable("expected_state");
   const struct memory *values = select_a_variable("value_dumps");
-  uint8_t *value_dumps = (uint8_t *) (size_t) values->address;
+  const struct memory *addresses = select_a_variable("address_dumps");
+  const struct memory *sizes = select_a_variable("size_dumps");
+  const struct encoded encoded = {
+    .input = (uint8_t *) (size_t) expected->address,
+    .output = (uint8_t *) (size_t) values->address,
+    .addresses = (uint64_t *) (size_t) addresses->address,
+    .sizes = (uint64_t *) (size_t) sizes->address
+  };
 
   malloc_the_stored_state();
 
   /* run the tests */
-  const uint64_t count = sizeof(input.functions) / sizeof(struct function);
-  for (uint32_t function = 0; function < count; ++function) {
+  const uint64_t function_count = sizeof(input.functions)
+                                  / sizeof(struct function);
+  for (uint32_t function = 0; function < function_count; ++function) {
     for (uint32_t i = 0; i < constants.iteration_count; ++i) {
-      regenerate_the_expected_state(expected_state);
+      regenerate_the_expected_state(encoded.input);
 
       printf("  - Function: \"%s\"\n", input.functions[function].name);
       printf("    Iteration: %d\n", i);
       test_function(&input.functions[function]);
-      decode(input.functions[function].name, expected_state, value_dumps);
+      decode(input.functions[function].name, encoded);
       decode_saved_state();
       puts("");
     }

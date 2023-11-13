@@ -7,6 +7,8 @@ This template file is distributed under the MIT License. See LICENSE.md for deta
 
 /*(- generation_notice )*/
 
+#include <stdint.h>
+
 static struct {
   uint64_t seed, iteration_count, stack_byte_count, generated_byte_count;
 } constants = {
@@ -14,4 +16,12 @@ static struct {
   .iteration_count = /*( iteration_count )*/,
   .stack_byte_count = /*( stack_byte_count )*/,
   .generated_byte_count = /*( generated_byte_count )*/
+};
+
+struct encoded {
+  uint8_t *input;
+  uint8_t *output;
+
+  uint64_t *addresses;
+  uint64_t *sizes;
 };
