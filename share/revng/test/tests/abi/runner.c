@@ -242,6 +242,8 @@ int main(int argc, char **argv) {
   /* run the tests */
   const uint64_t function_count = sizeof(input.functions)
                                   / sizeof(struct function);
+  assert((function_count == constants.function_count,
+          "Some functions where lost, is linker trying to be overly smart?"));
   for (uint32_t function = 0; function < function_count; ++function) {
     for (uint32_t i = 0; i < constants.iteration_count; ++i) {
       regenerate_the_expected_state(encoded.input);

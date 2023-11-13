@@ -10,12 +10,14 @@ This template file is distributed under the MIT License. See LICENSE.md for deta
 #include <stdint.h>
 
 static struct {
-  uint64_t seed, iteration_count, stack_byte_count, generated_byte_count;
+  uint64_t seed, iteration_count;
+  uint64_t stack_byte_count, generated_byte_count, function_count;
 } constants = {
   .seed = /*( lfsr_seed )*/,
   .iteration_count = /*( iteration_count )*/,
   .stack_byte_count = /*( stack_byte_count )*/,
-  .generated_byte_count = /*( generated_byte_count )*/
+  .generated_byte_count = /*( generated_byte_count )*/,
+  .function_count = /*( function_count )*/
 };
 
 struct encoded {

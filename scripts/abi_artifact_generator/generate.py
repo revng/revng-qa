@@ -240,9 +240,11 @@ def get_masm_style_generation_notice():
 """
 
 
-def render_functions(jinja_environment, functions, out_dir: str):
+def render_functions(jinja_environment, config, functions, out_dir: str):
     dictionary = {
         "generation_notice": get_generation_notice(),
+        "maximum_argument_count": config["maximum_argument_count"],
+        "maximum_argument_size": config["maximum_argument_size"],
         "structs": functions["structs"],
         "packed_structs": functions["packed_structs"],
         "argument_functions": functions["argument_tests"],
@@ -280,6 +282,8 @@ def render_function_description(jinja_env, architectures, config, functions, out
             "stack_byte_count": config["stack_byte_count"],
             "lfsr_seed": config["lfsr_seed"],
             "iteration_count": config["iteration_count"],
+            "maximum_argument_count": config["maximum_argument_count"],
+            "maximum_argument_size": config["maximum_argument_size"],
             "register_type": register_type(architecture["register_size"]),
             "intel_register_type": intel_register_type(architecture["register_size"]),
             "register_size": architecture["register_size"],
@@ -297,6 +301,9 @@ def render_function_description(jinja_env, architectures, config, functions, out
         combined_registers = dictionary["register_count"] * dictionary["register_size"]
         dictionary["generated_byte_count"] = dictionary["stack_byte_count"] + combined_registers
         assert dictionary["generated_byte_count"] % dictionary["register_size"] == 0
+
+        function_count = len(functions["argument_tests"]) + len(functions["return_value_tests"])
+        dictionary["function_count"] = function_count
 
         filename = "constants.h"
         path = out_dir + "/" + architecture_name + "/" + filename
@@ -329,7 +336,7 @@ def main():
     environment = setup_jinja_environment(arguments)
 
     out_dir = str(arguments.output_directory)
-    render_functions(environment, functions, out_dir)
+    render_functions(environment, config, functions, out_dir)
     render_function_description(environment, architectures, config, functions, out_dir)
 
     return 0
