@@ -65,6 +65,19 @@ def render_helper(env, template_name: str, result_path: str, variable_dictionary
         file.write(jinja_template.render(variable_dictionary))
 
 
+def register_type(register_size: str):
+    if register_size == 1:
+        return "uint8_t"
+    elif register_size == 2:
+        return "uint16_t"
+    elif register_size == 4:
+        return "uint32_t"
+    elif register_size == 8:
+        return "uint64_t"
+    else:
+        raise Exception("unsupported register size")
+
+
 def intel_register_type(register_size: str):
     if register_size == 1:
         return "byte"
@@ -267,7 +280,7 @@ def render_function_description(jinja_env, architectures, config, functions, out
             "stack_byte_count": config["stack_byte_count"],
             "lfsr_seed": config["lfsr_seed"],
             "iteration_count": config["iteration_count"],
-            "register_type": architecture["register_type"],
+            "register_type": register_type(architecture["register_size"]),
             "intel_register_type": intel_register_type(architecture["register_size"]),
             "register_size": architecture["register_size"],
             "register_list": architecture["register_list"],
