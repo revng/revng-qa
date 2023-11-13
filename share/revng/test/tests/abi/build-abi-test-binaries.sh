@@ -19,7 +19,7 @@ OBJDUMP_FLAGS="$5"
 
 test -n "${INPUT_DIRECTORY}"
 test -n "${OUTPUT_DIRECTORY}"
-test -n ""${TRIPLE}""
+test -n "${TRIPLE}"
 test -n "${CFLAGS}"
 
 mkdir -p "${OUTPUT_DIRECTORY}"

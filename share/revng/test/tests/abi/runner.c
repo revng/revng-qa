@@ -112,7 +112,7 @@ static void test_function(const struct function *function) {
  */
 int current_state = 0;
 
-/* Since it's not safe to call functions like `prinf` inside the handler (what
+/* Since it's not safe to call functions like `printf` inside the handler (what
  * if an interrupt happens while inside?), these memory locations are used as
  * an intermediate place to store the state which can be printed later down
  * the line
@@ -241,7 +241,7 @@ int main(int argc, char **argv) {
       regenerate_the_randomized_state(randomized_state);
 
       printf("  - Function: \"%s\"\n", input.functions[function].name);
-      printf("    Iteration: \"%d\"\n", i);
+      printf("    Iteration: %d\n", i);
       test_function(&input.functions[function]);
       print(input.functions[function].name,
             randomized_state,

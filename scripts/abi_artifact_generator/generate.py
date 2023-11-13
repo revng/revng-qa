@@ -227,13 +227,13 @@ def get_masm_style_generation_notice():
 """
 
 
-def render_functions(jinja_environment, config, out_dir: str):
+def render_functions(jinja_environment, functions, out_dir: str):
     dictionary = {
         "generation_notice": get_generation_notice(),
-        "structs": config["structs"],
-        "packed_structs": config["packed_structs"],
-        "argument_functions": config["argument_tests"],
-        "return_value_functions": config["return_value_tests"],
+        "structs": functions["structs"],
+        "packed_structs": functions["packed_structs"],
+        "argument_functions": functions["argument_tests"],
+        "return_value_functions": functions["return_value_tests"],
         "supported_primitives": [
             "int8_t",
             "int16_t",
@@ -281,8 +281,8 @@ def render_function_description(jinja_env, architectures, config, functions, out
             "return_from_function": asm(return_from_function(architecture, config)),
         }
 
-        combined = dictionary["register_count"] * dictionary["register_size"]
-        dictionary["generated_byte_count"] = dictionary["stack_byte_count"] + combined
+        combined_registers = dictionary["register_count"] * dictionary["register_size"]
+        dictionary["generated_byte_count"] = dictionary["stack_byte_count"] + combined_registers
         assert dictionary["generated_byte_count"] % dictionary["register_size"] == 0
 
         filename = "constants.h"
