@@ -229,8 +229,8 @@ int main(int argc, char **argv) {
   const struct memory *state = select_a_variable("expected_state");
   uint8_t *expected_state = (uint8_t *) (size_t) state->address;
 
-  const struct memory *printable = select_a_variable("printable_location");
-  uint8_t *printable_location = (uint8_t *) (size_t) printable->address;
+  const struct memory *values = select_a_variable("value_dumps");
+  uint8_t *value_dumps = (uint8_t *) (size_t) values->address;
 
   malloc_the_stored_state();
 
@@ -243,9 +243,7 @@ int main(int argc, char **argv) {
       printf("  - Function: \"%s\"\n", input.functions[function].name);
       printf("    Iteration: %d\n", i);
       test_function(&input.functions[function]);
-      print(input.functions[function].name,
-            expected_state,
-            printable_location);
+      print(input.functions[function].name, expected_state, value_dumps);
       print_saved_state();
       puts("");
     }

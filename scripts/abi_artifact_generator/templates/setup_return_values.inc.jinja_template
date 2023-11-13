@@ -7,7 +7,7 @@ This template file is distributed under the MIT License. See LICENSE.md for deta
 #include "../functions.h"
 
 uint8_t expected_state[/*( generated_byte_count )*/] = { 1 };
-uint8_t printable_location[/*( generated_byte_count )*/] = { 1 };
+uint8_t value_dumps[/*( generated_byte_count )*/] = { 1 };
 
 // A place to safely store tested function return addresses, so they can be
 // recovered no matter how much stack and registers are modified.
@@ -25,10 +25,10 @@ void setup_/*( name )*/(void) {
   return_value_type returned = test_/*( name )*/();
 
   // Write the pointer to the received values into a safe location,
-  *(return_value_type **) printable_location = &returned;
+  *(return_value_type **) value_dumps = &returned;
 
   // Then write the value to it as well.
-  *(return_value_type *) (printable_location + 8) = returned;
+  *(return_value_type *) (value_dumps + 8) = returned;
 }
 
 /*{ endfor }*/

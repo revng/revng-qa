@@ -24,24 +24,24 @@ This template file is distributed under the MIT License. See LICENSE.md for deta
 
 // Temporary locations to store data that needs to be preserved across a test.
 extern uint8_t expected_state[];
-extern uint8_t printable_location[];
+extern uint8_t value_dumps[];
 
 // A variable used for temporary storage of offsets while iterating one of the
 // locations above.
 ptrdiff_t current_offset = 0;
 
 // Stores the values (or pointers to, depending on the type) of all
-// the arguments at specially dedicated `printable_location`, so that they
+// the arguments at specially dedicated `value_dumps`, so that they
 // can be dumped later on.
 #define SAVE_ARGUMENT_VALUE(TYPE, NAME)                                        \
   do {                                                                         \
     if (sizeof(TYPE) <= ARGUMENT_SIZE_LIMIT(TYPE, NAME) && !IS_PACKED(TYPE)) { \
       /* If the argument is passed by value, save the value, */                \
-      *(TYPE *) (printable_location + current_offset) = NAME;                  \
+      *(TYPE *) (value_dumps + current_offset) = NAME;                  \
       current_offset += sizeof(TYPE);                                          \
     } else {                                                                   \
       /* Otherwise, save a pointer to it. */                                   \
-      *(TYPE **) (printable_location + current_offset) = &NAME;                \
+      *(TYPE **) (value_dumps + current_offset) = &NAME;                \
       current_offset += sizeof(TYPE *);                                        \
     }                                                                          \
   } while (0)

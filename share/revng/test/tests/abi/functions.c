@@ -7,7 +7,7 @@
 /* RUN-default: nope */
 
 uint8_t expected_state[/* doesn't matter */ 1];
-uint8_t printable_location[/* doesn't matter */ 1];
+uint8_t value_dumps[/* doesn't matter */ 1];
 
 static size_t runtime_endianness_check() {
   size_t i = 1;
