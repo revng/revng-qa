@@ -6,6 +6,7 @@ import argparse
 import dataclasses
 import re
 import sys
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 
@@ -23,67 +24,102 @@ def accept_arguments():
         help="the file listing the interesting symbols",
     )
 
+    parser.add_argument(
+        "section_dump", type=str, help="the file listing sections present in the binary"
+    )
+
+    parser.add_argument(
+        "symbol_dump", type=str, help="the file listing symbols present in the binary"
+    )
+
+    parser.add_argument(
+        "disassembly_dump",
+        type=str,
+        help="the file containing the outputs of a disassembler for the binary",
+    )
+
     return parser.parse_args()
 
 
-def has_objdump_header(data):
-    return bool(re.search(b"^\n[^:]+:\s+file format elf.+\n", data))
+class DisassemblyParser(ABC):
+    def __init__(self, sections, symbols, disassembly):
+        self.sections = sections
+        self.symbols = symbols
+        self.disassembly = disassembly
+
+    @abstractmethod
+    def list_symbols(self):
+        raise Exception("Use one of the children.")
+
+    @abstractmethod
+    def find_section(self, name):
+        raise Exception("Use one of the children.")
+
+    @abstractmethod
+    def find_callsites(self, name):
+        raise Exception("Use one of the children.")
 
 
-def has_dumpbin_header(data):
-    return bool(re.search(b"^\nDump of file ", data))
+class ObjdumpOutputParser(DisassemblyParser):
+    def __init__(self, *args):
+        super().__init__(*args)
 
+    def list_symbols(self):
+        result = {}
+        for match in re.finditer(
+            b"\n0+([a-fA-F0-9]+)\s+"  # address (without leading 0s)
+            + b"(\w+)\s+"  # symbol type (local, global, etc)
+            + b"(?:(\w+)\s+|)"  # optional extra flags (weak, debug, etc)
+            + b"([\*\.\w]+)\s+"  # section symbol belongs to
+            + b"([a-fA-F0-9]+)\s+"  # either alignment or size of the symbol
+            + b"([\w\._-]+)+",  # name of the symbol
+            self.symbols,
+        ):
+            result[match[6].decode("utf-8")] = match[1].decode("utf-8")
 
-def list_symbols(data):
-    result = {}
-    for match in re.finditer(
-        b"\n0+([a-fA-F0-9]+)\s+"  # address (without leading 0s)
-        + b"(\w+)\s+"  # symbol type (local, global, etc)
-        + b"(?:(\w+)\s+|)"  # optional extra flags (weak, debug, etc)
-        + b"([\*\.\w]+)\s+"  # section symbol belongs to
-        + b"([a-fA-F0-9]+)\s+"  # either alignment or size of the symbol
-        + b"([\w\._-]+)+",  # name of the symbol
-        data,
-    ):
-        result[match[6].decode("utf-8")] = match[1].decode("utf-8")
+        return result
 
-    return result
-
-
-def find_section(name, data):
-    match = re.search(
-        b"\n\s+\d+\s+"  # index
-        + bytes(name, "utf-8")  # name
-        + b"\s+([a-fA-F0-9]+)\s+"  # size
-        + b"([a-fA-F0-9]+)\s+"  # vma
-        + b"([a-fA-F0-9]+)\s+"  # lma
-        + b"([a-fA-F0-9]+)\s+"  # offset within the file
-        + b"\d+\*\*\d+\s*",  # (uncaptured) alignment
-        data,
-    )
-    if match:
-        return (
-            match[1].decode("utf-8"),  # size
-            match[2].decode("utf-8"),  # vma
-            match[4].decode("utf-8"),  # offset
+    def find_section(self, name):
+        match = re.search(
+            b"\n\s+\d+\s+"  # index
+            + bytes(name, "utf-8")  # name
+            + b"\s+([a-fA-F0-9]+)\s+"  # size
+            + b"([a-fA-F0-9]+)\s+"  # vma
+            + b"([a-fA-F0-9]+)\s+"  # lma
+            + b"([a-fA-F0-9]+)\s+"  # offset within the file
+            + b"\d+\*\*\d+\s*",  # (uncaptured) alignment
+            self.sections,
         )
+        if match:
+            return Section(
+                name,
+                match[1].decode("utf-8"),  # size
+                match[2].decode("utf-8"),  # vma
+                match[4].decode("utf-8"),  # offset
+            )
+        else:
+            raise Exception("unable to find a section: '" + name + "'")
+
+    def find_callsites(self, name):
+        result = []
+        for match in re.finditer(
+            b"\n\s+0*([a-fA-F0-9]+):"  # address (without leading 0s)
+            + b"[^<\n]*<"  # any number of non-`<` characters followed by `<`
+            + bytes(name, "utf-8")  # name
+            + b">\n"  # `>` character and a new line
+            + b"\s+0*([a-fA-F0-9]+)",  # address of the next instruction
+            self.disassembly,
+        ):
+            result.append((match[1].decode("utf-8"), match[2].decode("utf-8")))
+
+        return result
+
+
+def select_parser(sections, symbols, disassembly):
+    if re.match(b"^\n[^:]+:\s+file format elf.+\n", sections):
+        return ObjdumpOutputParser(sections, symbols, disassembly)
     else:
-        raise Exception("unable to find a section: '" + name + "'")
-
-
-def find_callsites(name, data):
-    result = []
-    for match in re.finditer(
-        b"\n\s+0*([a-fA-F0-9]+):"  # address (without leading 0s)
-        + b"[^<\n]*<"  # any number of non-`<` characters followed by `<`
-        + bytes(name, "utf-8")  # name
-        + b">\n"  # `>` character and a new line
-        + b"\s+0*([a-fA-F0-9]+)",  # address of the next instruction
-        data,
-    ):
-        result.append((match[1].decode("utf-8"), match[2].decode("utf-8")))
-
-    return result
+        raise Exception("Unsupported input file format")
 
 
 @dataclass
@@ -268,19 +304,23 @@ const const struct {
 def main():
     arguments = accept_arguments()
 
-    result = Gathered()
-    disassembly = sys.stdin.buffer.read()
-    if has_objdump_header(disassembly):
-        size, vma, file_offset = find_section(".text", disassembly)
-        result.sections.append(Section(".text", size, vma, file_offset))
+    with open(arguments.section_dump, "rb") as sections:
+        with open(arguments.symbol_dump, "rb") as symbols:
+            with open(arguments.disassembly_dump, "rb") as disassembly:
+                parser = select_parser(sections.read(), symbols.read(), disassembly.read())
 
-        list_of_symbols_to_extract = arguments.list_of_symbols_to_extract.split()
-        for name, address in list_symbols(disassembly).items():
-            if name in list_of_symbols_to_extract:
-                assert name not in result.memory
-                result.memory[name] = address
+    result = Gathered()
+    result.sections.append(parser.find_section(".text"))
+
+    list_of_symbols_to_extract = arguments.list_of_symbols_to_extract.split()
+    for name, address in parser.list_symbols().items():
+        match = re.match("^(?:_|@|)([\w_]+)(?:_\d+|@+\d+|)\s*$", name)
+        if match:
+            if match[1] in list_of_symbols_to_extract:
+                assert match[1] not in result.memory
+                result.memory[match[1]] = address
             else:
-                match = re.match("^(test|setup)_([\w_]+)\s*$", name)
+                match = re.match("^(test|setup)_([\w_]+)$", match[1])
                 if match:
                     if match[2] not in result.functions:
                         result.functions[match[2]] = Function()
@@ -291,21 +331,17 @@ def main():
                         assert result.functions[match[2]].entry_point == ""
                         result.functions[match[2]].entry_point = address
 
-        assert len(list_of_symbols_to_extract) == len(result.memory)
-        assert len(result.functions) > 0
+    assert len(list_of_symbols_to_extract) == len(result.memory)
+    assert len(result.functions) > 0
 
-        for name, function in result.functions.items():
-            assert function.address != ""
-            assert function.entry_point != ""
+    for name, function in result.functions.items():
+        assert function.address != ""
+        assert function.entry_point != ""
 
-            for before, after in find_callsites("test_" + name, disassembly):
-                function.callsites.append(CallSite(before, after))
+        for before, after in parser.find_callsites("test_" + name):
+            function.callsites.append(CallSite(before, after))
 
-    elif has_dumpbin_header(disassembly):
-        raise Exception("TODO")
-
-    else:
-        raise Exception("Invalid input file")
+        assert len(function.callsites) == 1
 
     result.emit()
 
