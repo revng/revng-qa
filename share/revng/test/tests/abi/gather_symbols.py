@@ -115,9 +115,66 @@ class ObjdumpOutputParser(DisassemblyParser):
         return result
 
 
+class DumpbinOutputParser(DisassemblyParser):
+    def __init__(self, *args):
+        super().__init__(*args)
+
+    def list_symbols(self):
+        result = {}
+        for match in re.finditer(
+            b"\n\s+\d+:[a-fA-F0-9]+\s+"  # section relative address
+            + b"([\w_?$@<>\.\\\-]+)+\s+"  # name of the symbol
+            + b"0+([a-fA-F0-9]*)\s+",  # virtual address (without leading 0s)
+            self.symbols,
+        ):
+            result[match[1].decode("utf-8")] = match[2].decode("utf-8")
+
+        return result
+
+    def find_section(self, name):
+        match = re.search(
+            b"\r\nSECTION HEADER #\d+\r\n\s+"  # index
+            + bytes(name, "utf-8")  # name
+            + b" name\r\n\s+"
+            + b"([a-fA-F0-9]+) virtual size\r\n\s+"  # size
+            + b"([a-fA-F0-9]+) virtual address "  # relative section start
+            + b"\(0+([a-fA-F0-9]+) to [a-fA-F0-9]+\)\r\n\s+"  # vma
+            + b"([a-fA-F0-9]+) size of raw data\r\n\s+"  # raw size
+            + b"([a-fA-F0-9]+) file pointer to raw data",  # offset within the file
+            self.sections,
+        )
+        if match:
+            return Section(
+                name,
+                match[1].decode("utf-8"),  # size
+                match[3].decode("utf-8"),  # vma
+                match[5].decode("utf-8"),  # offset
+            )
+        else:
+            raise Exception("unable to find a section: '" + name + "'")
+
+    def find_callsites(self, name):
+        result = []
+        for match in re.finditer(
+            b"\r\n\s+0*([a-fA-F0-9]+):"  # address (without leading 0s)
+            + b"[\w\s]*\s"  # any number of letters (to catch instruction mnemonics) and whitespaces
+            + b"(?:_|@|)"  # optional prefix
+            + bytes(name, "utf-8")  # name
+            + b"(?:_\d*|@+\d*|)"  # optional suffix
+            + b"\r\n"  # `>` a new line character
+            + b"\s+0*([a-fA-F0-9]+):",  # address of the next instruction
+            self.disassembly,
+        ):
+            result.append((match[1].decode("utf-8"), match[2].decode("utf-8")))
+
+        return result
+
+
 def select_parser(sections, symbols, disassembly):
     if re.match(b"^\n[^:]+:\s+file format elf.+\n", sections):
         return ObjdumpOutputParser(sections, symbols, disassembly)
+    elif re.match(b"^\r\nDump of file .*\.exe\r\n\r\nPE signature found\r\n", sections):
+        return DumpbinOutputParser(sections, symbols, disassembly)
     else:
         raise Exception("Unsupported input file format")
 
