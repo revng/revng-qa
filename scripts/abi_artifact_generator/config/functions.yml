@@ -354,43 +354,78 @@ argument_tests:
   #
   # Tests for non-naturally aligned structs.
   #
-  # NOTE: these tests would require us to support unnatural alignment properly
-  # single_unnaturally_aligned_struct_64_argument: ["unnaturally_aligned_struct_64"]
-  # unnaturally_aligned_struct_64_in_registers:
-  #   - size_t
-  #   - size_t
-  #   - unnaturally_aligned_struct_64
-  # unnaturally_aligned_struct_64_on_stack:
-  #   - size_t
-  #   - size_t
-  #   - size_t
-  #   - size_t
-  #   - size_t
-  #   - size_t
-  #   - size_t
-  #   - size_t
-  #   - uint8_t
-  #   - unnaturally_aligned_struct_64
-  #   - uint8_t
-  #   - unnaturally_aligned_struct_64
-  # single_unnaturally_aligned_struct_32_argument: ["unnaturally_aligned_struct_32"]
-  # unnaturally_aligned_struct_32_in_registers:
-  #   - size_t
-  #   - size_t
-  #   - unnaturally_aligned_struct_32
-  # unnaturally_aligned_struct_32_on_stack:
-  #   - size_t
-  #   - size_t
-  #   - size_t
-  #   - size_t
-  #   - size_t
-  #   - size_t
-  #   - size_t
-  #   - size_t
-  #   - uint8_t
-  #   - unnaturally_aligned_struct_32
-  #   - uint8_t
-  #   - unnaturally_aligned_struct_32
+  single_unnaturally_aligned_struct_128_argument: ["unnaturally_aligned_struct_128"]
+  unnaturally_aligned_struct_128_in_registers:
+    - size_t
+    - size_t
+    - unnaturally_aligned_struct_16
+  unnaturally_aligned_struct_128_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - unnaturally_aligned_struct_128
+    - uint8_t
+    - unnaturally_aligned_struct_128
+  single_unnaturally_aligned_struct_64_argument: ["unnaturally_aligned_struct_64"]
+  unnaturally_aligned_struct_64_in_registers:
+    - size_t
+    - size_t
+    - unnaturally_aligned_struct_64
+  unnaturally_aligned_struct_64_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - unnaturally_aligned_struct_64
+    - uint8_t
+    - unnaturally_aligned_struct_64
+  single_unnaturally_aligned_struct_32_argument: ["unnaturally_aligned_struct_32"]
+  unnaturally_aligned_struct_32_in_registers:
+    - size_t
+    - size_t
+    - unnaturally_aligned_struct_32
+  unnaturally_aligned_struct_32_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - unnaturally_aligned_struct_32
+    - uint8_t
+    - unnaturally_aligned_struct_32
+  single_unnaturally_aligned_struct_16_argument: ["unnaturally_aligned_struct_16"]
+  unnaturally_aligned_struct_16_in_registers:
+    - size_t
+    - size_t
+    - unnaturally_aligned_struct_16
+  unnaturally_aligned_struct_16_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - unnaturally_aligned_struct_16
+    - uint8_t
+    - unnaturally_aligned_struct_16
 
 return_value_tests:
   single_8_bit_return_value: "uint8_t"
@@ -413,9 +448,10 @@ return_value_tests:
   single_small_struct_of_structs_return_value: "small_struct_of_structs"
   single_struct_of_structs_return_value: "struct_of_structs"
 
-  # NOTE: re-enable these these tests when unnatural alignment support is fixed
-  # single_unnaturally_aligned_struct_32_return_value: "unnaturally_aligned_struct_32"
-  # single_unnaturally_aligned_struct_64_return_value: "unnaturally_aligned_struct_64"
+  single_unnaturally_aligned_struct_16_return_value: "unnaturally_aligned_struct_16"
+  single_unnaturally_aligned_struct_32_return_value: "unnaturally_aligned_struct_32"
+  single_unnaturally_aligned_struct_64_return_value: "unnaturally_aligned_struct_64"
+  single_unnaturally_aligned_struct_128_return_value: "unnaturally_aligned_struct_128"
 
   single_void_pointer_return_value: "void *"
   single_int_pointer_return_value: "uint32_t *"
