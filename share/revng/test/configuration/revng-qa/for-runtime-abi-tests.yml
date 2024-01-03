@@ -68,27 +68,60 @@ tags:
     variables:
       ABI_NAME: Microsoft_x86_cdecl
       GCC_CFLAGS:
-        - -DABIDEF=__attribute__((ms_abi,cdecl))
+        # Safeguard in case somebody tries using it with gcc
+        - -DABIDEF=UNSUPPORTED
       MSVC_CFLAGS:
         - -DABIDEF=__cdecl
+
+  - name: i386-cdecl-microsoft-abi-gcc-edition
+    implies: [i386]
+    variables:
+      ABI_NAME: Microsoft_x86_cdecl_gcc
+      GCC_CFLAGS:
+        - -DABIDEF=__attribute__((ms_abi,cdecl))
+      MSVC_CFLAGS:
+        # Safeguard in case somebody tries using it with msvc
+        - -DABIDEF=UNSUPPORTED
 
   - name: i386-fastcall-microsoft-abi
     implies: [i386]
     variables:
       ABI_NAME: Microsoft_x86_fastcall
       GCC_CFLAGS:
-        - -DABIDEF=__attribute__((ms_abi,fastcall))
+        # Safeguard in case somebody tries using it with gcc
+        - -DABIDEF=UNSUPPORTED
       MSVC_CFLAGS:
         - -DABIDEF=__fastcall
+
+  - name: i386-fastcall-microsoft-abi-gcc-edition
+    implies: [i386]
+    variables:
+      ABI_NAME: Microsoft_x86_fastcall_gcc
+      GCC_CFLAGS:
+        - -DABIDEF=__attribute__((ms_abi,fastcall))
+      MSVC_CFLAGS:
+        # Safeguard in case somebody tries using it with msvc
+        - -DABIDEF=UNSUPPORTED
 
   - name: i386-stdcall-microsoft-abi
     implies: [i386]
     variables:
       ABI_NAME: Microsoft_x86_stdcall
       GCC_CFLAGS:
-        - -DABIDEF=__attribute__((ms_abi,stdcall))
+        # Safeguard in case somebody tries using it with gcc
+        - -DABIDEF=UNSUPPORTED
       MSVC_CFLAGS:
         - -DABIDEF=__stdcall
+
+  - name: i386-stdcall-microsoft-abi-gcc-edition
+    implies: [i386]
+    variables:
+      ABI_NAME: Microsoft_x86_stdcall_gcc
+      GCC_CFLAGS:
+        - -DABIDEF=__attribute__((ms_abi,stdcall))
+      MSVC_CFLAGS:
+        # Safeguard in case somebody tries using it with msvc
+        - -DABIDEF=UNSUPPORTED
 
   - name: i386-vectorcall-microsoft-abi
     implies: [i386]
@@ -130,9 +163,12 @@ sources:
       - [i386-regparm-3-systemv-abi]
       - [i386-regparm-2-systemv-abi]
       - [i386-regparm-1-systemv-abi]
-      - [i386-cdecl-microsoft-abi]
-      - [i386-fastcall-microsoft-abi]
-      - [i386-stdcall-microsoft-abi]
+
+      # "gcc editions" are not tested by default to limit test run time.
+      # Uncomment, if you need to verify these work.
+      # - [i386-cdecl-microsoft-abi-gcc-edition]
+      # - [i386-fastcall-microsoft-abi-gcc-edition]
+      # - [i386-stdcall-microsoft-abi-gcc-edition]
 
       - [i386-cdecl-microsoft-abi, windows]
       - [i386-fastcall-microsoft-abi, windows]
