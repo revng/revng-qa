@@ -69,8 +69,12 @@ void NOINLINE setup_/*( name )*/(void) {
   // Call the tested function.
   return_value_type returned = test_/*( name )*/();
 
+  // GCC works better when return value address is dumped _after_ the return,
+  // so do it here, while for MSVC do it _before_ the return.
+#ifndef _MSC_VER
   // Write the pointer to the received values into a safe location,
   address_dumps[0] = (uint64_t) (size_t) &returned;
+#endif
 
   // Then write the value as well.
   *(return_value_type *) (value_dumps) = returned;

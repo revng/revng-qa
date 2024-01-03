@@ -57,6 +57,13 @@ NOINLINE /*( return_value_type )*/ ABIDEF test_/*( name )*/(void) {
   _Static_assert(sizeof(/*( return_value_type )*/) <= /*( maximum_argument_size )*/,
                  "Size of the return value exceeds the allowed maximum.");
   /*( return_value_type )*/ returned = *(/*( return_value_type )*/ *) expected_state;
+
+  // MSVC works better when return value address is dumped _before_ the return,
+  // so do it here, while for GCC do it _after_ the return.
+#ifdef _MSC_VER
+  // Write the pointer to the received values into a safe location,
+  address_dumps[0] = (uint64_t) (size_t) &returned;
+#endif
   return returned;
 }
 
