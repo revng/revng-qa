@@ -16,6 +16,11 @@ This template file is distributed under the MIT License. See LICENSE.md for deta
 #include <stdio.h>
 #include <string.h>
 
+// Since this file is only used at "runner" time, we don't care about ABI it
+// uses. Discarding the related information makes it easier to shut down some
+// cases we don't want to ever happen when doing things normally.
+#undef ABIDEF
+
 #include "../common.h"
 #include "../functions.h"
 
@@ -65,7 +70,7 @@ void decode_stack(uint8_t *data) {
   } while (0)
 
 /*{ for name, arguments in argument_functions.items() -}*/
-static void ABIDEF decode_/*( name )*/(const struct encoded value) {
+static void decode_/*( name )*/(const struct encoded value) {
   uint64_t current_offset = 0;
   puts("    Arguments:");
   /*{- for type in arguments }*/
