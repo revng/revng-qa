@@ -1,5 +1,13 @@
 ---
 structs:
+  one_byte_struct: ["uint8_t a"]
+  two_byte_struct: ["uint16_t a"]
+  three_byte_struct: ["uint16_t a", "uint8_t b"]
+  four_byte_struct: ["uint32_t a"]
+  seven_byte_struct: ["uint32_t a", "uint16_t b", "uint8_t c"]
+  eight_byte_struct: ["uint64_t a"]
+  sixteen_byte_struct: ["uint64_t a", "uint64_t b"]
+
   small_struct: ["uint16_t a", "uint16_t b"]
   padded_struct: ["uint8_t a", "uint16_t b"]
   array_struct: ["uint64_t a[2]"]
@@ -7,8 +15,6 @@ structs:
   big_struct: ["uint64_t a[8]"]
   huge_struct: ["uint64_t a[32]"]
   double_aligned_struct: ["INT128_T a", "uint8_t b"]
-  one_byte_struct: ["uint8_t a"]
-  two_byte_struct: ["uint16_t a"]
   small_struct_of_structs: ["two_byte_struct a", "one_byte_struct b"]
   struct_of_structs: ["small_struct a[2]", "one_byte_struct b"]
   padded_struct_of_structs: ["one_byte_struct a", "big_struct b"]
@@ -31,19 +37,28 @@ argument_tests:
   single_64_bit_argument: ["int64_t"]
   single_128_bit_argument: ["INT128_T"]
 
+  single_one_byte_struct_argument: ["one_byte_struct"]
+  single_two_byte_struct_argument: ["two_byte_struct"]
+  single_three_byte_struct_argument: ["three_byte_struct"]
+  single_four_byte_struct_argument: ["four_byte_struct"]
+  single_seven_byte_struct_argument: ["seven_byte_struct"]
+  single_eight_byte_struct_argument: ["eight_byte_struct"]
+  single_sixteen_byte_struct_argument: ["sixteen_byte_struct"]
+
   single_small_struct_argument: ["small_struct"]
   single_padded_struct_argument: ["padded_struct"]
   single_array_struct_argument: ["array_struct"]
   single_two_arrays_struct_argument: ["two_arrays_struct"]
   single_big_struct_argument: ["big_struct"]
   single_huge_struct_argument: ["huge_struct"]
-  single_void_pointer_argument: ["void *"]
-  single_int_pointer_argument: ["uint32_t *"]
   single_double_aligned_struct_argument: ["double_aligned_struct"]
-  single_one_byte_struct_argument: ["one_byte_struct"]
-  single_two_byte_struct_argument: ["two_byte_struct"]
+  single_small_struct_of_structs_argument: ["small_struct_of_structs"]
+  single_struct_of_structs_argument: ["struct_of_structs"]
   single_padded_struct_of_structs_argument: ["padded_struct_of_structs"]
   single_double_padded_struct_of_structs_argument: ["double_padded_struct_of_structs"]
+
+  single_void_pointer_argument: ["void *"]
+  single_int_pointer_argument: ["uint32_t *"]
 
   # TODO: floating point arguments.
 
@@ -382,12 +397,19 @@ return_value_tests:
   single_16_bit_return_value: "int16_t"
   single_32_bit_return_value: "uint32_t"
   single_64_bit_return_value: "int64_t"
+  single_128_bit_return_value: "UINT128_T"
+
+  single_one_byte_struct_return_value: "one_byte_struct"
+  single_two_byte_struct_return_value: "two_byte_struct"
+  single_three_byte_struct_return_value: "three_byte_struct"
+  single_four_byte_struct_return_value: "four_byte_struct"
+  single_seven_byte_struct_return_value: "seven_byte_struct"
+  single_eight_byte_struct_return_value: "eight_byte_struct"
+  single_sixteen_byte_struct_return_value: "sixteen_byte_struct"
 
   single_small_struct_return_value: "small_struct"
   single_padded_struct_return_value: "padded_struct"
   single_array_struct_return_value: "array_struct"
-  single_one_byte_struct_return_value: "one_byte_struct"
-  single_two_byte_struct_return_value: "two_byte_struct"
   single_small_struct_of_structs_return_value: "small_struct_of_structs"
   single_struct_of_structs_return_value: "struct_of_structs"
 
@@ -399,7 +421,6 @@ return_value_tests:
   single_int_pointer_return_value: "uint32_t *"
   single_struct_pointer_return_value: "huge_struct *"
 
-  single_128_bit_return_value: "UINT128_T"
   single_big_struct_return_value: "big_struct"
   single_huge_struct_return_value: "huge_struct"
 
