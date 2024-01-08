@@ -143,6 +143,21 @@ tags:
     variables:
       ABI_NAME: AAPCS
 
+  - name: mips-systemv-abi
+    implies: [mips]
+    variables:
+      ABI_NAME: SystemV_MIPS_o32
+
+  - name: mipsel-systemv-abi
+    implies: [mipsel]
+    variables:
+      ABI_NAME: SystemV_MIPSEL_o32
+
+  - name: s390x-systemz-abi
+    implies: [s390x]
+    variables:
+      ABI_NAME: SystemZ_s390x
+
   - name: for-runtime-abi-tests
     variables:
       GCC_CFLAGS:
@@ -179,6 +194,14 @@ sources:
       # - [aarch64-aapcs64-abi]
 
       - [arm-aapcs-abi]
+
+      # TODO: re-enable once mips testing suite is fixed.
+      # - [mips-systemv-abi]
+      # - [mipsel-systemv-abi]
+
+      # TODO: re-enable once qemu stops segfaulting on these binaries
+      #       (when we update it?).
+      # - [s390x-systemz-abi]
     members:
       - share/revng/test/tests/abi/
 

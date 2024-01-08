@@ -14,6 +14,12 @@
 #include "aarch64/setup.inc"
 #elif TARGET_arm
 #include "arm/setup.inc"
+#elif TARGET_mips
+#include "mips/setup.inc"
+#elif TARGET_mipsel
+#include "mipsel/setup.inc"
+#elif TARGET_s390x
+#include "s390x/setup.inc"
 #else
 #error "Impossible to find sources because the target architecture is unknown."
 #endif

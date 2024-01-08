@@ -12,6 +12,12 @@
 #include "aarch64/decoders.inc"
 #elif TARGET_arm
 #include "arm/decoders.inc"
+#elif TARGET_mips
+#include "mips/decoders.inc"
+#elif TARGET_mipsel
+#include "mipsel/decoders.inc"
+#elif TARGET_s390x
+#include "s390x/decoders.inc"
 #else
 #error "Impossible to find sources because the target architecture is unknown."
 #endif

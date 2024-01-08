@@ -14,3 +14,15 @@
 "arm":
   register_size: 4
   register_list: [r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12]
+
+"mips":
+  register_size: 4
+  register_list: [$v0, $v1, $a0, $a1, $a2, $a3, $s0, $s1, $s2, $s3, $s4, $s5, $s6, $s7, $t8, $t9, $k0, $k1]
+
+"mipsel":
+  register_size: 4
+  register_list: [$v0, $v1, $a0, $a1, $a2, $a3, $s0, $s1, $s2, $s3, $s4, $s5, $s6, $s7, $t8, $t9, $k0, $k1]
+
+"s390x":
+  register_size: 4
+  register_list: [r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13, r14, r15, f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15]

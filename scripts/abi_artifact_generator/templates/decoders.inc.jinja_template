@@ -125,6 +125,12 @@ void print_header(void) {
   puts("TargetArchitecture: aarch64");
 #elif TARGET_arm
   puts("TargetArchitecture: arm");
+#elif TARGET_mips
+  puts("TargetArchitecture: mips");
+#elif TARGET_mipsel
+  puts("TargetArchitecture: mipsel");
+#elif TARGET_s390x
+  puts("TargetArchitecture: s390x");
 #else
   puts("TargetArchitecture: UNSUPPORTED");
   _Static_assert(0, "unsupported platform architecture");
