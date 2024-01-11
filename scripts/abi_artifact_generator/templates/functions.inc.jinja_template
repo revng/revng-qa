@@ -67,4 +67,18 @@ NOINLINE /*( return_value_type )*/ ABIDEF test_/*( name )*/(void) {
   return returned;
 }
 
+/*{ endfor -}*/
+
+#ifdef PREVENT_TESTS_FROM_BEING_REMOVED_BY_THE_LINKER
+/*{ for name, arguments in argument_functions.items() -}*/
+void (ABIDEF *test_/*( name )*/_pointer)(
+  /*{- for type in arguments -}*/
+  /*( type )*/
+  /*{- if not loop.last -}*/ , /*{ endif -}*/
+  /*{- endfor -}*/
+) = &test_/*( name )*/;
 /*{ endfor }*/
+/*{ for name, return_value_type in return_value_functions.items() -}*/
+/*( return_value_type )*/(ABIDEF *test_/*( name )*/_pointer)(void) = &test_/*( name )*/;
+/*{ endfor -}*/
+#endif

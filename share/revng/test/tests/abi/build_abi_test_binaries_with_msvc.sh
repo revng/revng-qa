@@ -34,7 +34,7 @@ timeout 30 ${MSVC_TRIPLE}cl \
   ${MSVC_CFLAGS} -O2 -std:c11 -Zi -GS- \
   "z:\\${INPUT_DIRECTORY}/functions.c" \
   -Fe"${OUTPUT_DIRECTORY}/functions.exe" \
-  -link ${LDFLAGS} /opt:noref,noicf \
+  -link ${LDFLAGS} /opt:ref,noicf \
   /pdb:"${OUTPUT_DIRECTORY}/functions.pdb" \
   /map:"${OUTPUT_DIRECTORY}/functions.map"
 

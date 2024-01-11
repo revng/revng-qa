@@ -2,6 +2,7 @@
  * This file is distributed under the MIT License. See LICENSE.md for details.
  */
 
+#define PREVENT_TESTS_FROM_BEING_REMOVED_BY_THE_LINKER
 #include "functions.inc"
 
 /* RUN-default: nope */
