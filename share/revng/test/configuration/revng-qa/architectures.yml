@@ -7,6 +7,8 @@ tags:
     implies: [linux]
   - name: native
     implies: [compiler]
+    variables:
+      POINTER_SIZE: "32"
   - name: dynamic
     implies: [compiler]
   - name: static
@@ -27,6 +29,7 @@ tags:
     implies: [cross-compiler]
     variables:
       TRIPLE: armv7a-hardfloat-linux-uclibceabi-
+      POINTER_SIZE: "32"
       QEMU_NAME: arm
       CFLAGS:
         - -Wl,-Ttext-segment=0x20000
@@ -35,6 +38,7 @@ tags:
     implies: [cross-compiler]
     variables:
       TRIPLE: x86_64-gentoo-linux-musl-
+      POINTER_SIZE: "64"
       QEMU_NAME: x86_64
       OBJDUMP_FLAGS: -Mintel
       CFLAGS:
@@ -43,6 +47,7 @@ tags:
     implies: [cross-compiler]
     variables:
       TRIPLE: mips-unknown-linux-musl-
+      POINTER_SIZE: "32"
       QEMU_NAME: mips
       CFLAGS:
         - -DTARGET_mips
@@ -50,6 +55,7 @@ tags:
     implies: [cross-compiler]
     variables:
       TRIPLE: mipsel-unknown-linux-musl-
+      POINTER_SIZE: "32"
       QEMU_NAME: mipsel
       CFLAGS:
         - -DTARGET_mipsel
@@ -57,6 +63,7 @@ tags:
     implies: [cross-compiler]
     variables:
       TRIPLE: i386-gentoo-linux-musl-
+      POINTER_SIZE: "32"
       QEMU_NAME: i386
       CFLAGS:
         - -DTARGET_i386
@@ -64,6 +71,7 @@ tags:
     implies: [cross-compiler]
     variables:
       TRIPLE: s390x-ibm-linux-musl-
+      POINTER_SIZE: "64"
       QEMU_NAME: s390x
       CFLAGS:
         - -DTARGET_s390x
@@ -71,6 +79,7 @@ tags:
     implies: [cross-compiler]
     variables:
       TRIPLE: aarch64-unknown-linux-musl-
+      POINTER_SIZE: "64"
       QEMU_NAME: aarch64
       CFLAGS:
         - -DTARGET_aarch64
