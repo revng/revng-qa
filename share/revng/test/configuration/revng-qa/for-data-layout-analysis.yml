@@ -1,0 +1,21 @@
+tags:
+  - name: for-data-layout-analysis
+    variables:
+      CFLAGS:
+        - -O2
+        - -Wno-pointer-bool-conversion
+        - -fno-unroll-loops
+        - -fno-inline
+        - -fno-optimize-sibling-calls
+        - -fno-stack-protector
+sources:
+  - tags: [for-data-layout-analysis]
+    members:
+      - share/revng/test/tests/analysis/data-layout-analysis/linked-lists.c
+      - share/revng/test/tests/analysis/data-layout-analysis/segments-and-sections.c
+commands:
+  - type: revng-qa.compiled-for-data-layout-analysis
+    from:
+      - type: source
+        filter: for-data-layout-analysis
+    command: clang $INPUT -o $OUTPUT $CFLAGS
