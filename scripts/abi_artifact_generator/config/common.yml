@@ -1,4 +1,6 @@
 ---
 stack_byte_count: 512
+maximum_argument_count: 32
+maximum_argument_size: 256 # bytes
 lfsr_seed: "0x3141592653589793"
 iteration_count: 5

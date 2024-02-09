@@ -13,8 +13,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "abi.h"
-
 #ifdef TARGET_x86_64
 #include "x86_64/constants.h"
 #elif TARGET_i386
@@ -23,6 +21,12 @@
 #include "aarch64/constants.h"
 #elif TARGET_arm
 #include "arm/constants.h"
+#elif TARGET_mips
+#include "mips/constants.h"
+#elif TARGET_mipsel
+#include "mipsel/constants.h"
+#elif TARGET_s390x
+#include "s390x/constants.h"
 #else
 #error "Impossible to find sources because the target architecture is unknown."
 #endif

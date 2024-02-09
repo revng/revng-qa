@@ -19,14 +19,14 @@ OBJDUMP_FLAGS="$5"
 
 test -n "${INPUT_DIRECTORY}"
 test -n "${OUTPUT_DIRECTORY}"
-test -n ""${TRIPLE}""
+test -n "${TRIPLE}"
 test -n "${CFLAGS}"
 
 mkdir -p "${OUTPUT_DIRECTORY}"
 
 # Build the "functions" binary
 "${TRIPLE}gcc" \
-  ${CFLAGS} -O3 -ggdb3 \
+  ${CFLAGS} -O3 -ggdb3 -static \
   "${INPUT_DIRECTORY}/functions.c" \
   -o "${OUTPUT_DIRECTORY}/functions"
 
@@ -35,21 +35,32 @@ mkdir -p "${OUTPUT_DIRECTORY}"
   ${CFLAGS} -O3 -static \
   -Wl,--section-start=.text=0x2000000 \
   -fno-zero-initialized-in-bss \
-  "${INPUT_DIRECTORY}/gcc/setup_arguments.S" \
-  "${INPUT_DIRECTORY}/setup_return_values.c" \
+  "${INPUT_DIRECTORY}/setup.c" \
   -o "${OUTPUT_DIRECTORY}/foreign-executable"
 
 # Run `objdump` on it
 "${TRIPLE}objdump" \
   ${OBJDUMP_FLAGS} \
-  --wide --no-show-raw-insn -h -t -d \
+  --wide -h \
   "${OUTPUT_DIRECTORY}/foreign-executable" \
-  > "${OUTPUT_DIRECTORY}/foreign-executable.S"
+  > "${OUTPUT_DIRECTORY}/foreign-executable-sections.txt"
+${TRIPLE}objdump \
+  ${OBJDUMP_FLAGS} \
+  --wide -t \
+  "${OUTPUT_DIRECTORY}/foreign-executable" \
+  > "${OUTPUT_DIRECTORY}/foreign-executable-symbols.txt"
+${TRIPLE}objdump \
+  ${OBJDUMP_FLAGS} \
+  --wide --no-show-raw-insn -d \
+  "${OUTPUT_DIRECTORY}/foreign-executable" \
+  > "${OUTPUT_DIRECTORY}/foreign-executable-disassembly.txt"
 
 # Run `gather_symbols.py`
 python3 "${INPUT_DIRECTORY}/gather_symbols.py" \
-  "randomized_state printable_location" \
-  < "${OUTPUT_DIRECTORY}/foreign-executable.S" \
+  "expected_state value_dumps address_dumps size_dumps" \
+  "${OUTPUT_DIRECTORY}/foreign-executable-sections.txt" \
+  "${OUTPUT_DIRECTORY}/foreign-executable-symbols.txt" \
+  "${OUTPUT_DIRECTORY}/foreign-executable-disassembly.txt" \
   > "${OUTPUT_DIRECTORY}/gathered_symbols.h"
 
 # Build the `runner`
@@ -57,5 +68,5 @@ python3 "${INPUT_DIRECTORY}/gather_symbols.py" \
   ${CFLAGS} -O3 -D_GNU_SOURCE -static \
   -I"${OUTPUT_DIRECTORY}" \
   "${INPUT_DIRECTORY}/runner.c" \
-  "${INPUT_DIRECTORY}/printers.c" \
+  "${INPUT_DIRECTORY}/decoders.c" \
   -o "${OUTPUT_DIRECTORY}/probe-calls"

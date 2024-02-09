@@ -20,10 +20,10 @@
  * to the state).
  *
  * All the gathered state data (`stored_state` array) is then dumped thanks
- * to external `print_a_register` and `print_stack` helpers.
+ * to external `decode_a_register` and `decode_stack` helpers.
  *
  * Similarly, all the output data from the tests themselves is printed using
- * the `print` dispatcher (see the docs related to `printers.c` template).
+ * the `decode` dispatcher (see the docs related to `decoders.c` template).
  */
 
 #include <assert.h>
@@ -52,7 +52,7 @@ static uint64_t get_next_lfsr(uint32_t iteration_count) {
 }
 
 _Static_assert(sizeof(uint8_t) == 1, "A type with size == 1 is required.");
-static void regenerate_the_randomized_state(uint8_t *location) {
+static void regenerate_the_expected_state(uint8_t *location) {
   for (uint32_t offset = 0; offset < constants.generated_byte_count; ++offset)
     location[offset] = (uint8_t) get_next_lfsr(8);
 }
@@ -112,7 +112,7 @@ static void test_function(const struct function *function) {
  */
 int current_state = 0;
 
-/* Since it's not safe to call functions like `prinf` inside the handler (what
+/* Since it's not safe to call functions like `printf` inside the handler (what
  * if an interrupt happens while inside?), these memory locations are used as
  * an intermediate place to store the state which can be printed later down
  * the line
@@ -155,28 +155,28 @@ void handler(int signal, siginfo_t *info, void *context) {
     current_state = 0;
 }
 
-void print_a_register(const char *name, uint8_t *value);
-void print_stack(uint8_t *data);
-static void print_single_state(uint8_t *data) {
+void decode_a_register(const char *name, uint8_t *value);
+void decode_stack(uint8_t *data);
+static void decode_single_state(uint8_t *data) {
   puts("      Registers:");
   for (uint32_t i = 0; i < REGISTER_COUNT; ++i)
-    print_a_register(register_names[i], data + sizeof(size_t) * i);
+    decode_a_register(register_names[i], data + sizeof(size_t) * i);
 
   printf("      Stack: ");
-  print_stack(data + sizeof(size_t) * REGISTER_COUNT);
+  decode_stack(data + sizeof(size_t) * REGISTER_COUNT);
 }
 
-static void print_saved_state(void) {
+static void decode_saved_state(void) {
   puts("    StateBeforeTheCall:");
-  print_single_state(stored_state[0]);
+  decode_single_state(stored_state[0]);
   puts("    StateAfterTheCall:");
-  print_single_state(stored_state[1]);
+  decode_single_state(stored_state[1]);
   puts("    StateAfterTheReturn:");
-  print_single_state(stored_state[2]);
+  decode_single_state(stored_state[2]);
 }
 
 void print_header(void);
-void print(const char *name, const uint8_t *input, const uint8_t *output);
+void decode(const char *name, const struct encoded value);
 
 int main(int argc, char **argv) {
   /* Setup signal handling */
@@ -226,27 +226,33 @@ int main(int argc, char **argv) {
   print_header();
   puts("Iterations:");
 
-  const struct memory *state = select_a_variable("randomized_state");
-  uint8_t *randomized_state = (uint8_t *) (size_t) state->address;
-
-  const struct memory *printable = select_a_variable("printable_location");
-  uint8_t *printable_location = (uint8_t *) (size_t) printable->address;
+  const struct memory *expected = select_a_variable("expected_state");
+  const struct memory *values = select_a_variable("value_dumps");
+  const struct memory *addresses = select_a_variable("address_dumps");
+  const struct memory *sizes = select_a_variable("size_dumps");
+  const struct encoded encoded = {
+    .input = (uint8_t *) (size_t) expected->address,
+    .output = (uint8_t *) (size_t) values->address,
+    .addresses = (uint64_t *) (size_t) addresses->address,
+    .sizes = (uint64_t *) (size_t) sizes->address
+  };
 
   malloc_the_stored_state();
 
   /* run the tests */
-  const uint64_t count = sizeof(input.functions) / sizeof(struct function);
-  for (uint32_t function = 0; function < count; ++function) {
+  const uint64_t function_count = sizeof(input.functions)
+                                  / sizeof(struct function);
+  assert((function_count == constants.function_count,
+          "Some functions where lost, is linker trying to be overly smart?"));
+  for (uint32_t function = 0; function < function_count; ++function) {
     for (uint32_t i = 0; i < constants.iteration_count; ++i) {
-      regenerate_the_randomized_state(randomized_state);
+      regenerate_the_expected_state(encoded.input);
 
       printf("  - Function: \"%s\"\n", input.functions[function].name);
-      printf("    Iteration: \"%d\"\n", i);
+      printf("    Iteration: %d\n", i);
       test_function(&input.functions[function]);
-      print(input.functions[function].name,
-            randomized_state,
-            printable_location);
-      print_saved_state();
+      decode(input.functions[function].name, encoded);
+      decode_saved_state();
       puts("");
     }
   }

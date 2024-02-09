@@ -3,7 +3,7 @@ tags:
   - name: for-analysis
   - name: moderate-opt
     variables:
-      CFLAGS:
+      GCC_CFLAGS:
         - -O2
         - -fno-stack-protector
         - -fomit-frame-pointer

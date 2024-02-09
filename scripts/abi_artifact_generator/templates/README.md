@@ -10,21 +10,18 @@ graph TB
   classDef blue fill: #fff, stroke: #55f, stroke-width: 2px
   classDef green fill: #fff, stroke: #090, stroke-width: 2px
 
-  abi.h(abi.h)
   common.h(common.h)
-  types.h(types.h)
   ucontext_wrapper.h(ucontext_wrapper.h)
   runner.c(runner.c)
   gather_symbols.py(gather_symbols.py)
-  class abi.h,common.h,types.h,ucontext_wrapper.h,runner.c,gather_symbols.py black
+  class common.h,ucontext_wrapper.h,runner.c,gather_symbols.py black
 
   functions.h(functions.h)
   functions.inc(functions.inc)
-  printers.c(printers.c)
-  setup_return_values.c(setup_return_values.c)
-  setup_arguments.S(setup_arguments.S)
+  decoders.c(decoders.c)
+  setup.inc(setup.inc)
   constants.h(constants.h)
-  class constants.h,functions.h,functions.inc,printers.c,setup_arguments.S,setup_return_values.c blue
+  class constants.h,functions.h,functions.inc,decoders.c,setup.inc blue
 
   gathered_symbols.h(gathered_symbols.h)
   class gathered_symbols.h green
@@ -34,26 +31,19 @@ graph TB
   mb(mmap'ed binary)
   class fb,rb,mb red
 
-  abi.h --> common.h
-  abi.h --> functions.h
-
   constants.h --> common.h
 
   common.h --> functions.inc
   functions.h --> functions.inc
-  types.h --> functions.inc
   functions.inc --> fb
 
-  common.h --> printers.c
-  functions.h --> printers.c
-  types.h --> printers.c
-  printers.c --> rb
+  common.h --> decoders.c
+  functions.h --> decoders.c
+  decoders.c --> rb
 
-  setup_arguments.S --> mb
-
-  abi.h --> setup_return_values.c
-  functions.h --> setup_return_values.c
-  setup_return_values.c --> mb
+  functions.h --> setup.inc
+  functions.inc --> mb
+  setup.inc --> mb
 
   common.h --> runner.c
   ucontext_wrapper.h --> runner.c
@@ -64,55 +54,6 @@ graph TB
 
   gathered_symbols.h --> runner.c
 ```
-
-<details>
-  <summary>(graphviz)</summary>
-
-```graphviz
-strict digraph {
-  "abi.h" -> "common.h"
-  "abi.h" -> "functions.h"
-  "functions.h" [color=blue]
-
-  "constants.h" --> "common.h"
-  "common.h" -> "functions.inc"
-  "functions.h" -> "functions.inc"
-  "types.h" -> "functions.inc"
-  "functions.inc" -> "functions binary"
-  "functions.inc" [color=blue]
-
-  "common.h" -> "printers.c"
-  "functions.h" -> "printers.c"
-  "types.h" -> "printers.c"
-  "printers.c" -> "runner binary"
-  "printers.c" [color=blue]
-
-  "setup_arguments.S" -> "mmap'ed binary"
-  "setup_arguments.S" [color=blue]
-
-  "abi.h" -> "setup_return_values.c"
-  "functions.h" -> "setup_return_values.c"
-  "setup_return_values.c" -> "mmap'ed binary"
-  "setup_return_values.c" [color=blue]
-
-  "gathered_symbols.h" [color=green]
-
-  "common.h" -> "runner.c"
-  "gathered_symbols.h" -> "runner.c"
-  "ucontext_wrapper.h" -> "runner.c"
-  "runner.c" -> "runner binary"
-
-  "functions binary" [color=red]
-  "mmap'ed binary" [color=red]
-  "runner binary" [color=red]
-
-  "mmap'ed binary" -> "gathered_symbols.h"
-  "gather_symbols.py" -> "gathered_symbols.h"
-}
-  ```
-
-</details>
-
 
 Legend:
 * blue - generated using jinja2.
@@ -133,30 +74,18 @@ and `test_{{ TEST_NAME }}` is the function whose prototype is to be used from th
 
 ## `functions.inc`
 
-This file provides the bodies of all the `test_{{ TEST_NAME }}` functions in pure C (which makes them architecture-independent).
+This file provides the bodies of all the `test_{{ TEST_NAME }}` functions.
 
-## `printers.inc`
+## `decoders.inc`
 
 This file provides the way to decode information "dumped" by the functions from `functions.inc` into the final yaml format (see the [relevant doc](../output_format.md)) on a test-by-test basis.
 
-Note that it provides a dispatcher-style function `"print"` which takes function name as an argument to pass the decoding to the correct instance of the printer.
+Note that it provides a dispatcher-style function `"decode"` which takes function name as an argument to pass the decoding to the instance of the printer that corresponds to it.
 
-## `setup_arguments.S`
+## `setup.inc`
 
-This file provides generated into pure assembly bodies for `setup_{{ TEST_NAME }}` functions. Note that the outputs are architecture-specific.
-
-For more details, see the [explanation of the relevant config](../config/README.md#architecturesyml).
-
-TODO: extend with the explanation of styles once they are finalized in the future PR.
-
-## `setup_return_values.inc`
-
-This file provides the return value counter-part of the test setup. Thanks to the simplicity of the new test suite, it can be written in C instead of assembly.
+This file provides the bodies of all the `setup_{{ TEST_NAME }}` functions.
 
 ## `constants.h`
 
-This file provides acouple of extra values passed from the generator to the script to keep all the configs in [a single place](../config/common.yml) instead of having to update them all over the place when such an update is needed.
-
-## `types.h`
-
-Due to not wanting to lock ourselves into a single compiler ecosystem, we are not able to rely on the compiler-specific data type logic, which leads to have to generate a "universal" solution based on the data we already have within the generator script. It takes a shape of `_Generic` macro (C11) which provides an unambiguous way to decide whether a specific type will be treated as a scalar or as an aggregate.
+This file provides a couple of extra values passed from the generator to the script to keep all the configs in [a single place](../config/common.yml) instead of having to update them all over the place when such an update is needed.

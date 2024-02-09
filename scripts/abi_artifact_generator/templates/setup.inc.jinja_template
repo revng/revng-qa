@@ -1,0 +1,92 @@
+/*#-
+This template file is distributed under the MIT License. See LICENSE.md for details.
+#*/
+
+/*(- generation_notice )*/
+
+#include "../functions.h"
+
+// A place for the runner to put the value it expects to be carried over.
+uint8_t expected_state[/*( generated_byte_count )*/] = { 1 };
+
+// A place where the state is placed after it was put through a call.
+// In a perfect world, this would be identical to `expected_state`, but
+// this is not one.
+uint8_t value_dumps[/*( generated_byte_count )*/] = { 1 };
+
+// A place to put the information about the actual argument/return value
+// sizes to avoid any possible inter-compiler differences.
+uint64_t size_dumps[/*( maximum_argument_count )*/] = { 1 };
+
+// A place to put the information about the positions of specific arguments
+// and return values in memory while the test code is being executed.
+uint64_t address_dumps[/*( maximum_argument_count )*/] = { 1 };
+
+// NOTE: Unused initial values are provided to prevent these from ending up
+//       in `.bss`. These values should *never* be relied upon.
+
+#ifdef _MSC_VER
+#pragma optimize("", off)
+#else
+#pragma GCC push_options
+#pragma GCC optimize ("no-optimize-sibling-calls")
+#endif
+
+/*{ for name, arguments in argument_functions.items() -}*/
+void NOINLINE setup_/*( name )*/(void) {
+  _Static_assert(/*( arguments | length )*/ < /*( maximum_argument_count )*/,
+                 "Number of arguments exceeds the allowed maximum.");
+
+  uint64_t current_offset = 0;
+  /*{- for type in arguments }*/
+  _Static_assert(sizeof(/*( type )*/) <= /*( maximum_argument_size )*/,
+                 "Size of an argument exceeds the allowed maximum.");
+  size_dumps[/*( loop.index -1 )*/] = sizeof(/*( type )*/);
+  /*( type )*/ argument_/*( loop.index - 1 )*/ = *(/*( type )*/ *) (expected_state + current_offset);
+  current_offset += sizeof(/*( type )*/);
+  /*{ endfor -}*/
+
+  test_/*( name )*/(
+    /*{- for type in arguments -}*/
+      argument_/*( loop.index - 1 )*/
+      /*{- if not loop.last -}*/ , /*{ endif -}*/
+    /*{- endfor -}*/
+  );
+}
+
+/*{ endfor }*/
+
+#ifdef _MSC_VER
+#pragma optimize("", on)
+#else
+#pragma GCC pop_options
+#endif
+
+/*{ for name, return_value_type in return_value_functions.items() -}*/
+void NOINLINE setup_/*( name )*/(void) {
+  typedef /*( return_value_type )*/ return_value_type;
+
+  // Call the tested function.
+  return_value_type returned = test_/*( name )*/();
+
+  // GCC works better when return value address is dumped _after_ the return,
+  // so do it here, while for MSVC do it _before_ the return.
+#ifndef _MSC_VER
+  // Write the pointer to the received values into a safe location,
+  address_dumps[0] = (uint64_t) (size_t) &returned;
+#endif
+
+  // Then write the value as well.
+  *(return_value_type *) (value_dumps) = returned;
+}
+
+/*{ endfor }*/
+
+int main() {
+  /*{ for name in argument_functions -}*/
+  setup_/*( name )*/();
+  /*{ endfor -}*/
+  /*{ for name in return_value_functions -}*/
+  setup_/*( name )*/();
+  /*{ endfor -}*/
+}

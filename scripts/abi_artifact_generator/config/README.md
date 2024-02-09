@@ -7,12 +7,13 @@ This file is used to declare global options that stay the same for every archite
 - `stack_byte_count` - number of stack bytes to generate for each test call.
 - `lfsr_seed` - the seed passed to the random number generator.
 - `iteration_count` - number of times each test should be repeated. Multiple iterations are a good way to make colliding results caused by limited randomness of generated numbers have no practical impact on the test results.
+- `maximum_argument_count` and `maximum_argument_size` - the maximum number of possible arguments, and their maximum size. They are used when choosing the size of the buffers used for intermediate data storage.
 
 ## `functions.yml`
 
 This file is used to declare the list of test functions (and structs they use) in an architecture-independent manner.
 
-### - `helper_structs`
+### - `structs`
 
 Declares a list of structs used by the tests, they are declared in this format:
 ```yaml
@@ -23,6 +24,10 @@ struct_name:
   - ...
 ```
 Types can be arbitrary, both pointers and arrays are also allowed.
+
+### - `packed_structs`
+
+The way structs are specified here is no different from that of `structs`. Functionally, the only difference is that these functions get declared in the output header inside the `#pragma pack(push, 1)` and `#pragma pack(pop)` pair.
 
 ### - `argument_tests`
 
@@ -35,7 +40,7 @@ function_name:
   - ...
 ```
 Note that only types are provided, no names.
-Pointers are allowed, arrays are not.
+Pointers are allowed, arrays are not (but you can use structs to simulate them).
 
 ### - `return_value_tests`
 
@@ -44,7 +49,7 @@ Declares a list of test function declared in this format:
 function_name: "return_value_type"
 ```
 Note that this is not an array, as only a function can only have a single return value type.
-Pointers are allowed, arrays are not.
+Pointers are allowed, arrays are not (but you can use structs to simulate them).
 
 ### Additional notes
 
@@ -52,46 +57,7 @@ Pointers are allowed, arrays are not.
 
 ## `architectures.yml`
 
-(OUTDATED)
+NOTE: this template was heavily used in the past, when we generated the test function bodies as assembly. Now it's slimmed down to just two fields:
 
-This file contains a list of separate dictionary entries each of which represents a single supported architecture and MUST provide the value for each of the following fields:
-
-- `register_type` - the C type equivalent for a single generic purpose register (typical values include `uint64_t` for 64-bit architectures and `uint32_t` for 32-bit ones). This value is used as the internal placeholder for potential register values, it's really important for the test integrity that the size of this type matches the actual register size.
-- `register_size` - the size of the `register_type` type.
-- `register_list` - the list of register names to test provided in the `__asm`-compatible manner for the supported compilers.
-
-as well as a template for each the following:
-
-- `call_a_function` - architecture-specific way to call a function in the default assembly. Has a single argument:
-  - `{{ function_name }}` - is replaced by the name of the callee when this template is used.
-
-- `return_from_function` - architecture-specific way to return from the callee. Has no arguments (must be valid assembly).
-
-- `return_from_function_with_cleanup` - a special case of `return_from_function` used exclusively when setting up big return values in ABIs where callee is responsible for cleaning up the stack argument after the call. Has no arguments (must be valid assembly).  
-  It's advised to provide invalid instructions (for example, `.word 0xe7f0def0` in ARM) for each architecture where such callee-cleaned function are not supported by any major ABI.
-
-- `fill_a_register` - architecture-specific way to copy a value from a dedicated location in memory into a specified register. Has three arguments:
-  - `register` - the register to fill in.
-  - `location` (+ `offset`) - the location to read the data from. Note that offset MUST be added to the location by the template provided here.
-
-- `push_to_stack` - there are two kinds of these instructions, the first line MUST specify which kind is used, options include:
-  - `{{ fill_a_register }}` - single register push
-  - `{{ fill_two_registers }}` - double register push
-
-  All the following lines after the first one can be used freely, as with any other template.
-
-  In the single register case (the one you should use unless it's really inefficient for the current architecture) - it only has a single argument:
-  - `register` to indicate the register value of which has to be pushed to the stack.
-
-  In the double register case - there are two:
-  - `register` - the top half of the double-register word to be pushed.
-  - `second_register` - the bottom half.
-
-- `cleanup_stack_arguments ` - architecture-specific way of removing the specified number of bytes from the top of the stack (popping them). It has a single argument:
-  - `stack_size` - the number of bytes to pop.
-
-- `save_return_address` - architecture-specific way of saving the return address of the current function onto the stack. It has no arguments - so it must be valid assembly.
-
-- `restore_return_address` - architecture-specific way of loading a value from the specified stack offset into the place where function return address is normally placed (for example top of the stack for x86 or `lr` register for ARM). It has a single argument:
-  - `stack_size` - the offset from the top of the stack until the value that must be loaded.
-
+- `register_size` - the size of a single general purpose register for a given architecture
+- `register_list` - the list of registers we are interested in testing.

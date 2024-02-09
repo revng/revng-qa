@@ -3,19 +3,29 @@
 #
 
 tags:
-  - name: windows
+  - name: for-import-pe
+    implies: [windows]
     variables:
-      CFLAGS:
-        - /DEBUG:FULL
-        - /Z7
-        - /EHsc
-        - /WX
-        - /nologo
-      LDFLAGS:
-        - /NOLOGO
-        - /WX
+      MSVC_CFLAGS:
+        - -Z7 # makes debug information c7.0-compatible
+        - -EHsc # enables exceptions BUT makes all the `extern "C"` stuff `nothrow`
+        - -O2 # "fast code" optimization level
+
+  - name: vc19-x86-64
+    variables:
+      MSVC_TRIPLE: "x86_64-winsdk-vc19-"
+  - name: vc19-i386
+    variables:
+      MSVC_TRIPLE: "i386-winsdk-vc19-"
+  - name: vc16-i386
+    variables:
+      MSVC_TRIPLE: "i386-winsdk-vc16-"
 sources:
-  - tags: [windows]
+  - tags: [windows, for-import-pe, simple-executable]
+    repeat-for:
+      - [vc19-x86-64]
+      - [vc19-i386]
+      - [vc16-i386]
     prefix: share/revng/test/tests/model/import/pe
     members:
       - main.c
@@ -26,15 +36,24 @@ commands:
   - type: revng-qa.compiled
     from:
       - type: source
-        filter: windows
+        filter: windows and simple-executable
+    suffix: .exe
     pool: wine
     command: |-
-      timeout 30 i386-winsdk-vc16-cl z:\$INPUT /Fe$OUTPUT $CFLAGS /link $LDFLAGS
+      timeout 30 ${MSVC_TRIPLE}cl z:\$INPUT -Fe$OUTPUT $MSVC_CFLAGS $COMMON_CFLAGS -link $LDFLAGS
   - type: revng-qa.generated-pdb
     from:
       - type: source
-        filter: windows
+        filter: windows and simple-executable
     suffix: .pdb
     pool: wine
     command: |-
-      timeout 30 i386-winsdk-vc16-cl z:\$INPUT $CFLAGS /link /pdb:$OUTPUT $LDFLAGS
+      timeout 30 ${MSVC_TRIPLE}cl z:\$INPUT $MSVC_CFLAGS $COMMON_CFLAGS -link /pdb:$OUTPUT $MSVC_LDFLAGS
+
+  - type: revng-qa.disassembled
+    from:
+      - type: revng-qa.compiled
+        filter: windows
+    suffix: .asm
+    command: |-
+      llvm-objdump $OBJDUMP_FLAGS -d $INPUT > $OUTPUT

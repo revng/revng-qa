@@ -3,84 +3,165 @@ tags:
     implies: [x86-64]
     variables:
       ABI_NAME: SystemV_x86_64
-      CFLAGS:
-        - -DABI_SystemV_x86_64
+      MSVC_CFLAGS:
+        # Safeguard in case somebody tries using it with msvc
+        - -DABIDEF=UNSUPPORTED
 
   - name: x86-64-microsoft-abi
     implies: [x86-64]
     variables:
       ABI_NAME: Microsoft_x86_64
-      CFLAGS:
-        - -DABI_Microsoft_x86_64
+      GCC_CFLAGS:
+        - -DABIDEF=__attribute__((ms_abi))
         - -maccumulate-outgoing-args
+
+  - name: x86-64-vectorcall-microsoft-abi
+    implies: [x86-64]
+    variables:
+      ABI_NAME: Microsoft_x86_64_vectorcall
+      CFLAGS:
+        # Safeguard in case somebody tries using gcc
+        - -DABIDEF=UNSUPPORTED
+      MSVC_CFLAGS:
+        - -DABIDEF=__vectorcall
 
   - name: i386-systemv-abi
     implies: [i386]
     variables:
       ABI_NAME: SystemV_x86
-      CFLAGS:
-        - -DABI_SystemV_x86
+      MSVC_CFLAGS:
+        # Safeguard in case somebody tries using it with msvc
+        - -DABIDEF=UNSUPPORTED
 
   - name: i386-regparm-3-systemv-abi
     implies: [i386]
     variables:
       ABI_NAME: SystemV_x86_regparm_3
-      CFLAGS:
-        - -DABI_SystemV_x86_regparm_3
+      GCC_CFLAGS:
+        - -DABIDEF=__attribute__((regparm(3)))
+      MSVC_CFLAGS:
+        # Safeguard in case somebody tries using it with msvc
+        - -DABIDEF=UNSUPPORTED
 
   - name: i386-regparm-2-systemv-abi
     implies: [i386]
     variables:
       ABI_NAME: SystemV_x86_regparm_2
-      CFLAGS:
-        - -DABI_SystemV_x86_regparm_2
+      GCC_CFLAGS:
+        - -DABIDEF=__attribute__((regparm(2)))
+      MSVC_CFLAGS:
+        # Safeguard in case somebody tries using it with msvc
+        - -DABIDEF=UNSUPPORTED
 
   - name: i386-regparm-1-systemv-abi
     implies: [i386]
     variables:
       ABI_NAME: SystemV_x86_regparm_1
-      CFLAGS:
-        - -DABI_SystemV_x86_regparm_1
+      GCC_CFLAGS:
+        - -DABIDEF=__attribute__((regparm(1)))
+      MSVC_CFLAGS:
+        # Safeguard in case somebody tries using it with msvc
+        - -DABIDEF=UNSUPPORTED
 
   - name: i386-cdecl-microsoft-abi
     implies: [i386]
     variables:
       ABI_NAME: Microsoft_x86_cdecl
-      CFLAGS:
-        - -DABI_Microsoft_x86_cdecl
+      GCC_CFLAGS:
+        # Safeguard in case somebody tries using it with gcc
+        - -DABIDEF=UNSUPPORTED
+      MSVC_CFLAGS:
+        - -DABIDEF=__cdecl
+
+  - name: i386-cdecl-microsoft-abi-gcc-edition
+    implies: [i386]
+    variables:
+      ABI_NAME: Microsoft_x86_cdecl_gcc
+      GCC_CFLAGS:
+        - -DABIDEF=__attribute__((ms_abi,cdecl))
+      MSVC_CFLAGS:
+        # Safeguard in case somebody tries using it with msvc
+        - -DABIDEF=UNSUPPORTED
 
   - name: i386-fastcall-microsoft-abi
     implies: [i386]
     variables:
       ABI_NAME: Microsoft_x86_fastcall
-      CFLAGS:
-        - -DABI_Microsoft_x86_fastcall
+      GCC_CFLAGS:
+        # Safeguard in case somebody tries using it with gcc
+        - -DABIDEF=UNSUPPORTED
+      MSVC_CFLAGS:
+        - -DABIDEF=__fastcall
+
+  - name: i386-fastcall-microsoft-abi-gcc-edition
+    implies: [i386]
+    variables:
+      ABI_NAME: Microsoft_x86_fastcall_gcc
+      GCC_CFLAGS:
+        - -DABIDEF=__attribute__((ms_abi,fastcall))
+      MSVC_CFLAGS:
+        # Safeguard in case somebody tries using it with msvc
+        - -DABIDEF=UNSUPPORTED
 
   - name: i386-stdcall-microsoft-abi
     implies: [i386]
     variables:
       ABI_NAME: Microsoft_x86_stdcall
+      GCC_CFLAGS:
+        # Safeguard in case somebody tries using it with gcc
+        - -DABIDEF=UNSUPPORTED
+      MSVC_CFLAGS:
+        - -DABIDEF=__stdcall
+
+  - name: i386-stdcall-microsoft-abi-gcc-edition
+    implies: [i386]
+    variables:
+      ABI_NAME: Microsoft_x86_stdcall_gcc
+      GCC_CFLAGS:
+        - -DABIDEF=__attribute__((ms_abi,stdcall))
+      MSVC_CFLAGS:
+        # Safeguard in case somebody tries using it with msvc
+        - -DABIDEF=UNSUPPORTED
+
+  - name: i386-vectorcall-microsoft-abi
+    implies: [i386]
+    variables:
+      ABI_NAME: Microsoft_x86_vectorcall
       CFLAGS:
-        - -DABI_Microsoft_x86_stdcall
+        # Safeguard in case somebody tries using it with gcc
+        - -DABIDEF=UNSUPPORTED
+      MSVC_CFLAGS:
+        - -DABIDEF=__vectorcall
 
   - name: aarch64-aapcs64-abi
     implies: [aarch64]
     variables:
       ABI_NAME: AAPCS64
-      CFLAGS:
-        - -DABI_AAPCS64
 
   - name: arm-aapcs-abi
     implies: [arm]
     variables:
       ABI_NAME: AAPCS
-      CFLAGS:
-        - -DABI_AAPCS
+
+  - name: mips-systemv-abi
+    implies: [mips]
+    variables:
+      ABI_NAME: SystemV_MIPS_o32
+
+  - name: mipsel-systemv-abi
+    implies: [mipsel]
+    variables:
+      ABI_NAME: SystemV_MIPSEL_o32
+
+  - name: s390x-systemz-abi
+    implies: [s390x]
+    variables:
+      ABI_NAME: SystemZ_s390x
 
   - name: for-runtime-abi-tests
     variables:
-      CFLAGS:
-        - -std=c99
+      GCC_CFLAGS:
+        - -std=c11
         - -fno-pic
         - -fno-pie
         - -fno-stack-protector
@@ -89,15 +170,38 @@ sources:
   - tags: [for-runtime-abi-tests]
     repeat-for:
       - [x86-64-systemv-abi]
+
+      - [x86-64-microsoft-abi, windows]
+      - [x86-64-vectorcall-microsoft-abi, windows]
+
       - [i386-systemv-abi]
       - [i386-regparm-3-systemv-abi]
       - [i386-regparm-2-systemv-abi]
       - [i386-regparm-1-systemv-abi]
-      - [i386-cdecl-microsoft-abi]
-      - [i386-fastcall-microsoft-abi]
-      - [i386-stdcall-microsoft-abi]
+
+      # "gcc editions" are not tested by default to limit test run time.
+      # Uncomment, if you need to verify these work.
+      # - [i386-cdecl-microsoft-abi-gcc-edition]
+      # - [i386-fastcall-microsoft-abi-gcc-edition]
+      # - [i386-stdcall-microsoft-abi-gcc-edition]
+
+      - [i386-cdecl-microsoft-abi, windows]
+      - [i386-fastcall-microsoft-abi, windows]
+      - [i386-stdcall-microsoft-abi, windows]
+      - [i386-vectorcall-microsoft-abi, windows]
+
+      # TODO: re-enable once arm64 support is fixed.
       # - [aarch64-aapcs64-abi]
+
       - [arm-aapcs-abi]
+
+      # TODO: re-enable once mips testing suite is fixed.
+      # - [mips-systemv-abi]
+      # - [mipsel-systemv-abi]
+
+      # TODO: re-enable once qemu stops segfaulting on these binaries
+      #       (when we update it?).
+      # - [s390x-systemz-abi]
     members:
       - share/revng/test/tests/abi/
 
@@ -105,12 +209,36 @@ commands:
   - type: revng-qa.runtime-abi-tests
     from:
       - type: source
-        filter: for-runtime-abi-tests
+        filter: for-runtime-abi-tests and !windows
     suffix: /
     command: |-
-      "${INPUT}/build-abi-test-binaries.sh"
+      "${INPUT}/build_abi_test_binaries_with_gcc.sh"
         "${INPUT}"
         "${OUTPUT}"
         "${TRIPLE}"
-        "${CFLAGS}"
+        "${GCC_CFLAGS} ${COMMON_CFLAGS}"
         "${OBJDUMP_FLAGS}"
+
+  - type: revng-qa.runtime-abi-tests
+    from:
+      - type: source
+        filter: for-runtime-abi-tests and windows
+    suffix: /
+    pool: wine
+    command: |-
+      if [[ "${QEMU_NAME}" =~ ^x86_64$$ ]]; then
+        MSVC_TRIPLE="x86_64-winsdk-vc19-";
+      elif [[ "${QEMU_NAME}" =~ ^i386$$ ]]; then
+        MSVC_TRIPLE="i386-winsdk-vc19-";
+      else
+        echo "Unsupported architecture" > /dev/stderr;
+        exit 1;
+      fi;
+      "${INPUT}/build_abi_test_binaries_with_msvc.sh"
+        "${INPUT}"
+        "${OUTPUT}"
+        "${TRIPLE}"
+        "$${MSVC_TRIPLE}"
+        "${GCC_CFLAGS} ${COMMON_CFLAGS}"
+        "${MSVC_CFLAGS} ${COMMON_CFLAGS}"
+        "${MSVC_LDFLAGS}";

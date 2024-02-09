@@ -1,0 +1,146 @@
+/*#-
+This template file is distributed under the MIT License. See LICENSE.md for details.
+#*/
+
+/*(- generation_notice )*/
+
+/**
+ * Provides the way to decode information "dumped" by the functions from
+ * `functions.inc` into the final yaml format on a test-by-test basis.
+ *
+ * Note that it provides a dispatcher-style function `"print"` which takes
+ * function name as an argument to pass the decoding to the corresponding
+ * printer function.
+ */
+
+#include <stdio.h>
+#include <string.h>
+
+// Since this file is only used at "runner" time, we don't care about ABI it
+// uses. Discarding the related information makes it easier to shut down some
+// cases we don't want to ever happen when doing things normally.
+#undef ABIDEF
+
+#include "../common.h"
+#include "../functions.h"
+
+void print_bytes(const uint8_t *value, uint32_t count) {
+  printf("[ ");
+  for (uint32_t i = 0; i < count - 1; ++i)
+    printf("0x%.2hhx, ", value[i]);
+  printf("0x%.2hhx ]\n", value[count - 1]);
+}
+
+_Static_assert(sizeof(uint8_t) == 1, "A type with size == 1 is required.");
+#define PRINT_AS_BYTES(TYPE, POINTER)                           \
+  do {                                                          \
+    union helper {                                              \
+      TYPE v;                                                   \
+      uint8_t a[sizeof(TYPE)];                                  \
+    } helper;                                                   \
+    print_bytes(((union helper *) (POINTER))->a, sizeof(TYPE)); \
+  } while (0)
+
+void decode_a_register(const char *name, const uint8_t *value) {
+  printf("        - Name: \"%s\"\n"
+         "          Value: 0x%0/*( register_size * 2 )*/zx\n",
+         name,
+         *(/*( register_type )*/ *) value);
+  printf("          Bytes: ");
+  print_bytes(value, /*( register_size )*/);
+}
+
+void decode_stack(uint8_t *data) {
+  typedef uint8_t stack_state[/*( stack_byte_count )*/];
+  PRINT_AS_BYTES(stack_state, (stack_state *) data);
+}
+
+#define DECODE_A_SINGLE_VALUE(TYPE, SIZE, ADDRESS, INPUT, OUTPUT) \
+  do {                                                            \
+    printf("      - Type: " #TYPE " # size = %zu\n"               \
+           "        Address: 0x%0/*( register_size * 2 )*/zx\n"   \
+           "        AddressBytes: ",                              \
+           (/*( register_type )*/) (SIZE),                        \
+           (/*( register_type )*/) (ADDRESS));                    \
+    PRINT_AS_BYTES(/*( register_type )*/, &ADDRESS);              \
+    printf("        ExpectedBytes: ");                            \
+    print_bytes((INPUT), (SIZE));                                 \
+    printf("        FoundBytes: ");                               \
+    print_bytes((OUTPUT), (SIZE));                                \
+  } while (0)
+
+/*{ for name, arguments in argument_functions.items() -}*/
+static void decode_/*( name )*/(const struct encoded value) {
+  uint64_t current_offset = 0;
+  puts("    Arguments:");
+  /*{- for type in arguments }*/
+  DECODE_A_SINGLE_VALUE(/*( type )*/,
+                        value.sizes[/*( loop.index - 1 )*/],
+                        value.addresses[/*( loop.index - 1 )*/],
+                        value.input + current_offset,
+                        value.output + current_offset);
+  current_offset += value.sizes[/*( loop.index - 1 )*/];
+  /*{ endfor -}*/
+}
+
+/*{ endfor -}*/
+
+/*{ for name, return_value_type in return_value_functions.items() -}*/
+static void decode_/*( name )*/(const struct encoded value) {
+  puts("    ReturnValues:");
+  DECODE_A_SINGLE_VALUE(/*( return_value_type )*/,
+                        value.sizes[0],
+                        value.addresses[0],
+                        value.input + 0,
+                        value.output + 0);
+}
+
+/*{ endfor -}*/
+
+/* Dispatches to the current printer call based on the test name */
+void decode(const char *name, const struct encoded value) {
+  /*{ for name in argument_functions -}*/
+  if (strcmp("/*( name )*/", name) == 0)
+    return decode_/*( name )*/(value);
+  /*{ endfor -}*/
+  /*{ for name in return_value_functions -}*/
+  if (strcmp("/*( name )*/", name) == 0)
+    return decode_/*( name )*/(value);
+  /*{ endfor -}*/
+
+  assert((0, "unknown test"));
+}
+
+static size_t runtime_endianness_check() {
+  size_t i = 1;
+  return !*((uint8_t *) &i);
+}
+
+void print_header(void) {
+#ifdef TARGET_x86_64
+  puts("TargetArchitecture: x86_64");
+#elif TARGET_i386
+  puts("TargetArchitecture: x86");
+#elif TARGET_aarch64
+  puts("TargetArchitecture: aarch64");
+#elif TARGET_arm
+  puts("TargetArchitecture: arm");
+#elif TARGET_mips
+  puts("TargetArchitecture: mips");
+#elif TARGET_mipsel
+  puts("TargetArchitecture: mipsel");
+#elif TARGET_s390x
+  puts("TargetArchitecture: s390x");
+#else
+  puts("TargetArchitecture: UNSUPPORTED");
+  _Static_assert(0, "unsupported platform architecture");
+#endif
+
+#ifdef ENDIANNESS_LITTLE
+  assert(!runtime_endianness_check() && "little endianness expected!");
+  puts("IsLittleEndian: yes");
+#elif defined(ENDIANNESS_BIG)
+  assert(runtime_endianness_check() && "big endianness expected!");
+  puts("IsLittleEndian: no");
+#endif
+}
