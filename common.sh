@@ -28,5 +28,6 @@ function at_exit() {
 trap at_exit EXIT
 
 if [[ $OUTPUT == */ ]]; then
+    rm -rf "$OUTPUT"
     mkdir -p "$OUTPUT"
 fi
