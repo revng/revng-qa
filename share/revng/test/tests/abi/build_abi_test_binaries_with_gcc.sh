@@ -26,7 +26,7 @@ mkdir -p "${OUTPUT_DIRECTORY}"
 
 # Build the "functions" binary
 "${TRIPLE}gcc" \
-  ${CFLAGS} -O3 -ggdb3 \
+  ${CFLAGS} -O3 -ggdb3 -static \
   "${INPUT_DIRECTORY}/functions.c" \
   -o "${OUTPUT_DIRECTORY}/functions"
 
