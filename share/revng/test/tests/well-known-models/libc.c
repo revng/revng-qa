@@ -60,3 +60,10 @@ int sethostname(const char *name, size_t len) { trap(); }
 
 noreturn void __stack_chk_fail(void) { trap(); };
 noreturn void abort(void) { trap(); }
+noreturn void _exit(int status) { trap(); }
+noreturn void _Exit(int status) { trap(); }
+noreturn void exit(int status) { trap(); }
+noreturn void __assert_fail(const char *assertion,
+                            const char *file,
+                            unsigned int line,
+                            const char *function) { trap(); }
