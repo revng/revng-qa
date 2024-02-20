@@ -59,3 +59,4 @@ int gethostname(char *name, size_t len) { trap(); }
 int sethostname(const char *name, size_t len) { trap(); }
 
 noreturn void __stack_check_fail(void) { trap(); };
+noreturn void abort(void) { trap(); }
