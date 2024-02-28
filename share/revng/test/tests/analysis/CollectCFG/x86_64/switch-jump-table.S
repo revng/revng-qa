@@ -10,12 +10,16 @@ _start:
     ja     end
     jmp    QWORD PTR [rax*8+jumptable]
 one:
+    mov rax, 0x3
     ret
 two:
+    mov rax, 0x5
     ret
 three:
+    mov rax, 0x6
     ret
 end:
+    mov rax, 0x1
     ret
 
     .section        .rodata
