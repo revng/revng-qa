@@ -1,0 +1,19 @@
+tags:
+  - name: for-pretty-int-formatting
+    variables:
+      CFLAGS:
+        - -O2
+        - -fno-inline
+        - -fno-optimize-sibling-calls
+        - -fno-stack-protector
+sources:
+  - tags: [for-pretty-int-formatting]
+    members:
+      - share/revng/test/tests/analysis/pretty-int-formatting/pretty-ints.c
+commands:
+  - type: revng-qa.compiled-for-pretty-int-formatting
+    from:
+      - type: source
+        filter: for-pretty-int-formatting
+    command: clang $INPUT -o $OUTPUT $CFLAGS
+
