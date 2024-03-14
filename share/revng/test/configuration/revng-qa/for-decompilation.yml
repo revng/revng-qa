@@ -2,13 +2,28 @@ tags:
   - name: for-decompilation
     variables:
       GCC_CFLAGS:
-        - -fno-inline
+        # We want optimized code
         - -O2
+        # Disable a bunch of optimizations around calls
+        - -fno-inline
+        - -fno-optimize-sibling-calls
+        # Disable stack protector, to reduce noise
+        - -fno-stack-protector
+  - name: linked-lists-flags
+    variables:
+      GCC_CFLAGS:
+        # Disable loop unrolling, only honored by clang
+        - -fno-unroll-loops
+        # Turn off some warnings
+        - -Wno-pointer-bool-conversion
+        - -Wno-unused-command-line-argument
 sources:
-  - tags: [simple-executable, native, dynamic, for-decompilation]
-    prefix: share/revng/test/tests/analysis/Decompilation/dynamic_native
+  - tags: [simple-executable, x86-64, static, nostdlib, for-decompilation]
+    prefix: share/revng/test/tests/analysis/Decompilation/x86-64/
     members:
-      - struct.c
-      - array.c
-      - linked_list.c
-      - array_of_structs.c
+      - segments-and-sections.c
+      - pretty-ints.c
+  - tags: [simple-executable, native, dynamic, for-decompilation, clang, linked-lists-flags]
+    prefix: share/revng/test/tests/analysis/Decompilation/clang/
+    members:
+      - linked-lists.c

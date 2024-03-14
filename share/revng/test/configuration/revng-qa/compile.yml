@@ -1,14 +1,19 @@
 tags:
+  - name: clang
   - name: simple-executable
-
   - name: stripped
   - name: with-debug-info
 commands:
   - type: revng-qa.compiled-with-debug-info
     from:
       - type: source
-        filter: linux and simple-executable
+        filter: linux and simple-executable and !clang
     command: ${TRIPLE}gcc $INPUT -o $OUTPUT $GCC_CFLAGS $COMMON_CFLAGS
+  - type: revng-qa.compiled-with-debug-info
+    from:
+      - type: source
+        filter: linux and simple-executable and clang
+    command: ${TRIPLE}clang $INPUT -o $OUTPUT $GCC_CFLAGS $COMMON_CFLAGS
   - type: revng-qa.compiled-stripped
     from:
       - type: revng-qa.compiled-with-debug-info
