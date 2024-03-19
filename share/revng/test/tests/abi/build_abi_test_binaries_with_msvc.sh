@@ -49,11 +49,11 @@ timeout 30 ${MSVC_TRIPLE}cl \
   /map:"${OUTPUT_DIRECTORY}/foreign-executable-symbols.txt"
 
 # Run `dumpbin` on it
-timeout 30 ${MSVC_TRIPLE}dumpbin \
+timeout 120 ${MSVC_TRIPLE}dumpbin \
   -nologo -headers \
   "${OUTPUT_DIRECTORY}/foreign-executable.exe" \
   -out:"${OUTPUT_DIRECTORY}/foreign-executable-sections.txt"
-timeout 30 ${MSVC_TRIPLE}dumpbin \
+timeout 120 ${MSVC_TRIPLE}dumpbin \
   -nologo -symbols -disasm:nobytes \
   "${OUTPUT_DIRECTORY}/foreign-executable.exe" \
   -out:"${OUTPUT_DIRECTORY}/foreign-executable-disassembly.txt"
