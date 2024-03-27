@@ -1,6 +1,7 @@
 tags:
   - name: for-collect-cfg
   - name: for-analysis
+  - name: for-simplify-switch
   - name: moderate-opt
     variables:
       GCC_CFLAGS:
@@ -51,13 +52,16 @@ sources:
     prefix: share/revng/test/tests/analysis/CollectCFG/x86_64
     members:
       - try-catch-ehframe.S
-      - switch-jump-table.S
       - switch-jump-table-32-bit-comparison.S
       # - rda-in-memory.S
       - longjmp.S
       - indirect-tail-call.S
       - indirect-call.S
       - call.S
+  - tags: [simple-executable, x86-64, static, nostdlib, for-analysis, for-collect-cfg, for-simplify-switch]
+    prefix: share/revng/test/tests/analysis/CollectCFG/x86_64
+    members:
+      - switch-jump-table.S
   - tags: [simple-executable, x86-64, static, nostdlib, moderate-opt, for-analysis, for-collect-cfg]
     prefix: share/revng/test/tests/analysis/CollectCFG/x86_64
     members:
