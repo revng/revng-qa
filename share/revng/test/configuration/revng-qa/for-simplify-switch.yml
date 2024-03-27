@@ -1,0 +1,22 @@
+tags:
+  - name: for-simplify-switch
+  - name: for-analysis
+    variables:
+      GCC_CFLAGS:
+        - -O2
+        - -fno-stack-protector
+        - -fomit-frame-pointer
+        - -fno-reorder-functions
+        - -fno-unwind-tables
+        - -fno-asynchronous-unwind-tables
+        - -fno-stack-check
+        - -fno-optimize-sibling-calls
+        - -fno-inline-functions
+        - -fno-inline-small-functions
+        - -fno-align-functions
+        - -fno-optimize-sibling-calls
+sources:
+  - tags: [simple-executable, x86-64, static, nostdlib, for-analysis, for-simplify-switch]
+    prefix: share/revng/test/tests/analysis/SimplifySwitch/x86_64
+    members:
+      - simple-switch.S
