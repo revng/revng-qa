@@ -23,6 +23,7 @@ sources:
     members:
       - segments-and-sections.c
       - pretty-ints.c
+      - dual-case-switch.c
   - tags: [simple-executable, native, dynamic, for-decompilation, clang, linked-lists-flags]
     prefix: share/revng/test/tests/analysis/Decompilation/clang/
     members:
