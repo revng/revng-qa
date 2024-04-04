@@ -224,7 +224,6 @@ commands:
       - type: source
         filter: for-runtime-abi-tests and windows
     suffix: /
-    pool: wine
     command: |-
       if [[ "${QEMU_NAME}" =~ ^x86_64$$ ]]; then
         MSVC_TRIPLE="x86_64-winsdk-vc19-";
