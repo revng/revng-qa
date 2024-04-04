@@ -4,7 +4,7 @@ tags:
       GCC_CFLAGS:
         - -nostartfiles
         - -fuse-ld=bfd
-        - -Wl,--section-start=.text=0xAB00000000
+        - -Wl,--section-start=.text=0xAB00000
 sources:
   - tags: [simple-executable, native, static, for-collect-cfep]
     members:
