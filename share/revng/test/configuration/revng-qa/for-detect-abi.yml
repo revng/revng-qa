@@ -26,3 +26,22 @@ sources:
       - push-pop.S
       - indirect-call-callee-saved.S
       # - return-value-to-argument.S
+      - argument-from-call-site.S
+      - argument-used-on-one-path.S
+      - call-site-argument.S
+      - call-site-register-used-on-one-path.S
+      - call-site-return-value-used-on-one-path-only.S
+      - call-site-return-value.S
+      - callee-saved-register-in-callee.S
+      - callee-saved-register.S
+      - clobbered-register-in-callee.S
+      - register-clobbered-on-all-paths.S
+      - regular-argument.S
+      - regular-return-value.S
+      - return-value-and-callee-saved-register-in-callee.S
+      - return-value-and-clobbered-register-in-callee.S
+      - return-value-from-call-site.S
+      - return-value-multiple-paths.S
+      - scratch-register.S
+      - stack-pointer-is-not-an-argument.S
+      - write-used-only-one-path.S
