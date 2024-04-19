@@ -12,6 +12,8 @@ void *memcpy(void *dest, const void *src, size_t n) { trap(); }
 void *mempcpy(void *dest, const void *src, size_t n) { trap(); }
 void *memmove(void *dest, const void *src, size_t n) { trap(); }
 void *memset(void *s, int c, size_t n) { trap(); }
+void bzero(void *s, size_t n) { trap(); }
+void bcopy(const void *src, void *dest, size_t n) { trap(); }
 
 size_t strlen(const char *s) { trap(); }
 size_t strnlen(const char *s, size_t maxlen) { trap(); }
@@ -67,3 +69,5 @@ noreturn void __assert_fail(const char *assertion,
                             const char *file,
                             unsigned int line,
                             const char *function) { trap(); }
+
+int socket(int domain, int type, int protocol) { trap(); }
