@@ -7,9 +7,15 @@ tags:
     implies: [windows]
     variables:
       MSVC_CFLAGS:
-        - -Z7 # makes debug information c7.0-compatible
-        - -EHsc # enables exceptions BUT makes all the `extern "C"` stuff `nothrow`
-        - -O2 # "fast code" optimization level
+        # Makes debug information c7.0-compatible
+        - -Z7
+        # Enables exceptions BUT makes all the `extern "C"` stuff `nothrow`
+        - -EHsc
+        # "Fast code" optimization level
+        - -O2
+      MSVC_LDFLAGS:
+        # Force base address to avoid clashes with ASan memory areas
+        - /BASE:0x400000 /IGNORE:4281
 
   - name: vc19-x86-64
     variables:
@@ -42,7 +48,7 @@ commands:
       ROOT="$$PWD";
       TEMP="$$(temp -d)";
       cd "$$TEMP";
-      timeout 30 ${MSVC_TRIPLE}cl z:\\$INPUT -Fez:\\"$$ROOT"/$OUTPUT $MSVC_CFLAGS $COMMON_CFLAGS -link $LDFLAGS;
+      timeout 30 ${MSVC_TRIPLE}cl z:\\$INPUT -Fez:\\"$$ROOT"/$OUTPUT $MSVC_CFLAGS $COMMON_CFLAGS -link $MSVC_LDFLAGS;
       cd -
   - type: revng-qa.generated-pdb
     from:

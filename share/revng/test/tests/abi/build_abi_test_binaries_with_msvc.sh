@@ -45,7 +45,9 @@ timeout 30 ${MSVC_TRIPLE}cl \
   -Fe"z:\\${OUTPUT_DIRECTORY}/functions.exe" \
   -link ${LDFLAGS} /opt:ref,noicf \
   /pdb:"z:\\${OUTPUT_DIRECTORY}/functions.pdb" \
-  /map:"z:\\${OUTPUT_DIRECTORY}/functions.map"
+  /map:"z:\\${OUTPUT_DIRECTORY}/functions.map" \
+  /BASE:0x400000 /IGNORE:4281
+
 
 # Build the binary for runner to `mmap`
 timeout 30 ${MSVC_TRIPLE}cl \
@@ -70,7 +72,7 @@ timeout 120 ${MSVC_TRIPLE}dumpbin \
   -out:z:\\"${OUTPUT_DIRECTORY}/foreign-executable-disassembly.txt"
 
 # Run `gather_symbols.py`
-timeout 30 python3 "${INPUT_DIRECTORY}/gather_symbols.py" \
+python3 "${INPUT_DIRECTORY}/gather_symbols.py" \
   "expected_state value_dumps address_dumps size_dumps" \
   "${OUTPUT_DIRECTORY}/foreign-executable-sections.txt" \
   "${OUTPUT_DIRECTORY}/foreign-executable-symbols.txt" \
