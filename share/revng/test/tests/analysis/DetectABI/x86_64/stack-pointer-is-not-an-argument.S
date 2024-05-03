@@ -2,18 +2,16 @@
 # This file is distributed under the MIT License. See LICENSE.md for details.
 #
 
-# WIP: drop
-
 .intel_syntax noprefix
 .type _start, @function
 .global _start
 _start:
-    call urvof
+    call function
     ret
 
-.type urvof, @function
-urvof:
-    # This is a dead assignment to a register, therefore it has to be a return
-    # value
-    mov rax,42
+.intel_syntax noprefix
+.type function, @function
+function:
+    # rsp would be an argument, but rsp is never an argument
+    mov QWORD PTR [0x1000], rsp
     ret

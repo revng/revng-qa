@@ -29,34 +29,45 @@ test -n "${LDFLAGS}"
 
 mkdir -p "${OUTPUT_DIRECTORY}"
 
+OUTPUT_DIRECTORY="$(realpath "$OUTPUT_DIRECTORY")"
+INPUT_DIRECTORY="$(realpath "$INPUT_DIRECTORY")"
+
 # Build the "functions" binary
+
+# Move to a temporary directory before using cl.exe
+WORKDIR="$(mktemp -d)"
+trap 'rm -rf "$WORKDIR"' EXIT
+pushd "$WORKDIR" >& /dev/null
+
 timeout 30 ${MSVC_TRIPLE}cl \
   ${MSVC_CFLAGS} -O2 -std:c11 -Zi -GS- \
   "z:\\${INPUT_DIRECTORY}/functions.c" \
-  -Fe"${OUTPUT_DIRECTORY}/functions.exe" \
+  -Fe"z:\\${OUTPUT_DIRECTORY}/functions.exe" \
   -link ${LDFLAGS} /opt:ref,noicf \
-  /pdb:"${OUTPUT_DIRECTORY}/functions.pdb" \
-  /map:"${OUTPUT_DIRECTORY}/functions.map"
+  /pdb:"z:\\${OUTPUT_DIRECTORY}/functions.pdb" \
+  /map:"z:\\${OUTPUT_DIRECTORY}/functions.map"
 
 # Build the binary for runner to `mmap`
 timeout 30 ${MSVC_TRIPLE}cl \
   ${MSVC_CFLAGS} -O2 -std:c11 -Zi -GS- \
   "z:\\${INPUT_DIRECTORY}/setup.c" \
-  -Fe"${OUTPUT_DIRECTORY}/foreign-executable.exe" \
+  -Fe"z:\\${OUTPUT_DIRECTORY}/foreign-executable.exe" \
   -link ${LDFLAGS} /opt:ref,noicf /ignore:4281 \
   /dynamicbase:no /base:0x2000000 /fixed /filealign:4096 \
-  /pdb:"${OUTPUT_DIRECTORY}/foreign-executable.pdb" \
-  /map:"${OUTPUT_DIRECTORY}/foreign-executable-symbols.txt"
+  /pdb:"z:\\${OUTPUT_DIRECTORY}/foreign-executable.pdb" \
+  /map:"z:\\${OUTPUT_DIRECTORY}/foreign-executable-symbols.txt"
+
+popd >& /dev/null
 
 # Run `dumpbin` on it
 timeout 120 ${MSVC_TRIPLE}dumpbin \
   -nologo -headers \
-  "${OUTPUT_DIRECTORY}/foreign-executable.exe" \
-  -out:"${OUTPUT_DIRECTORY}/foreign-executable-sections.txt"
+  z:\\"${OUTPUT_DIRECTORY}/foreign-executable.exe" \
+  -out:z:\\"${OUTPUT_DIRECTORY}/foreign-executable-sections.txt"
 timeout 120 ${MSVC_TRIPLE}dumpbin \
   -nologo -symbols -disasm:nobytes \
-  "${OUTPUT_DIRECTORY}/foreign-executable.exe" \
-  -out:"${OUTPUT_DIRECTORY}/foreign-executable-disassembly.txt"
+  z:\\"${OUTPUT_DIRECTORY}/foreign-executable.exe" \
+  -out:z:\\"${OUTPUT_DIRECTORY}/foreign-executable-disassembly.txt"
 
 # Run `gather_symbols.py`
 timeout 30 python3 "${INPUT_DIRECTORY}/gather_symbols.py" \

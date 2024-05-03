@@ -2,24 +2,20 @@
 # This file is distributed under the MIT License. See LICENSE.md for details.
 #
 
-# WIP: drop
-
 .intel_syntax noprefix
 .type _start, @function
 .global _start
 _start:
-    call urvofc
-    ret
-
-# rax is a return value
-.type urvofc, @function
-urvofc:
-    call callee
-    mov rbx,rax
+    call caller
     ret
 
 .type callee, @function
 callee:
-    mov rax, 42
-    mov rbx, rax
+    mov QWORD PTR [0x1000], rdi
+    ret
+
+.type caller, @function
+caller:
+    # callee has an argument, we should inherit it
+    call callee
     ret
