@@ -138,6 +138,14 @@ tags:
     variables:
       ABI_NAME: AAPCS64
 
+  - name: aarch64-aapcs64-microsoft-abi
+    implies: [aarch64]
+    variables:
+      ABI_NAME: Microsoft_AAPCS64
+      GCC_CFLAGS:
+        # Safeguard in case somebody tries using it with gcc
+        - -DABIDEF=UNSUPPORTED
+
   - name: arm-aapcs-abi
     implies: [arm]
     variables:
@@ -192,6 +200,7 @@ sources:
 
       # TODO: re-enable once arm64 support is fixed.
       # - [aarch64-aapcs64-abi]
+      - [aarch64-aapcs64-microsoft-abi, windows]
 
       - [arm-aapcs-abi]
 
@@ -229,6 +238,8 @@ commands:
         MSVC_TRIPLE="x86_64-winsdk-vc19-";
       elif [[ "${QEMU_NAME}" =~ ^i386$$ ]]; then
         MSVC_TRIPLE="i386-winsdk-vc19-";
+      elif [[ "${QEMU_NAME}" =~ ^aarch64$$ ]]; then
+        MSVC_TRIPLE="aarch64-winsdk-vc19-";
       else
         echo "Unsupported architecture" > /dev/stderr;
         exit 1;
