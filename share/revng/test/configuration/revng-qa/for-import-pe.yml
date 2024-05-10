@@ -14,6 +14,9 @@ tags:
   - name: vc19-x86-64
     variables:
       MSVC_TRIPLE: "x86_64-winsdk-vc19-"
+  - name: vc19-aarch64
+    variables:
+      MSVC_TRIPLE: "aarch64-winsdk-vc19-"
   - name: vc19-i386
     variables:
       MSVC_TRIPLE: "i386-winsdk-vc19-"
@@ -24,6 +27,7 @@ sources:
   - tags: [windows, for-import-pe, simple-executable]
     repeat-for:
       - [vc19-x86-64]
+      - [vc19-aarch64]
       - [vc19-i386]
       - [vc16-i386]
     prefix: share/revng/test/tests/model/import/pe
