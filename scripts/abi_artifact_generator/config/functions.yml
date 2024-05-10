@@ -358,7 +358,7 @@ argument_tests:
   unnaturally_aligned_struct_128_in_registers:
     - size_t
     - size_t
-    - unnaturally_aligned_struct_16
+    - unnaturally_aligned_struct_128
   unnaturally_aligned_struct_128_on_stack:
     - size_t
     - size_t
