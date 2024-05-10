@@ -52,8 +52,7 @@ timeout 30 ${MSVC_TRIPLE}cl \
   ${MSVC_CFLAGS} -O2 -std:c11 -Zi -GS- \
   "z:\\${INPUT_DIRECTORY}/setup.c" \
   -Fe"z:\\${OUTPUT_DIRECTORY}/foreign-executable.exe" \
-  -link ${LDFLAGS} /opt:ref,noicf /ignore:4281 \
-  /dynamicbase:no /base:0x2000000 /fixed /filealign:4096 \
+  -link ${LDFLAGS} /opt:ref,noicf /ignore:4281 /filealign:4096 \
   /pdb:"z:\\${OUTPUT_DIRECTORY}/foreign-executable.pdb" \
   /map:"z:\\${OUTPUT_DIRECTORY}/foreign-executable-symbols.txt"
 
