@@ -198,8 +198,7 @@ sources:
       - [i386-stdcall-microsoft-abi, windows]
       - [i386-vectorcall-microsoft-abi, windows]
 
-      # TODO: re-enable once arm64 support is fixed.
-      # - [aarch64-aapcs64-abi]
+      - [aarch64-aapcs64-abi]
       - [aarch64-aapcs64-microsoft-abi, windows]
 
       - [arm-aapcs-abi]
