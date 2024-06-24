@@ -5,35 +5,33 @@ import hashlib
 import json
 import os
 import re
-import shlex
 import sys
 from collections import defaultdict
 from dataclasses import asdict, dataclass, field
-from functools import reduce
 from graphlib import TopologicalSorter
 from itertools import product
 from pathlib import Path
 from stat import S_IEXEC
-from typing import Dict, List, Union
+from typing import List
 
 import yaml
 from boolparser import BooleanParser
-from expandvars import expand
 
 # TODO: re-enable abi
 
-# BooleanParser self-test
+# Start BooleanParser self-test
 assert (
     BooleanParser("(var1 and var2) or (var2 and undefined)").evaluate({"var1": True, "no": False})
-    == False
+    is False
 )
-assert BooleanParser("var1 and var2").evaluate({"var1": True, "var2": True}) == True
-assert BooleanParser("var1").evaluate({"var1": True}) == True
-assert BooleanParser("!var1").evaluate({"var1": True}) == False
-assert BooleanParser("var1").evaluate({"var1": False}) == False
-assert BooleanParser("!var1").evaluate({"var1": False}) == True
-assert BooleanParser("var1").evaluate({}) == False
-assert BooleanParser("1 == 1").evaluate({}) == True
+assert BooleanParser("var1 and var2").evaluate({"var1": True, "var2": True}) is True
+assert BooleanParser("var1").evaluate({"var1": True}) is True
+assert BooleanParser("!var1").evaluate({"var1": True}) is False
+assert BooleanParser("var1").evaluate({"var1": False}) is False
+assert BooleanParser("!var1").evaluate({"var1": False}) is True
+assert BooleanParser("var1").evaluate({}) is False
+assert BooleanParser("1 == 1").evaluate({}) is True
+# End BooleanParser self-test
 
 verbose = False
 
@@ -54,18 +52,18 @@ def error(message):
 
 def distances(target, result):
     result.add(target)
-    for input in target.inputs:
-        distances(input, result)
+    for input_ in target.inputs:
+        distances(input_, result)
     return result
 
 
 def most_similar_tuples(inputs, command_type):
-    log(json.dumps([[x.path for x in input] for input in inputs], indent=2))
+    log(json.dumps([[x.path for x in input_] for input_ in inputs], indent=2))
     if len(inputs) == 1:
         return list(product(*inputs))
 
     longest_input = 0
-    for index, input in enumerate(inputs):
+    for index, input_ in enumerate(inputs):
         if len(inputs) > len(inputs[longest_input]):
             longest_input = index
 
@@ -95,12 +93,15 @@ def most_similar_tuples(inputs, command_type):
 
             if len(scores) > 1 and scores[0][:-1] == scores[1][:-1]:
                 error(
-                    f"While emitting {command_type}, {reference.path} has multiple good matches for index #{index}:\n  {inputs[index][scores[0][2]].path}\n  {inputs[index][scores[1][2]].path}"
+                    f"While emitting {command_type}, {reference.path} has multiple good matches "
+                    + f"for index #{index}:\n  {inputs[index][scores[0][2]].path}\n"
+                    + f"  {inputs[index][scores[1][2]].path}"
                 )
 
             if not scores:
                 error(
-                    f"While emitting {command_type}, cannot match {reference.path} with any other target for input #{index}"
+                    f"While emitting {command_type}, cannot match {reference.path} with any "
+                    + f"other target for input #{index}"
                 )
 
             used_inputs.add((index, scores[0][2]))
@@ -108,10 +109,10 @@ def most_similar_tuples(inputs, command_type):
 
         result.append(entry)
 
-    log(json.dumps([[x.path for x in input] for input in result], indent=2))
+    log(json.dumps([[x.path for x in input_] for input_ in result], indent=2))
 
-    for input_index, input in enumerate(inputs):
-        for target_index, target in enumerate(input):
+    for input_index, input_ in enumerate(inputs):
+        for target_index, target in enumerate(input_):
             if (input_index, target_index) not in used_inputs:
                 error(f"Target {target.path} has not been used!")
 
@@ -169,8 +170,7 @@ class Variables:
             if name in self.variables:
                 error(
                     f"Variable {name} of type str is already defined with a "
-                    f'different value: "{value}" and '
-                    f'"{self.variables[name]}"'
+                    f'different value: "{value}" and {self.variables[name]}"'
                 )
             self.variables[name] = value
         elif value_type is list:
@@ -197,7 +197,7 @@ class Tag:
 @dataclass
 class Target:
     name: str
-    type: str
+    type: str  # noqa: A003
     path: str
     source_path: str
     derived_targets_prefix: str
@@ -219,14 +219,14 @@ SafeLoaderIgnoreUnknown.add_constructor(None, SafeLoaderIgnoreUnknown.ignore_unk
 
 
 class Configuration:
-    def __init__(self, data, allowed_types, filter, install_path):
+    def __init__(self, data, allowed_types, filter_, install_path):
         self.tags_list = {}
         self.targets = []
         self.commands = {}
-        self.types = set(["source"])
+        self.types = {"source"}
         self.install_path = install_path
         self.allowed_types = [re.compile(allowed_type) for allowed_type in allowed_types]
-        self.filter = BooleanParser(filter)
+        self.filter = BooleanParser(filter_)
 
         self._load_tags(data)
         self._load_sources(data)
@@ -347,7 +347,7 @@ class Configuration:
         for command in data["commands"]:
             self.types.add(command["type"])
 
-        sources = set(target for target in self.targets if target.type == "source")
+        sources = {target for target in self.targets if target.type == "source"}
 
         # Produce the targets
         type_counts = defaultdict(lambda: 0)
@@ -418,7 +418,7 @@ class Configuration:
 
         if sources:
             error(
-                f"The following sources are unused:\n  "
+                "The following sources are unused:\n  "
                 + "\n  ".join([source.path for source in sources])
             )
 
@@ -641,9 +641,8 @@ def emit_ninja(config, destination):
     if all_paths:
         ninja += f"rule install\n"
         ninja += (
-            '    command = for FILE in $in; do find "$$FILE" -type f -exec install -D "{}" $$DESTDIR'
-            + str(config.install_path)
-            + "/{} \\; ; done\n"
+            f'    command = for FILE in $in; do find "$$FILE" -type f -exec install -D "{{}}"'
+            f" $$DESTDIR{config.install_path!s}/{{}} \\; ; done\n"
         )
         ninja += f"\n"
         ninja += f"build install-impl: install{all_paths}\n"
@@ -678,7 +677,12 @@ def emit_graph(config):
             source_commands[input_target.source_path].add((target.name, index))
 
     def style_generator():
-        colors = ["#e6194B", "#3cb44b", "#ffe119", "#4363d8", "#f58231", "#911eb4", "#42d4f4", "#f032e6", "#bfef45", "#fabed4", "#469990", "#dcbeff", "#9A6324", "#fffac8", "#800000", "#aaffc3", "#808000", "#ffd8b1", "#000075", "#a9a9a9", "#ffffff", "#000000"]
+        colors = (
+            ("#e6194B", "#3cb44b", "#ffe119", "#4363d8", "#f58231", "#911eb4", "#42d4f4")
+            + ("#f032e6", "#bfef45", "#fabed4", "#469990", "#dcbeff", "#9A6324", "#fffac8")
+            + ("#800000", "#aaffc3", "#808000", "#ffd8b1", "#000075", "#a9a9a9", "#ffffff")
+            + ("#000000",)
+        )
 
         for color in colors:
             yield f'color="{color}"'
@@ -698,7 +702,8 @@ def emit_graph(config):
         for edge in edge_set:
             edges[edge].append(edge_set)
 
-    get_id = lambda obj: hex(abs(hash(obj)))
+    def get_id(obj):
+        return hex(abs(hash(obj)))
 
     result += """digraph {"""
     result += """  node [shape=box,style=bold,fontname=monospace];"""
@@ -706,10 +711,10 @@ def emit_graph(config):
     result += """  rankdir="LR";"""
 
     for command_set, sources in command_set_sources.items():
-        id = get_id(command_set)
+        id_ = get_id(command_set)
         label = "\\l".join(sources[0]) + "\\l"
         style = command_set_sources[command_set][1]
-        result += f'  source{id} [label="{label}",{style}];'
+        result += f'  source{id_} [label="{label}",{style}];'
 
     for command_name, command in config.commands.items():
         command_type = command["type"]
@@ -719,17 +724,20 @@ def emit_graph(config):
 
         result += f"""  "{command_type}";"""
 
-        for index, input in enumerate(command["from"]):
+        for index, input_ in enumerate(command["from"]):
             edge = (command_name, index)
 
-            if input["type"] == "source":
+            if input_["type"] == "source":
                 for edge_set in edges[edge]:
                     style = command_set_sources[edge_set][1]
                     result += f"""  "source{get_id(edge_set)}" -> "{command_type}" [{style}];"""
             else:
                 for edge_set in edges[edge]:
                     style = command_set_sources[edge_set][1]
-                    result += f"""  "{input['type']}" -> "{command_type}" [label="{input.get('filter', '')}",{style}];"""
+                    result += (
+                        f"""  "{input_['type']}" -> "{command_type}" """
+                        + f"""[label="{input_.get('filter', '')}",{style}];"""
+                    )
 
     result += "}"
 
@@ -777,8 +785,8 @@ def main():
                     data[key] = value
 
     allowed_types = set(args.target_type or [])
-    filter = args.filter_tags
-    config = Configuration(data, allowed_types, filter, install_path)
+    filter_ = args.filter_tags
+    config = Configuration(data, allowed_types, filter_, install_path)
 
     config.dump_state()
 
