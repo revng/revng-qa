@@ -633,7 +633,7 @@ def emit_ninja(config, destination):
 
     if all_paths:
         ninja += f"rule install\n"
-        ninja += "    command = for FILE in $in; do find \"$$FILE\" -type f -exec install -D \"{}\" $$DESTDIR" + str(config.install_path) +"/{} \; ; done\n"
+        ninja += "    command = for FILE in $in; do find \"$$FILE\" -type f -exec install -D \"{}\" $$DESTDIR" + str(config.install_path) +"/{} \\; ; done\n"
         ninja += f"\n"
         ninja += f"build install-impl: install{all_paths}\n"
         ninja += f"\n"
