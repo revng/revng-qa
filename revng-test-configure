@@ -5,62 +5,65 @@ import hashlib
 import json
 import os
 import re
-import shlex
 import sys
-import yaml
-
-from dataclasses import dataclass, field, asdict
-from expandvars import expand
 from collections import defaultdict
-from typing import Union, List, Dict
-from itertools import product
-from functools import reduce
-from boolparser import BooleanParser
-from pathlib import Path
+from dataclasses import asdict, dataclass, field
 from graphlib import TopologicalSorter
+from itertools import product
+from pathlib import Path
 from stat import S_IEXEC
+from typing import List
+
+import yaml
+from boolparser import BooleanParser
 
 # TODO: re-enable abi
 
-# BooleanParser self-test
-assert BooleanParser("(var1 and var2) or (var2 and undefined)").evaluate({
-    "var1": True,
-    "no": False
-}) == False
-assert BooleanParser("var1 and var2").evaluate({"var1": True, "var2": True}) == True
-assert BooleanParser("var1").evaluate({"var1": True}) == True
-assert BooleanParser("!var1").evaluate({"var1": True}) == False
-assert BooleanParser("var1").evaluate({"var1": False}) == False
-assert BooleanParser("!var1").evaluate({"var1": False}) == True
-assert BooleanParser("var1").evaluate({}) == False
-assert BooleanParser("1 == 1").evaluate({}) == True
+# Start BooleanParser self-test
+assert (
+    BooleanParser("(var1 and var2) or (var2 and undefined)").evaluate({"var1": True, "no": False})
+    is False
+)
+assert BooleanParser("var1 and var2").evaluate({"var1": True, "var2": True}) is True
+assert BooleanParser("var1").evaluate({"var1": True}) is True
+assert BooleanParser("!var1").evaluate({"var1": True}) is False
+assert BooleanParser("var1").evaluate({"var1": False}) is False
+assert BooleanParser("!var1").evaluate({"var1": False}) is True
+assert BooleanParser("var1").evaluate({}) is False
+assert BooleanParser("1 == 1").evaluate({}) is True
+# End BooleanParser self-test
 
 verbose = False
+
 
 def log(message):
     global verbose
     if verbose:
         sys.stderr.write(message + "\n")
 
+
 def warning(message):
     sys.stderr.write(f"Warning: {message}\n")
+
 
 def error(message):
     raise Exception(message)
 
+
 def distances(target, result):
     result.add(target)
-    for input in target.inputs:
-        distances(input, result)
+    for input_ in target.inputs:
+        distances(input_, result)
     return result
 
+
 def most_similar_tuples(inputs, command_type):
-    log(json.dumps([[x.path for x in input] for input in inputs], indent=2))
+    log(json.dumps([[x.path for x in input_] for input_ in inputs], indent=2))
     if len(inputs) == 1:
         return list(product(*inputs))
 
     longest_input = 0
-    for index, input in enumerate(inputs):
+    for index, input_ in enumerate(inputs):
         if len(inputs) > len(inputs[longest_input]):
             longest_input = index
 
@@ -79,30 +82,42 @@ def most_similar_tuples(inputs, command_type):
             # A list of (has_different_source, -common_tags_count, index)
             scores = []
             for candidate_index, candidate in enumerate(inputs[index]):
-                scores.append((reference.source_path != candidate.source_path,
-                               -len(set(reference.tags) & set(candidate.tags)),
-                               candidate_index))
+                scores.append(
+                    (
+                        reference.source_path != candidate.source_path,
+                        -len(set(reference.tags) & set(candidate.tags)),
+                        candidate_index,
+                    )
+                )
             scores = sorted(scores)
 
             if len(scores) > 1 and scores[0][:-1] == scores[1][:-1]:
-                error(f"While emitting {command_type}, {reference.path} has multiple good matches for index #{index}:\n  {inputs[index][scores[0][2]].path}\n  {inputs[index][scores[1][2]].path}")
+                error(
+                    f"While emitting {command_type}, {reference.path} has multiple good matches "
+                    + f"for index #{index}:\n  {inputs[index][scores[0][2]].path}\n"
+                    + f"  {inputs[index][scores[1][2]].path}"
+                )
 
             if not scores:
-                error(f"While emitting {command_type}, cannot match {reference.path} with any other target for input #{index}")
+                error(
+                    f"While emitting {command_type}, cannot match {reference.path} with any "
+                    + f"other target for input #{index}"
+                )
 
             used_inputs.add((index, scores[0][2]))
             entry[index] = inputs[index][scores[0][2]]
 
         result.append(entry)
 
-    log(json.dumps([[x.path for x in input] for input in result], indent=2))
+    log(json.dumps([[x.path for x in input_] for input_ in result], indent=2))
 
-    for input_index, input in enumerate(inputs):
-        for target_index, target in enumerate(input):
+    for input_index, input_ in enumerate(inputs):
+        for target_index, target in enumerate(input_):
             if (input_index, target_index) not in used_inputs:
                 error(f"Target {target.path} has not been used!")
 
     return result
+
 
 def sort_list(entries, key, dependencies):
     # Collect entries by key and id
@@ -115,18 +130,17 @@ def sort_list(entries, key, dependencies):
     # Create graph
     entries_graph = defaultdict(set)
     for entry in entries:
-        entries_graph[id(entry)].update(set().union(*[entries_by_key[dependency]
-                                                      for dependency
-                                                      in dependencies(entry)]))
+        entries_graph[id(entry)].update(
+            set().union(*[entries_by_key[dependency] for dependency in dependencies(entry)])
+        )
 
     # Sort the entries in reverse post-order
-    return [entries_by_id[entry_id]
-            for entry_id
-            in TopologicalSorter(entries_graph).static_order()]
+    return [entries_by_id[entry_id] for entry_id in TopologicalSorter(entries_graph).static_order()]
 
 
 def short_hash(data):
     return hashlib.sha256(data.encode("utf8")).hexdigest()[:8]
+
 
 @dataclass
 class Variables:
@@ -154,9 +168,10 @@ class Variables:
 
         if value_type is str:
             if name in self.variables:
-                error(f"Variable {name} of type str is already defined with a "
-                      f"different value: \"{value}\" and "
-                      f"\"{self.variables[name]}\"")
+                error(
+                    f"Variable {name} of type str is already defined with a "
+                    f'different value: "{value}" and {self.variables[name]}"'
+                )
             self.variables[name] = value
         elif value_type is list:
             if name not in self.variables:
@@ -178,10 +193,11 @@ class Tag:
     def __hash__(self):
         return id(self)
 
+
 @dataclass
 class Target:
     name: str
-    type: str
+    type: str  # noqa: A003
     path: str
     source_path: str
     derived_targets_prefix: str
@@ -193,32 +209,31 @@ class Target:
     def __hash__(self):
         return id(self)
 
+
 class SafeLoaderIgnoreUnknown(yaml.SafeLoader):
     def ignore_unknown(self, node):
         return self.construct_mapping(node)
 
+
 SafeLoaderIgnoreUnknown.add_constructor(None, SafeLoaderIgnoreUnknown.ignore_unknown)
 
+
 class Configuration:
-    def __init__(self, data, allowed_types, filter, install_path):
+    def __init__(self, data, allowed_types, filter_, install_path):
         self.tags_list = {}
         self.targets = []
         self.commands = {}
-        self.types = set(["source"])
+        self.types = {"source"}
         self.install_path = install_path
-        self.allowed_types = [re.compile(allowed_type)
-                              for allowed_type
-                              in allowed_types]
-        self.filter = BooleanParser(filter)
+        self.allowed_types = [re.compile(allowed_type) for allowed_type in allowed_types]
+        self.filter = BooleanParser(filter_)
 
         self._load_tags(data)
         self._load_sources(data)
         self._load_commands(data)
 
     def _evaluate(self, expression, tags):
-        return expression.evaluate({tag.name: True
-                                    for tag
-                                    in tags})
+        return expression.evaluate({tag.name: True for tag in tags})
 
     def is_allowed(self, target):
         if target.type == "source":
@@ -227,10 +242,9 @@ class Configuration:
         if not self._evaluate(self.filter, target.tags):
             return False
 
-        if (self.allowed_types
-            and not any(allowed_type.match(target.type)
-                        for allowed_type
-                        in self.allowed_types)):
+        if self.allowed_types and not any(
+            allowed_type.match(target.type) for allowed_type in self.allowed_types
+        ):
             return False
 
         return True
@@ -293,28 +307,26 @@ class Configuration:
                 error(f"Can't find source file {path}")
 
             for repetition in group.get("repeat-for", [[]]):
-                source_tags = tags + [tag
-                                      for tag
-                                      in self.tags(repetition)
-                                      if tag not in tags]
+                source_tags = tags + [tag for tag in self.tags(repetition) if tag not in tags]
                 derived_targets_prefix = os.path.splitext(path)[0]
                 assert len(derived_targets_prefix) > 0
                 if repetition:
-                    if derived_targets_prefix[-1] != '/':
+                    if derived_targets_prefix[-1] != "/":
                         derived_targets_prefix = derived_targets_prefix + "-"
                     derived_targets_prefix = derived_targets_prefix + "-".join(repetition)
-                source_target = Target(name="source",
-                                       type="source",
-                                       path=path,
-                                       source_path=path,
-                                       derived_targets_prefix=derived_targets_prefix,
-                                       tags=source_tags,
-                                       command="")
+                source_target = Target(
+                    name="source",
+                    type="source",
+                    path=path,
+                    source_path=path,
+                    derived_targets_prefix=derived_targets_prefix,
+                    tags=source_tags,
+                    command="",
+                )
                 for tag in source_tags:
                     source_target.variables.merge(tag.variables)
 
                 self.targets.append(source_target)
-
 
     def _load_commands(self, data):
         log("Parsing commands")
@@ -335,7 +347,7 @@ class Configuration:
         for command in data["commands"]:
             self.types.add(command["type"])
 
-        sources = set(target for target in self.targets if target.type == "source")
+        sources = {target for target in self.targets if target.type == "source"}
 
         # Produce the targets
         type_counts = defaultdict(lambda: 0)
@@ -350,7 +362,7 @@ class Configuration:
                 type_counts[command_type] = 1
                 command_name = command_type
 
-            log(f"Parsing command \"{command_name}\"")
+            log(f'Parsing command "{command_name}"')
             if command_name in self.commands:
                 error(f"We have two commands with the following name: {command_name}")
 
@@ -359,16 +371,12 @@ class Configuration:
                 "command": command["command"],
                 "scripts": command.get("scripts", {}),
                 "from": command["from"],
-                "type": command["type"]
+                "type": command["type"],
             }
 
             inputs = [
-                (
-                    input_entry["type"],
-                    BooleanParser(input_entry.get("filter", "1 == 1"))
-                )
-                for input_entry
-                in command["from"]
+                (input_entry["type"], BooleanParser(input_entry.get("filter", "1 == 1")))
+                for input_entry in command["from"]
             ]
 
             output_tags = self.tags(command.get("tags", []))
@@ -377,7 +385,9 @@ class Configuration:
             for index, (input_type, input_filter) in enumerate(inputs):
 
                 if input_type not in self.types:
-                    error(f"{command_type} requires an input of type {input_type}, which is unknown")
+                    error(
+                        f"{command_type} requires an input of type {input_type}, which is unknown"
+                    )
 
                 input_targets.append([])
                 for target in self.targets:
@@ -402,22 +412,19 @@ class Configuration:
             for input_targets in input_targets_list:
                 assert type(input_targets) is not set
                 sources = sources - set(input_targets)
-                self._create_target(input_targets,
-                                    output_tags,
-                                    command_name,
-                                    command_type,
-                                    command_suffix)
+                self._create_target(
+                    input_targets, output_tags, command_name, command_type, command_suffix
+                )
 
         if sources:
-            error(f"The following sources are unused:\n  " + "\n  ".join([source.path for source in sources]))
+            error(
+                "The following sources are unused:\n  "
+                + "\n  ".join([source.path for source in sources])
+            )
 
-
-    def _create_target(self,
-                       input_targets,
-                       output_tags,
-                       command_name,
-                       command_type,
-                       command_suffix):
+    def _create_target(
+        self, input_targets, output_tags, command_name, command_type, command_suffix
+    ):
         final_tags = list(output_tags)
         for target in input_targets:
             for input_tag in target.tags:
@@ -428,23 +435,23 @@ class Configuration:
         path = ""
         path += derived_targets_prefix
         path += f"-{command_type}"
-        path += "-" + short_hash(" ".join([target.path[1:]
-                                           for target
-                                           in input_targets]))
+        path += "-" + short_hash(" ".join([target.path[1:] for target in input_targets]))
         path += command_suffix
 
         log(f"Target {path} generated from:")
         for input_target in input_targets:
             log(f"  {input_target.path}")
 
-        new_target = Target(name=command_name,
-                            type=command_type,
-                            tags=final_tags,
-                            path=path,
-                            source_path=input_targets[0].source_path,
-                            derived_targets_prefix=derived_targets_prefix,
-                            command=command_name,
-                            inputs=input_targets)
+        new_target = Target(
+            name=command_name,
+            type=command_type,
+            tags=final_tags,
+            path=path,
+            source_path=input_targets[0].source_path,
+            derived_targets_prefix=derived_targets_prefix,
+            command=command_name,
+            inputs=input_targets,
+        )
 
         # Initialize variables
         variables = new_target.variables
@@ -474,10 +481,10 @@ class Configuration:
             for index, target in enumerate(input_target_paths):
                 variables.set_private_variable(f"INPUT{index+1}", target)
 
-        variables.set_private_variable("SOURCE",
-                                       str(self.install_path / input_targets[0].source_path))
-        variables.set_private_variable("SOURCES_ROOT",
-                                       str(self.install_path))
+        variables.set_private_variable(
+            "SOURCE", str(self.install_path / input_targets[0].source_path)
+        )
+        variables.set_private_variable("SOURCES_ROOT", str(self.install_path))
 
         # Record target
         self.targets.append(new_target)
@@ -517,8 +524,10 @@ class Configuration:
         self._collect_dependencies(target, only_allowed, result)
         return set(result)
 
+
 def produces_output(command):
     return "$OUTPUT" in command or "${OUTPUT}" in command
+
 
 def emit_ninja(config, destination):
     destination_path = Path(destination)
@@ -541,9 +550,9 @@ def emit_ninja(config, destination):
 
         # Inject loading common.sh
         script_path = os.path.dirname(os.path.realpath(__file__))
-        command_prefix = f"source \"{script_path}/common.sh\" \"{command_name}\""
+        command_prefix = f'source "{script_path}/common.sh" "{command_name}"'
         if produces_output(command):
-            command_prefix += " \"${OUTPUT}\""
+            command_prefix += ' "${OUTPUT}"'
         command_prefix += "; "
         command = command_prefix + command
 
@@ -578,10 +587,7 @@ def emit_ninja(config, destination):
             continue
 
         variables = target.variables.variables
-        inputs = [value
-                  for name, value
-                  in variables.items()
-                  if name.startswith("INPUT")]
+        inputs = [value for name, value in variables.items() if name.startswith("INPUT")]
 
         if "UNAVAILABLE" in inputs:
             continue
@@ -606,10 +612,12 @@ def emit_ninja(config, destination):
                 value = " ".join(value)
             ninja += f"    {name} = {value}\n"
 
-        dependencies = " ".join([dependency.path
-                                 for dependency
-                                 in config.collect_dependencies(target,
-                                                                only_allowed=True)])
+        dependencies = " ".join(
+            [
+                dependency.path
+                for dependency in config.collect_dependencies(target, only_allowed=True)
+            ]
+        )
         ninja += f"\n"
         ninja += f"build clean-{output_path} : clean\n"
         ninja += f"    PATHS={dependencies}\n"
@@ -628,12 +636,14 @@ def emit_ninja(config, destination):
         ninja += f"build run-{command_name}: clean-and-run\n"
         ninja += f"    TARGET={command_name}\n"
 
-
     ninja += f"build all: phony {all_targets}\n"
 
     if all_paths:
         ninja += f"rule install\n"
-        ninja += "    command = for FILE in $in; do find \"$$FILE\" -type f -exec install -D \"{}\" $$DESTDIR" + str(config.install_path) +"/{} \; ; done\n"
+        ninja += (
+            f'    command = for FILE in $in; do find "$$FILE" -type f -exec install -D "{{}}"'
+            f" $$DESTDIR{config.install_path!s}/{{}} \\; ; done\n"
+        )
         ninja += f"\n"
         ninja += f"build install-impl: install{all_paths}\n"
         ninja += f"\n"
@@ -657,6 +667,7 @@ def emit_ninja(config, destination):
     with (destination_path / "build.ninja").open("w") as build_ninja_file:
         build_ninja_file.write(ninja)
 
+
 def emit_graph(config):
     result = ""
 
@@ -666,7 +677,12 @@ def emit_graph(config):
             source_commands[input_target.source_path].add((target.name, index))
 
     def style_generator():
-        colors = ["#e6194B", "#3cb44b", "#ffe119", "#4363d8", "#f58231", "#911eb4", "#42d4f4", "#f032e6", "#bfef45", "#fabed4", "#469990", "#dcbeff", "#9A6324", "#fffac8", "#800000", "#aaffc3", "#808000", "#ffd8b1", "#000075", "#a9a9a9", "#ffffff", "#000000"]
+        colors = (
+            ("#e6194B", "#3cb44b", "#ffe119", "#4363d8", "#f58231", "#911eb4", "#42d4f4")
+            + ("#f032e6", "#bfef45", "#fabed4", "#469990", "#dcbeff", "#9A6324", "#fffac8")
+            + ("#800000", "#aaffc3", "#808000", "#ffd8b1", "#000075", "#a9a9a9", "#ffffff")
+            + ("#000000",)
+        )
 
         for color in colors:
             yield f'color="{color}"'
@@ -686,7 +702,8 @@ def emit_graph(config):
         for edge in edge_set:
             edges[edge].append(edge_set)
 
-    get_id = lambda obj: hex(abs(hash(obj)))
+    def get_id(obj):
+        return hex(abs(hash(obj)))
 
     result += """digraph {"""
     result += """  node [shape=box,style=bold,fontname=monospace];"""
@@ -694,10 +711,10 @@ def emit_graph(config):
     result += """  rankdir="LR";"""
 
     for command_set, sources in command_set_sources.items():
-        id = get_id(command_set)
+        id_ = get_id(command_set)
         label = "\\l".join(sources[0]) + "\\l"
         style = command_set_sources[command_set][1]
-        result += f"  source{id} [label=\"{label}\",{style}];"
+        result += f'  source{id_} [label="{label}",{style}];'
 
     for command_name, command in config.commands.items():
         command_type = command["type"]
@@ -707,53 +724,50 @@ def emit_graph(config):
 
         result += f"""  "{command_type}";"""
 
-        for index, input in enumerate(command["from"]):
+        for index, input_ in enumerate(command["from"]):
             edge = (command_name, index)
 
-            if input["type"] == "source":
+            if input_["type"] == "source":
                 for edge_set in edges[edge]:
                     style = command_set_sources[edge_set][1]
                     result += f"""  "source{get_id(edge_set)}" -> "{command_type}" [{style}];"""
             else:
                 for edge_set in edges[edge]:
                     style = command_set_sources[edge_set][1]
-                    result += f"""  "{input['type']}" -> "{command_type}" [label="{input.get('filter', '')}",{style}];"""
+                    result += (
+                        f"""  "{input_['type']}" -> "{command_type}" """
+                        + f"""[label="{input_.get('filter', '')}",{style}];"""
+                    )
 
     result += "}"
 
     return result
 
+
 def main():
     # Argument parsing
     parser = argparse.ArgumentParser(description=".")
-    parser.add_argument("input",
-                        metavar="INPUT",
-                        default="/dev/stdin",
-                        nargs="+",
-                        help="The input files.")
-    parser.add_argument("--verbose",
-                        action="store_true",
-                        help="Enable logging.")
-    parser.add_argument("--graph",
-                        metavar="GRAPH_PATH",
-                        help="Path where the graph should be emitted.")
-    parser.add_argument("--install-path",
-                        metavar="INSTALL_PATH",
-                        default=".",
-                        help="Install path.")
-    parser.add_argument("--destination",
-                        metavar="DESTINATION",
-                        default=".",
-                        help="Build path.")
-    parser.add_argument("--target-type",
-                        metavar="TYPE",
-                        action="append",
-                        help="Only generate targets with type matching the regular expression.")
-    parser.add_argument("--filter-tags",
-                        metavar="EXPRESSION",
-                        default="1 == 1",
-                        help="Only generate target respecting the given "
-                        "expression.")
+    parser.add_argument(
+        "input", metavar="INPUT", default="/dev/stdin", nargs="+", help="The input files."
+    )
+    parser.add_argument("--verbose", action="store_true", help="Enable logging.")
+    parser.add_argument(
+        "--graph", metavar="GRAPH_PATH", help="Path where the graph should be emitted."
+    )
+    parser.add_argument("--install-path", metavar="INSTALL_PATH", default=".", help="Install path.")
+    parser.add_argument("--destination", metavar="DESTINATION", default=".", help="Build path.")
+    parser.add_argument(
+        "--target-type",
+        metavar="TYPE",
+        action="append",
+        help="Only generate targets with type matching the regular expression.",
+    )
+    parser.add_argument(
+        "--filter-tags",
+        metavar="EXPRESSION",
+        default="1 == 1",
+        help="Only generate target respecting the given " "expression.",
+    )
     args = parser.parse_args()
     global verbose
     verbose = args.verbose
@@ -771,8 +785,8 @@ def main():
                     data[key] = value
 
     allowed_types = set(args.target_type or [])
-    filter = args.filter_tags
-    config = Configuration(data, allowed_types, filter, install_path)
+    filter_ = args.filter_tags
+    config = Configuration(data, allowed_types, filter_, install_path)
 
     config.dump_state()
 
@@ -780,6 +794,7 @@ def main():
         Path(args.graph).write_text(emit_graph(config))
 
     emit_ninja(config, args.destination)
+
 
 if __name__ == "__main__":
     sys.exit(main())
