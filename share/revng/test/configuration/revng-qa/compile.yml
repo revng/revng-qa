@@ -1,5 +1,4 @@
 tags:
-  - name: clang
   - name: simple-executable
   - name: stripped
   - name: with-debug-info
@@ -13,15 +12,16 @@ commands:
     from:
       - type: source
         filter: linux and simple-executable and clang
-    command: ${TRIPLE}clang $INPUT -o $OUTPUT $GCC_CFLAGS $COMMON_CFLAGS
+    command: ${TRIPLE}clang $INPUT -o $OUTPUT $GCC_CFLAGS $COMMON_CFLAGS $CLANG_CFLAGS
   - type: revng-qa.compiled-stripped
     from:
       - type: revng-qa.compiled-with-debug-info
-    command: ${TRIPLE}strip $INPUT -o $OUTPUT
+    command: llvm-objcopy --strip-all $INPUT $OUTPUT
   - type: revng-qa.compiled
     tags: [with-debug-info]
     from:
       - type: revng-qa.compiled-with-debug-info
+        filter: "!clang"
     command: cp $INPUT $OUTPUT
   - type: revng-qa.compiled
     tags: [stripped]

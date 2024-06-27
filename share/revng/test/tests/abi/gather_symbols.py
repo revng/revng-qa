@@ -116,6 +116,36 @@ class ObjdumpOutputParser(DisassemblyParser):
         return result
 
 
+class MachoObjdumpOutputParser(ObjdumpOutputParser):
+    def __init__(self, *args):
+        super().__init__(*args)
+
+    def find_section(self, name):
+        assert len(name) > 0
+        assert name[0] == "."
+
+        match = re.search(
+            rb"  segname __"
+            + bytes(name[1:].upper(), "utf-8")
+            + rb"\n"  # name
+            + rb"   vmaddr 0x0*(\w+)\n"  # virtual address
+            + rb"   vmsize 0x0*(\w+)\n"  # size
+            + rb"  fileoff 0*(\w+)\n",  # offset
+            self.sections,
+        )
+        if match:
+            offset = int(match[3].decode("utf-8"))
+            offset_string = "0" if offset == 0 else hex(offset).lstrip("0x")
+            return Section(
+                name,
+                match[2].decode("utf-8"),  # size
+                match[1].decode("utf-8"),  # vma
+                offset_string,  # offset
+            )
+        else:
+            raise Exception("unable to find a section: '" + name + "'")
+
+
 class DumpbinOutputParser(DisassemblyParser):
     def __init__(self, *args):
         super().__init__(*args)
@@ -174,6 +204,8 @@ class DumpbinOutputParser(DisassemblyParser):
 def select_parser(sections, symbols, disassembly):
     if re.match(rb"^\n[^:]+:\s+file format elf.+\n", sections):
         return ObjdumpOutputParser(sections, symbols, disassembly)
+    elif re.match(rb"^\n[^:]+:\s+file format mach-o.+\n", sections):
+        return MachoObjdumpOutputParser(sections, symbols, disassembly)
     elif re.match(rb"^\r\nDump of file .*\.exe\r\n\r\nPE signature found\r\n", sections):
         return DumpbinOutputParser(sections, symbols, disassembly)
     else:
