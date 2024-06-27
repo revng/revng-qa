@@ -67,12 +67,12 @@ class ObjdumpOutputParser(DisassemblyParser):
     def list_symbols(self):
         result = {}
         for match in re.finditer(
-            b"\n0+([a-fA-F0-9]+)\s+"  # address (without leading 0s)
-            + b"(\w+)\s+"  # symbol type (local, global, etc)
-            + b"(?:(\w+)\s+|)"  # optional extra flags (weak, debug, etc)
-            + b"([\*\.\w]+)\s+"  # section symbol belongs to
-            + b"([a-fA-F0-9]+)\s+"  # either alignment or size of the symbol
-            + b"([\w\._-]+)+",  # name of the symbol
+            rb"\n0+([a-fA-F0-9]+)\s+"  # address (without leading 0s)
+            + rb"(\w+)\s+"  # symbol type (local, global, etc)
+            + rb"(?:(\w+)\s+|)"  # optional extra flags (weak, debug, etc)
+            + rb"([\*\.\w]+)\s+"  # section symbol belongs to
+            + rb"([a-fA-F0-9]+)\s+"  # either alignment or size of the symbol
+            + rb"([\w\._-]+)+",  # name of the symbol
             self.symbols,
         ):
             result[match[6].decode("utf-8")] = match[1].decode("utf-8")
@@ -81,13 +81,13 @@ class ObjdumpOutputParser(DisassemblyParser):
 
     def find_section(self, name):
         match = re.search(
-            b"\n\s+\d+\s+"  # index
+            rb"\n\s+\d+\s+"  # index
             + bytes(name, "utf-8")  # name
-            + b"\s+([a-fA-F0-9]+)\s+"  # size
-            + b"([a-fA-F0-9]+)\s+"  # vma
-            + b"([a-fA-F0-9]+)\s+"  # lma
-            + b"([a-fA-F0-9]+)\s+"  # offset within the file
-            + b"\d+\*\*\d+\s*",  # (uncaptured) alignment
+            + rb"\s+([a-fA-F0-9]+)\s+"  # size
+            + rb"([a-fA-F0-9]+)\s+"  # vma
+            + rb"([a-fA-F0-9]+)\s+"  # lma
+            + rb"([a-fA-F0-9]+)\s+"  # offset within the file
+            + rb"\d+\*\*\d+\s*",  # (uncaptured) alignment
             self.sections,
         )
         if match:
@@ -103,11 +103,11 @@ class ObjdumpOutputParser(DisassemblyParser):
     def find_callsites(self, name):
         result = []
         for match in re.finditer(
-            b"\n\s+0*([a-fA-F0-9]+):"  # address (without leading 0s)
-            + b"[^<\n]*<"  # any number of non-`<` characters followed by `<`
+            rb"\n\s+0*([a-fA-F0-9]+):"  # address (without leading 0s)
+            + rb"[^<\n]*<"  # any number of non-`<` characters followed by `<`
             + bytes(name, "utf-8")  # name
-            + b">\n"  # `>` character and a new line
-            + b"\s+0*([a-fA-F0-9]+)",  # address of the next instruction
+            + rb">\n"  # `>` character and a new line
+            + rb"\s+0*([a-fA-F0-9]+)",  # address of the next instruction
             self.disassembly,
         ):
             result.append((match[1].decode("utf-8"), match[2].decode("utf-8")))
@@ -122,9 +122,9 @@ class DumpbinOutputParser(DisassemblyParser):
     def list_symbols(self):
         result = {}
         for match in re.finditer(
-            b"\n\s+\d+:[a-fA-F0-9]+\s+"  # section relative address
-            + b"([\w_?$@<>\.\\\-]+)+\s+"  # name of the symbol
-            + b"0+([a-fA-F0-9]*)\s+",  # virtual address (without leading 0s)
+            rb"\n\s+\d+:[a-fA-F0-9]+\s+"  # section relative address
+            + rb"([\w_?$@<>\.\\\-]+)+\s+"  # name of the symbol
+            + rb"0+([a-fA-F0-9]*)\s+",  # virtual address (without leading 0s)
             self.symbols,
         ):
             result[match[1].decode("utf-8")] = match[2].decode("utf-8")
@@ -133,14 +133,14 @@ class DumpbinOutputParser(DisassemblyParser):
 
     def find_section(self, name):
         match = re.search(
-            b"\r\nSECTION HEADER #\d+\r\n\s+"  # index
+            rb"\r\nSECTION HEADER #\d+\r\n\s+"  # index
             + bytes(name, "utf-8")  # name
-            + b" name\r\n\s+"
-            + b"([a-fA-F0-9]+) virtual size\r\n\s+"  # size
-            + b"([a-fA-F0-9]+) virtual address "  # relative section start
-            + b"\(0+([a-fA-F0-9]+) to [a-fA-F0-9]+\)\r\n\s+"  # vma
-            + b"([a-fA-F0-9]+) size of raw data\r\n\s+"  # raw size
-            + b"([a-fA-F0-9]+) file pointer to raw data",  # offset within the file
+            + rb" name\r\n\s+"
+            + rb"([a-fA-F0-9]+) virtual size\r\n\s+"  # size
+            + rb"([a-fA-F0-9]+) virtual address "  # relative section start
+            + rb"\(0+([a-fA-F0-9]+) to [a-fA-F0-9]+\)\r\n\s+"  # vma
+            + rb"([a-fA-F0-9]+) size of raw data\r\n\s+"  # raw size
+            + rb"([a-fA-F0-9]+) file pointer to raw data",  # offset within the file
             self.sections,
         )
         if match:
@@ -156,13 +156,13 @@ class DumpbinOutputParser(DisassemblyParser):
     def find_callsites(self, name):
         result = []
         for match in re.finditer(
-            b"\r\n\s+0*([a-fA-F0-9]+):"  # address (without leading 0s)
-            + b"[\w\s]*\s"  # any number of letters (to catch instruction mnemonics) and whitespaces
-            + b"(?:_|@|)"  # optional prefix
+            rb"\r\n\s+0*([a-fA-F0-9]+):"  # address (without leading 0s)
+            + rb"[\w\s]*\s"  # any number of letters (to catch instruction mnemonics) and whitespaces
+            + rb"(?:_|@|)"  # optional prefix
             + bytes(name, "utf-8")  # name
-            + b"(?:_\d*|@+\d*|)"  # optional suffix
-            + b"\r\n"  # `>` a new line character
-            + b"\s+0*([a-fA-F0-9]+):",  # address of the next instruction
+            + rb"(?:_\d*|@+\d*|)"  # optional suffix
+            + rb"\r\n"  # `>` a new line character
+            + rb"\s+0*([a-fA-F0-9]+):",  # address of the next instruction
             self.disassembly,
         ):
             result.append((match[1].decode("utf-8"), match[2].decode("utf-8")))
@@ -171,9 +171,9 @@ class DumpbinOutputParser(DisassemblyParser):
 
 
 def select_parser(sections, symbols, disassembly):
-    if re.match(b"^\n[^:]+:\s+file format elf.+\n", sections):
+    if re.match(rb"^\n[^:]+:\s+file format elf.+\n", sections):
         return ObjdumpOutputParser(sections, symbols, disassembly)
-    elif re.match(b"^\r\nDump of file .*\.exe\r\n\r\nPE signature found\r\n", sections):
+    elif re.match(rb"^\r\nDump of file .*\.exe\r\n\r\nPE signature found\r\n", sections):
         return DumpbinOutputParser(sections, symbols, disassembly)
     else:
         raise Exception("Unsupported input file format")
@@ -371,13 +371,13 @@ def main():
 
     list_of_symbols_to_extract = arguments.list_of_symbols_to_extract.split()
     for name, address in parser.list_symbols().items():
-        match = re.match("^(?:_|@|)([\w_]+)(?:_\d+|@+\d+|)\s*$", name)
+        match = re.match(r"^(?:_|@|)([\w_]+)(?:_\d+|@+\d+|)\s*$", name)
         if match:
             if match[1] in list_of_symbols_to_extract:
                 assert match[1] not in result.memory
                 result.memory[match[1]] = address
             else:
-                match = re.match("^(test|setup)_([\w_]+)$", match[1])
+                match = re.match(r"^(test|setup)_([\w_]+)$", match[1])
                 if match:
                     if match[2] not in result.functions:
                         result.functions[match[2]] = Function()

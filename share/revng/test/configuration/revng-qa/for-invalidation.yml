@@ -1,0 +1,18 @@
+tags:
+  - name: for-invalidation
+    variables:
+      GCC_CFLAGS:
+      - -Wl,--section-start=.text=0x500000
+
+sources:
+  - tags:
+      - simple-executable
+      - x86-64
+      - static
+      - nostdlib
+      - for-invalidation
+      - linux
+    prefix: share/revng/test/tests/invalidation
+    members:
+      - three-jump-targets.S
+      - four-functions.S
