@@ -179,7 +179,7 @@ class Variables:
             elif type(self.variables[name]) is not list:
                 error(f"Key {name} is defined with different types")
 
-            self.variables[name] += value
+            self.variables[name] = value + self.variables[name]
         else:
             error(f"Unexpected type for variable {name}")
 
