@@ -34,6 +34,7 @@ mkdir -p "${OUTPUT_DIRECTORY}"
 "${TRIPLE}gcc" \
   ${CFLAGS} -O3 -static \
   -Wl,--section-start=.text=0x2000000 \
+  -Wl,--section-start=.data=0x3000000 \
   -fno-zero-initialized-in-bss \
   "${INPUT_DIRECTORY}/setup.c" \
   -o "${OUTPUT_DIRECTORY}/foreign-executable"
