@@ -31,12 +31,20 @@ mkdir -p "${OUTPUT_DIRECTORY}"
   -o "${OUTPUT_DIRECTORY}/functions"
 
 # Build the binary for runner to `mmap`
+"${TRIPLE}gcc" -c \
+  ${CFLAGS} -O3 -static \
+  -fno-zero-initialized-in-bss \
+  -ffreestanding \
+  "${INPUT_DIRECTORY}/setup.c" \
+  -o "${OUTPUT_DIRECTORY}/foreign-executable.o"
 "${TRIPLE}gcc" \
   ${CFLAGS} -O3 -static \
   -Wl,--section-start=.text=0x2000000 \
   -Wl,--section-start=.data=0x3000000 \
-  -fno-zero-initialized-in-bss \
-  "${INPUT_DIRECTORY}/setup.c" \
+  -Wl,--entry=main \
+  -nostdlib -nodefaultlibs \
+  "${OUTPUT_DIRECTORY}/foreign-executable.o" \
+  "${INPUT_DIRECTORY}/musl_memory_functions.c" \
   -o "${OUTPUT_DIRECTORY}/foreign-executable"
 
 # Run `objdump` on it

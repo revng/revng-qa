@@ -48,11 +48,15 @@ timeout 30 ${MSVC_TRIPLE}cl \
   /map:"z:\\${OUTPUT_DIRECTORY}/functions.map"
 
 # Build the binary for runner to `mmap`
-timeout 30 ${MSVC_TRIPLE}cl \
+timeout 30 ${MSVC_TRIPLE}cl -c \
   ${MSVC_CFLAGS} -O2 -std:c11 -Zi -GS- \
   "z:\\${INPUT_DIRECTORY}/setup.c" \
-  -Fe"z:\\${OUTPUT_DIRECTORY}/foreign-executable.exe" \
-  -link ${LDFLAGS} /opt:ref,noicf /ignore:4281 /filealign:4096 \
+  -Fo"z:\\${OUTPUT_DIRECTORY}/foreign-executable.obj"
+timeout 30 ${MSVC_TRIPLE}link \
+  ${LDFLAGS} /opt:ref,noicf /filealign:4096 \
+  /ignore:4281 /nodefaultlib /entry:main /subsystem:console \
+  "z:\\${OUTPUT_DIRECTORY}/foreign-executable.obj" \
+  /out:"z:\\${OUTPUT_DIRECTORY}/foreign-executable.exe" \
   /pdb:"z:\\${OUTPUT_DIRECTORY}/foreign-executable.pdb" \
   /map:"z:\\${OUTPUT_DIRECTORY}/foreign-executable-symbols.txt"
 
