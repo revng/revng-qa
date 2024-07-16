@@ -368,6 +368,7 @@ def main():
 
     result = Gathered()
     result.sections.append(parser.find_section(".text"))
+    result.sections.append(parser.find_section(".data"))
 
     list_of_symbols_to_extract = arguments.list_of_symbols_to_extract.split()
     for name, address in parser.list_symbols().items():
