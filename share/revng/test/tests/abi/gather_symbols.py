@@ -70,7 +70,7 @@ class ObjdumpOutputParser(DisassemblyParser):
             rb"\n0+([a-fA-F0-9]+)\s+"  # address (without leading 0s)
             + rb"(\w+)\s+"  # symbol type (local, global, etc)
             + rb"(?:(\w+)\s+|)"  # optional extra flags (weak, debug, etc)
-            + rb"([\*\.\w]+)\s+"  # section symbol belongs to
+            + rb"([\*\.\w,]+)\s+"  # section symbol belongs to
             + rb"([a-fA-F0-9]+)\s+"  # either alignment or size of the symbol
             + rb"([\w\._-]+)+",  # name of the symbol
             self.symbols,
