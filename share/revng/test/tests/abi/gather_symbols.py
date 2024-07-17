@@ -103,11 +103,11 @@ class ObjdumpOutputParser(DisassemblyParser):
     def find_callsites(self, name):
         result = []
         for match in re.finditer(
-            rb"\n\s+0*([a-fA-F0-9]+):"  # address (without leading 0s)
+            rb"\n\s*0*([a-fA-F0-9]+):"  # address (without leading 0s)
             + rb"[^<\n]*<"  # any number of non-`<` characters followed by `<`
             + bytes(name, "utf-8")  # name
             + rb">\n"  # `>` character and a new line
-            + rb"\s+0*([a-fA-F0-9]+)",  # address of the next instruction
+            + rb"\s*0*([a-fA-F0-9]+)",  # address of the next instruction
             self.disassembly,
         ):
             result.append((match[1].decode("utf-8"), match[2].decode("utf-8")))
