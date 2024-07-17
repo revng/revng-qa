@@ -105,6 +105,7 @@ class ObjdumpOutputParser(DisassemblyParser):
         for match in re.finditer(
             rb"\n\s*0*([a-fA-F0-9]+):"  # address (without leading 0s)
             + rb"[^<\n]*<"  # any number of non-`<` characters followed by `<`
+            + rb"(?:_|)"  # an optional `_` prefix
             + bytes(name, "utf-8")  # name
             + rb">\n"  # `>` character and a new line
             + rb"\s*0*([a-fA-F0-9]+)",  # address of the next instruction
