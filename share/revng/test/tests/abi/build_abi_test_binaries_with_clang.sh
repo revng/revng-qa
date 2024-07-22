@@ -6,8 +6,8 @@
 
 set -euo pipefail
 
-if [ $# -gt 5 ] || [ $# -lt 4 ]; then
-  echo "$0 INPUT_DIRECTORY OUTPUT_DIRECTORY TRIPLE CFLAGS [OBJDUMP_FLAGS]" > /dev/stderr
+if [ $# -gt 7 ] || [ $# -lt 6 ]; then
+  echo "$0 INPUT_DIRECTORY OUTPUT_DIRECTORY TRIPLE CFLAGS CLANG_CFLAGS ARCHITECTURE [OBJDUMP_FLAGS]" > /dev/stderr
   exit 1
 fi
 
@@ -15,7 +15,9 @@ INPUT_DIRECTORY="$1"
 OUTPUT_DIRECTORY="$2"
 TRIPLE="$3"
 CFLAGS="$4"
-OBJDUMP_FLAGS="$5"
+CLANG_CFLAGS="$5"
+ARCHITECTURE="$6"
+OBJDUMP_FLAGS="$7"
 
 test -n "${INPUT_DIRECTORY}"
 test -n "${OUTPUT_DIRECTORY}"
@@ -25,40 +27,51 @@ test -n "${CFLAGS}"
 mkdir -p "${OUTPUT_DIRECTORY}"
 
 # Build the "functions" binary
+# NOTE: Since macho support in revng is currently limited, temporarily build
+#       this binary with no regard to the specific architecture this code is
+#       testing. We can get away with that since it's only ever used to extract
+#       information about the prototypes from (in this case) dwarf.
+# TODO: when our macho support improves, switch to the proper binary, so that
+#       it serves as an extra test of the importer.
 "${TRIPLE}gcc" \
   ${CFLAGS} -O3 -ggdb3 -static \
   "${INPUT_DIRECTORY}/functions.c" \
   -o "${OUTPUT_DIRECTORY}/functions"
 
 # Build the binary for runner to `mmap`
-"${TRIPLE}gcc" -c \
-  ${CFLAGS} -O3 -static \
-  -fno-zero-initialized-in-bss \
-  -ffreestanding \
+clang -c \
+  ${CFLAGS} ${CLANG_CFLAGS} -O3 -static \
+  -fno-zero-initialized-in-bss -ffreestanding \
+  -fno-optimize-sibling-calls -fno-pic \
+  -Wno-unused-command-line-argument \
   "${INPUT_DIRECTORY}/setup.c" \
   -o "${OUTPUT_DIRECTORY}/foreign-executable.o"
-"${TRIPLE}gcc" \
-  ${CFLAGS} -O3 -static \
-  -Wl,--section-start=.text=0x2000000 \
-  -Wl,--section-start=.data=0x3000000 \
-  -Wl,--entry=main \
-  -nostdlib -nodefaultlibs \
-  "${OUTPUT_DIRECTORY}/foreign-executable.o" \
+clang -c \
+  ${CFLAGS} ${CLANG_CFLAGS} -O3 -static \
+  -fno-zero-initialized-in-bss -ffreestanding \
+  -nostdlib -nodefaultlibs -fno-pic \
+  -Wno-pointer-to-int-cast -Wno-unused-command-line-argument \
   "${INPUT_DIRECTORY}/musl_memory_functions.c" \
+  -o "${OUTPUT_DIRECTORY}/musl_memory_functions.o"
+ld64.lld \
+  -arch ${ARCHITECTURE} \
+  -platform_version macos 14.5 1 \
+  "${OUTPUT_DIRECTORY}/foreign-executable.o" \
+  "${OUTPUT_DIRECTORY}/musl_memory_functions.o" \
   -o "${OUTPUT_DIRECTORY}/foreign-executable"
 
 # Run `objdump` on it
-"${TRIPLE}objdump" \
+llvm-objdump \
   ${OBJDUMP_FLAGS} \
-  --wide -h \
+  --wide -p \
   "${OUTPUT_DIRECTORY}/foreign-executable" \
   > "${OUTPUT_DIRECTORY}/foreign-executable-sections.txt"
-${TRIPLE}objdump \
+llvm-objdump \
   ${OBJDUMP_FLAGS} \
   --wide -t \
   "${OUTPUT_DIRECTORY}/foreign-executable" \
   > "${OUTPUT_DIRECTORY}/foreign-executable-symbols.txt"
-${TRIPLE}objdump \
+llvm-objdump \
   ${OBJDUMP_FLAGS} \
   --wide --no-show-raw-insn -d \
   "${OUTPUT_DIRECTORY}/foreign-executable" \

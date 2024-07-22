@@ -25,6 +25,14 @@ tags:
       MSVC_CFLAGS:
         - -DABIDEF=__vectorcall
 
+  - name: x86-64-apple-abi
+    implies: [apple-x86-64, clang-only]
+    variables:
+      ABI_NAME: SystemV_x86_64
+      MSVC_CFLAGS:
+        # Safeguard in case somebody tries using it with gcc
+        - -DABIDEF=UNSUPPORTED
+
   - name: i386-systemv-abi
     implies: [i386]
     variables:
@@ -138,6 +146,22 @@ tags:
     variables:
       ABI_NAME: AAPCS64
 
+  - name: aarch64-aapcs64-microsoft-abi
+    implies: [aarch64]
+    variables:
+      ABI_NAME: Microsoft_AAPCS64
+      GCC_CFLAGS:
+        # Safeguard in case somebody tries using it with gcc
+        - -DABIDEF=UNSUPPORTED
+
+  - name: aarch64-aapcs64-apple-abi
+    implies: [apple-aarch64, clang-only]
+    variables:
+      ABI_NAME: Apple_AAPCS64
+      MSVC_CFLAGS:
+        # Safeguard in case somebody tries using it with gcc
+        - -DABIDEF=UNSUPPORTED
+
   - name: arm-aapcs-abi
     implies: [arm]
     variables:
@@ -171,6 +195,10 @@ sources:
     repeat-for:
       - [x86-64-systemv-abi]
 
+      # This test is temporarily disabled because of a clang bug.
+      # (https://github.com/llvm/llvm-project/issues/55844)
+      # - [x86-64-apple-abi]
+
       - [x86-64-microsoft-abi, windows]
       - [x86-64-vectorcall-microsoft-abi, windows]
 
@@ -190,8 +218,9 @@ sources:
       - [i386-stdcall-microsoft-abi, windows]
       - [i386-vectorcall-microsoft-abi, windows]
 
-      # TODO: re-enable once arm64 support is fixed.
-      # - [aarch64-aapcs64-abi]
+      - [aarch64-aapcs64-abi]
+      - [aarch64-aapcs64-apple-abi]
+      - [aarch64-aapcs64-microsoft-abi, windows]
 
       - [arm-aapcs-abi]
 
@@ -209,7 +238,7 @@ commands:
   - type: revng-qa.runtime-abi-tests
     from:
       - type: source
-        filter: for-runtime-abi-tests and !windows
+        filter: for-runtime-abi-tests and !windows and !clang-only
     suffix: /
     command: |-
       "${INPUT}/build_abi_test_binaries_with_gcc.sh"
@@ -222,6 +251,21 @@ commands:
   - type: revng-qa.runtime-abi-tests
     from:
       - type: source
+        filter: for-runtime-abi-tests and !windows and clang-only
+    suffix: /
+    command: |-
+      "${INPUT}/build_abi_test_binaries_with_clang.sh"
+        "${INPUT}"
+        "${OUTPUT}"
+        "${TRIPLE}"
+        "${GCC_CFLAGS} ${COMMON_CFLAGS}"
+        "${CLANG_CFLAGS}"
+        "${APPLE_NAME}"
+        "${OBJDUMP_FLAGS}"
+
+  - type: revng-qa.runtime-abi-tests
+    from:
+      - type: source
         filter: for-runtime-abi-tests and windows
     suffix: /
     command: |-
@@ -229,6 +273,8 @@ commands:
         MSVC_TRIPLE="x86_64-winsdk-vc19-";
       elif [[ "${QEMU_NAME}" =~ ^i386$$ ]]; then
         MSVC_TRIPLE="i386-winsdk-vc19-";
+      elif [[ "${QEMU_NAME}" =~ ^aarch64$$ ]]; then
+        MSVC_TRIPLE="aarch64-winsdk-vc19-";
       else
         echo "Unsupported architecture" > /dev/stderr;
         exit 1;

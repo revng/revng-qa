@@ -25,7 +25,7 @@ sources:
       - pretty-ints.c
       - dual-case-switch.c
       - reduce-c-casts.c
-  - tags: [simple-executable, native, dynamic, for-decompilation, clang, linked-lists-flags]
+  - tags: [simple-executable, native, dynamic, for-decompilation, clang-only, linked-lists-flags]
     prefix: share/revng/test/tests/analysis/Decompilation/clang/
     members:
       - linked-lists.c

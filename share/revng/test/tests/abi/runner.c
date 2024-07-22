@@ -204,21 +204,33 @@ int main(int argc, char **argv) {
   }
 
   const struct section *text_section = select_a_section(".text");
-  assert(text_section != NULL);
+  const struct section *data_section = select_a_section(".data");
+  assert(text_section != NULL && data_section != NULL);
 
-  void *mapped = mmap((void *) (size_t) text_section->vma,
-                      binary_file_stats.st_size,
-                      PROT_READ | PROT_WRITE | PROT_EXEC,
-                      MAP_PRIVATE | MAP_FIXED,
-                      binary_file,
-                      text_section->file_offset);
-  if (mapped == MAP_FAILED) {
+  assert((size_t) text_section->vma % 0x1000 == 0);
+  void *mapped_text = mmap((void *) (size_t) text_section->vma,
+                           binary_file_stats.st_size,
+                           PROT_READ | PROT_WRITE | PROT_EXEC,
+                           MAP_PRIVATE | MAP_FIXED,
+                           binary_file,
+                           text_section->file_offset);
+
+  assert((size_t) data_section->vma % 0x1000 == 0);
+  void *mapped_data = mmap((void *) (size_t) data_section->vma,
+                           binary_file_stats.st_size,
+                           PROT_READ | PROT_WRITE | PROT_EXEC,
+                           MAP_PRIVATE | MAP_FIXED,
+                           binary_file,
+                           data_section->file_offset);
+
+  if (mapped_text == MAP_FAILED || mapped_data == MAP_FAILED) {
     puts("`mmap` failed.");
     return 4;
   }
-  if (mapped != (void *) (size_t) text_section->vma) {
-    puts("`mmap` couldn't provide the expected virtual address. Should 'inner' "
-         "binary be compiled with a different `section-start` value?");
+  if (mapped_text != (void *) (size_t) text_section->vma
+      || mapped_data != (void *) (size_t) data_section->vma) {
+    puts("`mmap` couldn't provide the expected virtual address. "
+         "Use a different `section-start` value for the 'inner' binary.");
     return 5;
   }
 
@@ -261,11 +273,17 @@ int main(int argc, char **argv) {
 
   free_the_stored_state();
 
-  success = munmap(mapped, binary_file_stats.st_size);
+  success = munmap(mapped_text, binary_file_stats.st_size);
   if (success == -1) {
     puts("`munmap` failed.");
     return 6;
   }
+  success = munmap(mapped_data, binary_file_stats.st_size);
+  if (success == -1) {
+    puts("`munmap` failed.");
+    return 6;
+  }
+
   success = close(binary_file);
   if (success == -1) {
     puts("`close` failed.");

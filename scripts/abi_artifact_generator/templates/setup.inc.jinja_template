@@ -89,4 +89,6 @@ int main() {
   /*{ for name in return_value_functions -}*/
   setup_/*( name )*/();
   /*{ endfor -}*/
+
+  return 0;
 }
