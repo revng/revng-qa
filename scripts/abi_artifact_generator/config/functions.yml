@@ -103,7 +103,7 @@ argument_tests:
     - big_struct
     - big_struct
 
-  lots_of_arguments:
+  lots_of_one_byte_arguments:
     - uint8_t
     - uint8_t
     - uint8_t
@@ -127,6 +127,102 @@ argument_tests:
     - uint8_t
     - uint8_t
     - uint8_t
+  lots_of_two_byte_arguments:
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+  lots_of_four_byte_arguments:
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+  lots_of_eight_byte_arguments:
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+  lots_of_sixteen_byte_arguments:
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
 
   #
   # Equivalence tests.
