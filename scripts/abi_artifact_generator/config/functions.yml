@@ -523,6 +523,98 @@ argument_tests:
     - uint8_t
     - unnaturally_aligned_struct_16
 
+  #
+  # Dedicated tests for highlighting apple arm64 abi quirks
+  #
+  apple_double_aligned_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - uint8_t
+    - uint16_t
+  apple_reverse_double_aligned_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint16_t
+    - uint8_t
+    - uint8_t
+  apple_quad_aligned_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint32_t
+  apple_reverse_quad_aligned_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint32_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+  apple_multi_aligned_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint64_t
+  apple_reverse_multi_aligned_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint64_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+
 return_value_tests:
   single_8_bit_return_value: "uint8_t"
   single_16_bit_return_value: "int16_t"
