@@ -9,5 +9,7 @@ tags:
         - -fno-stack-protector
 sources:
   - tags: [simple-executable, native, dynamic, for-detect-stack-size]
+    prefix: share/revng/test/tests/analysis/DetectStackSize/dynamic_native/
     members:
-      - share/revng/test/tests/analysis/DetectStackSize/dynamic_native/stackframe.c
+      - stackframe.c
+      - memcpy-from-stack-arguments.c
