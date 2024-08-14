@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.15.0)
 
 project(revng-qa NONE)
 
-install(PROGRAMS revng-test-configure boolparser.py common.sh
+install(PROGRAMS test-configure boolparser.py common.sh
         DESTINATION libexec/revng)
 
 install(
