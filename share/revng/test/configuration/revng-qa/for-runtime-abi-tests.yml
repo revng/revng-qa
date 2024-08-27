@@ -262,12 +262,27 @@ commands:
         filter: for-runtime-abi-tests and !windows and !apple
     suffix: /
     command: |-
-      "${INPUT}/build_abi_test_binaries_with_gcc.sh"
+      source "${INPUT}/prepare-functions-binary.sh";
+      prepare-linux-functions
+        "${TRIPLE}"
+        "${GCC_CFLAGS} ${COMMON_CFLAGS}"
         "${INPUT}"
-        "${OUTPUT}"
+        "${OUTPUT}";
+
+      source "${INPUT}/prepare-foreign-executable.sh";
+      prepare-linux-foreign-executable
         "${TRIPLE}"
         "${GCC_CFLAGS} ${COMMON_CFLAGS}"
         "${OBJDUMP_FLAGS}"
+        "${INPUT}"
+        "${OUTPUT}";
+
+      source "${INPUT}/prepare-the-runner.sh";
+      prepare-the-runner
+        "${TRIPLE}"
+        "${GCC_CFLAGS} ${COMMON_CFLAGS}"
+        "${INPUT}"
+        "${OUTPUT}"
 
   - type: revng-qa.runtime-abi-tests
     from:
@@ -275,14 +290,28 @@ commands:
         filter: for-runtime-abi-tests and !windows and apple
     suffix: /
     command: |-
-      "${INPUT}/build_abi_test_binaries_with_clang.sh"
-        "${INPUT}"
-        "${OUTPUT}"
+      source "${INPUT}/prepare-functions-binary.sh";
+      prepare-apple-functions
         "${TRIPLE}"
         "${GCC_CFLAGS} ${COMMON_CFLAGS}"
-        "${CLANG_CFLAGS}"
-        "${APPLE_NAME}"
+        "${INPUT}"
+        "${OUTPUT}";
+
+      source "${INPUT}/prepare-foreign-executable.sh";
+      prepare-apple-foreign-executable
+        "${APPLE_TRIPLE}"
+        "${GCC_CFLAGS} ${COMMON_CFLAGS}"
         "${OBJDUMP_FLAGS}"
+        "${APPLE_NAME}"
+        "${INPUT}"
+        "${OUTPUT}";
+
+      source "${INPUT}/prepare-the-runner.sh";
+      prepare-the-runner
+        "${TRIPLE}"
+        "${GCC_CFLAGS} ${COMMON_CFLAGS}"
+        "${INPUT}"
+        "${OUTPUT}"
 
   - type: revng-qa.runtime-abi-tests
     from:
@@ -300,11 +329,35 @@ commands:
         echo "Unsupported architecture" > /dev/stderr;
         exit 1;
       fi;
-      "${INPUT}/build_abi_test_binaries_with_msvc.sh"
-        "${INPUT}"
-        "${OUTPUT}"
-        "${TRIPLE}"
+
+      INPUT_DIRECTORY="$$(realpath "$INPUT")"
+      OUTPUT_DIRECTORY="$$(realpath "$OUTPUT")"
+
+      WORKDIR="$$(mktemp -d)" &&
+      trap 'rm -rf "$$WORKDIR"' EXIT &&
+      pushd "$$WORKDIR" >& /dev/null &&
+
+      source "${INPUT}/prepare-functions-binary.sh" &&
+      prepare-windows-functions
         "$${MSVC_TRIPLE}"
-        "${GCC_CFLAGS} ${COMMON_CFLAGS}"
         "${MSVC_CFLAGS} ${COMMON_CFLAGS}"
-        "${MSVC_LDFLAGS}";
+        "${MSVC_LDFLAGS}"
+        "$${INPUT_DIRECTORY}"
+        "$${OUTPUT_DIRECTORY}" &&
+
+      source "${INPUT}/prepare-foreign-executable.sh" &&
+      prepare-windows-foreign-executable
+        "$${MSVC_TRIPLE}"
+        "${MSVC_CFLAGS} ${COMMON_CFLAGS}"
+        "${MSVC_LDFLAGS}"
+        "$${INPUT_DIRECTORY}"
+        "$${OUTPUT_DIRECTORY}" &&
+
+      source "${INPUT}/prepare-the-runner.sh" &&
+      prepare-the-runner
+        "${TRIPLE}"
+        "${GCC_CFLAGS} ${COMMON_CFLAGS}"
+        "$${INPUT_DIRECTORY}"
+        "$${OUTPUT_DIRECTORY}" &&
+
+      popd >& /dev/null
