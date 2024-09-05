@@ -1,0 +1,18 @@
+tags:
+  - name: for-precedence-tests
+    variables:
+      GCC_CFLAGS:
+        # We want optimized code
+        - -O3
+        # We don't really need standard library for this
+        - -nostdlib
+        - -nodefaultlibs
+        - -ffreestanding
+        # But let's use main as the entry point anyway
+        - -Wl,--entry=main
+        # Disable stack protector, to reduce noise
+        - -fno-stack-protector
+sources:
+  - tags: [simple-executable, x86-64, static, for-precedence-tests]
+    members:
+      - share/revng/test/tests/c-operator-precedence/precedence.c
