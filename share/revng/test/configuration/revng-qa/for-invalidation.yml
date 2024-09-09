@@ -2,7 +2,7 @@ tags:
   - name: for-invalidation
     variables:
       GCC_CFLAGS:
-      - -Wl,--section-start=.text=0x500000
+        - -Wl,--section-start=.text=0x500000
 
 sources:
   - tags:
