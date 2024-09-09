@@ -5,10 +5,10 @@
 typedef unsigned int uint;
 typedef unsigned char uchar;
 
-#define DECLARE_OPERATION(op, op_name, type1, type2) \
-    __attribute__((weak)) type1 op_name##_##type1##_##type2(type1 a, type2 b) { \
-        return a op b; \
-    }
+#define DECLARE_OPERATION(op, op_name, type1, type2)                          \
+  __attribute__((weak)) type1 op_name##_##type1##_##type2(type1 a, type2 b) { \
+    return a op b;                                                            \
+  }
 
 DECLARE_OPERATION(+, add, uint, uchar)
 DECLARE_OPERATION(+, add, uchar, uint)

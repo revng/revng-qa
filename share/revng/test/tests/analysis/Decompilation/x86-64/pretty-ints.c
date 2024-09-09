@@ -2,8 +2,8 @@
 // This file is distributed under the MIT License. See LICENSE.md for details.
 //
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #define WEAK __attribute__((weak))
 
@@ -50,7 +50,6 @@ int do_stuff() {
          + bitwise_xor(arg) + write_and_get_char();
 }
 
-WEAK
-void _start() {
+WEAK void _start() {
   do_stuff();
 }

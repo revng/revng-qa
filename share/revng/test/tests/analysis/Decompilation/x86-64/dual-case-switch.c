@@ -44,7 +44,6 @@ WEAK uint64_t f(uint64_t arg1) {
     }
   }
 
-
   report(1);
   goto LABEL_END;
 

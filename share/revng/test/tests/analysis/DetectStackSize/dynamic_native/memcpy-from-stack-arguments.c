@@ -1,5 +1,5 @@
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 typedef struct {
   uint64_t data[512 / 8];
@@ -12,7 +12,8 @@ void memcpy_from_stack_arguments(data_512_t argument) {
   global = argument;
 }
 
-void backward_memcpy_from_stack_arguments(data_512_t argument) __attribute__((weak));
+void backward_memcpy_from_stack_arguments(data_512_t argument)
+  __attribute__((weak));
 void backward_memcpy_from_stack_arguments(data_512_t argument) {
   for (size_t I = 0; I < 512 / 8; ++I) {
     size_t inverse_index = 512 / 8 - I - 1;
