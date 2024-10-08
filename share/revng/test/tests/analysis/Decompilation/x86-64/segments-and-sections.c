@@ -28,8 +28,7 @@ WEAK int sum_globals() {
   return TheData.x + TheData.y;
 }
 
-WEAK
-void _start() {
+WEAK void _start() {
   print_string();
   sum_globals();
 }

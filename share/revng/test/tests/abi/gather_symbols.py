@@ -70,8 +70,8 @@ class ObjdumpOutputParser(DisassemblyParser):
             rb"\n0+([a-fA-F0-9]+)\s+"  # address (without leading 0s)
             + rb"(\w+)\s+"  # symbol type (local, global, etc)
             + rb"(?:(\w+)\s+|)"  # optional extra flags (weak, debug, etc)
-            + rb"([\*\.\w]+)\s+"  # section symbol belongs to
-            + rb"([a-fA-F0-9]+)\s+"  # either alignment or size of the symbol
+            + rb"([\*\.\w,]+)\s+"  # section symbol belongs to
+            + rb"([a-fA-F0-9]+|)\s*"  # either alignment or size of the symbol (optional)
             + rb"([\w\._-]+)+",  # name of the symbol
             self.symbols,
         ):
@@ -103,16 +103,47 @@ class ObjdumpOutputParser(DisassemblyParser):
     def find_callsites(self, name):
         result = []
         for match in re.finditer(
-            rb"\n\s+0*([a-fA-F0-9]+):"  # address (without leading 0s)
+            rb"\n\s*0*([a-fA-F0-9]+):"  # address (without leading 0s)
             + rb"[^<\n]*<"  # any number of non-`<` characters followed by `<`
+            + rb"(?:_|)"  # an optional `_` prefix
             + bytes(name, "utf-8")  # name
             + rb">\n"  # `>` character and a new line
-            + rb"\s+0*([a-fA-F0-9]+)",  # address of the next instruction
+            + rb"\s*0*([a-fA-F0-9]+)",  # address of the next instruction
             self.disassembly,
         ):
             result.append((match[1].decode("utf-8"), match[2].decode("utf-8")))
 
         return result
+
+
+class MachoObjdumpOutputParser(ObjdumpOutputParser):
+    def __init__(self, *args):
+        super().__init__(*args)
+
+    def find_section(self, name):
+        assert len(name) > 0
+        assert name[0] == "."
+
+        match = re.search(
+            rb"  segname __"
+            + bytes(name[1:].upper(), "utf-8")
+            + rb"\n"  # name
+            + rb"   vmaddr 0x0*(\w+)\n"  # virtual address
+            + rb"   vmsize 0x0*(\w+)\n"  # size
+            + rb"  fileoff 0*(\w+)\n",  # offset
+            self.sections,
+        )
+        if match:
+            offset = int(match[3].decode("utf-8"))
+            offset_string = "0" if offset == 0 else hex(offset).lstrip("0x")
+            return Section(
+                name,
+                match[2].decode("utf-8"),  # size
+                match[1].decode("utf-8"),  # vma
+                offset_string,  # offset
+            )
+        else:
+            raise Exception("unable to find a section: '" + name + "'")
 
 
 class DumpbinOutputParser(DisassemblyParser):
@@ -173,6 +204,8 @@ class DumpbinOutputParser(DisassemblyParser):
 def select_parser(sections, symbols, disassembly):
     if re.match(rb"^\n[^:]+:\s+file format elf.+\n", sections):
         return ObjdumpOutputParser(sections, symbols, disassembly)
+    elif re.match(rb"^\n[^:]+:\s+file format mach-o.+\n", sections):
+        return MachoObjdumpOutputParser(sections, symbols, disassembly)
     elif re.match(rb"^\r\nDump of file .*\.exe\r\n\r\nPE signature found\r\n", sections):
         return DumpbinOutputParser(sections, symbols, disassembly)
     else:
@@ -368,6 +401,7 @@ def main():
 
     result = Gathered()
     result.sections.append(parser.find_section(".text"))
+    result.sections.append(parser.find_section(".data"))
 
     list_of_symbols_to_extract = arguments.list_of_symbols_to_extract.split()
     for name, address in parser.list_symbols().items():

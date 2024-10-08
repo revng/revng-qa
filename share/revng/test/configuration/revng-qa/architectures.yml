@@ -4,13 +4,15 @@ tags:
     variables:
       MSVC_CFLAGS:
         - -WX # treats warnings as errors
-        - -nologo # supresses startup banner
+        - -nologo # suppresses startup banner
       MSVC_LDFLAGS:
         # Sadly, msvc linker only supports `/`-style parameters.
         - /debug # creates debug information
-        - /nologo # supresses startup banner
+        - /nologo # suppresses startup banner
         - /wx # treats warnings as errors
+  - name: apple
 
+  - name: clang # Use clang instead of gcc
   - name: compiler
     variables:
       GCC_CFLAGS:
@@ -46,6 +48,9 @@ tags:
         - -Wl,-Ttext-segment=0x20000
       COMMON_CFLAGS:
         - -DTARGET_arm
+      CLANG_CFLAGS:
+        # TODO: symlink `clang --target=$TARGET` to `$TARGET-clang`.
+        - --target=armv7a-hardfloat-linux-uclibceabi
   - name: x86-64
     implies: [cross-compiler]
     variables:
@@ -55,6 +60,9 @@ tags:
       OBJDUMP_FLAGS: -Mintel
       COMMON_CFLAGS:
         - -DTARGET_x86_64
+      CLANG_CFLAGS:
+        # TODO: symlink `clang --target=$TARGET` to `$TARGET-clang`.
+        - --target=x86_64-gentoo-linux-musl
   - name: mips
     implies: [cross-compiler]
     variables:
@@ -63,6 +71,9 @@ tags:
       QEMU_NAME: mips
       COMMON_CFLAGS:
         - -DTARGET_mips
+      CLANG_CFLAGS:
+        # TODO: symlink `clang --target=$TARGET` to `$TARGET-clang`.
+        - --target=mips-unknown-linux-musl
   - name: mipsel
     implies: [cross-compiler]
     variables:
@@ -71,6 +82,9 @@ tags:
       QEMU_NAME: mipsel
       COMMON_CFLAGS:
         - -DTARGET_mipsel
+      CLANG_CFLAGS:
+        # TODO: symlink `clang --target=$TARGET` to `$TARGET-clang`.
+        - --target=mipsel-unknown-linux-musl
   - name: i386
     implies: [cross-compiler]
     variables:
@@ -79,6 +93,9 @@ tags:
       QEMU_NAME: i386
       COMMON_CFLAGS:
         - -DTARGET_i386
+      CLANG_CFLAGS:
+        # TODO: symlink `clang --target=$TARGET` to `$TARGET-clang`.
+        - --target=i386-gentoo-linux-musl
   - name: s390x
     implies: [cross-compiler]
     variables:
@@ -87,6 +104,9 @@ tags:
       QEMU_NAME: s390x
       COMMON_CFLAGS:
         - -DTARGET_s390x
+      CLANG_CFLAGS:
+        # TODO: symlink `clang --target=$TARGET` to `$TARGET-clang`.
+        - --target=s390x-ibm-linux-musl
   - name: aarch64
     implies: [cross-compiler]
     variables:
@@ -95,3 +115,29 @@ tags:
       QEMU_NAME: aarch64
       COMMON_CFLAGS:
         - -DTARGET_aarch64
+      CLANG_CFLAGS:
+        # TODO: symlink `clang --target=$TARGET` to `$TARGET-clang`.
+        - --target=aarch64-unknown-linux-musl
+
+  - name: apple-x86-64
+    implies: [x86-64, apple, clang]
+    variables:
+      APPLE_NAME: x86_64
+      APPLE_TRIPLE: x86_64-apple-darwin11
+  - name: apple-aarch64
+    implies: [aarch64, apple, clang]
+    variables:
+      APPLE_NAME: arm64
+      APPLE_TRIPLE: aarch64-apple-darwin11
+      CLANG_CFLAGS:
+        - -mcpu=apple-m1
+  - name: apple-i386
+    implies: [i386, apple, clang]
+    variables:
+      APPLE_NAME: x86
+      APPLE_TRIPLE: i686-apple-darwin11
+  - name: apple-arm
+    implies: [arm, apple, clang]
+    variables:
+      APPLE_NAME: arm
+      APPLE_TRIPLE: arm-apple-darwin11

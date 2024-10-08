@@ -7,6 +7,14 @@ tags:
         # Safeguard in case somebody tries using it with msvc
         - -DABIDEF=UNSUPPORTED
 
+  - name: x86-64-apple-abi
+    implies: [apple-x86-64]
+    variables:
+      ABI_NAME: SystemV_x86_64
+      MSVC_CFLAGS:
+        # Safeguard in case somebody tries using it with msvc
+        - -DABIDEF=UNSUPPORTED
+
   - name: x86-64-microsoft-abi
     implies: [x86-64]
     variables:
@@ -27,6 +35,14 @@ tags:
 
   - name: i386-systemv-abi
     implies: [i386]
+    variables:
+      ABI_NAME: SystemV_x86
+      MSVC_CFLAGS:
+        # Safeguard in case somebody tries using it with msvc
+        - -DABIDEF=UNSUPPORTED
+
+  - name: i386-apple-abi
+    implies: [apple-i386, clang]
     variables:
       ABI_NAME: SystemV_x86
       MSVC_CFLAGS:
@@ -138,8 +154,29 @@ tags:
     variables:
       ABI_NAME: AAPCS64
 
+  - name: aarch64-aapcs64-microsoft-abi
+    implies: [aarch64]
+    variables:
+      ABI_NAME: Microsoft_AAPCS64
+      GCC_CFLAGS:
+        # Safeguard in case somebody tries using it with gcc
+        - -DABIDEF=UNSUPPORTED
+
+  - name: aarch64-aapcs64-apple-abi
+    implies: [apple-aarch64]
+    variables:
+      ABI_NAME: Apple_AAPCS64
+      MSVC_CFLAGS:
+        # Safeguard in case somebody tries using it with gcc
+        - -DABIDEF=UNSUPPORTED
+
   - name: arm-aapcs-abi
     implies: [arm]
+    variables:
+      ABI_NAME: AAPCS
+
+  - name: arm-aapcs-apple-abi
+    implies: [apple-arm]
     variables:
       ABI_NAME: AAPCS
 
@@ -171,6 +208,10 @@ sources:
     repeat-for:
       - [x86-64-systemv-abi]
 
+      # This test is temporarily disabled because of a clang bug.
+      # (https://github.com/llvm/llvm-project/issues/55844)
+      # - [x86-64-apple-abi]
+
       - [x86-64-microsoft-abi, windows]
       - [x86-64-vectorcall-microsoft-abi, windows]
 
@@ -190,10 +231,19 @@ sources:
       - [i386-stdcall-microsoft-abi, windows]
       - [i386-vectorcall-microsoft-abi, windows]
 
-      # TODO: re-enable once arm64 support is fixed.
-      # - [aarch64-aapcs64-abi]
+      # Disabled for now because `ld64.lld` does not recognize the architecture
+      # TODO: look further into this.
+      # - [i386-apple-abi]
+
+      - [aarch64-aapcs64-abi]
+      - [aarch64-aapcs64-apple-abi]
+      - [aarch64-aapcs64-microsoft-abi, windows]
 
       - [arm-aapcs-abi]
+
+      # Disabled for now because `ld64.lld` does not recognize the architecture
+      # TODO: look further into this.
+      # - [arm-aapcs-apple-abi]
 
       # TODO: re-enable once mips testing suite is fixed.
       # - [mips-systemv-abi]
@@ -209,15 +259,59 @@ commands:
   - type: revng-qa.runtime-abi-tests
     from:
       - type: source
-        filter: for-runtime-abi-tests and !windows
+        filter: for-runtime-abi-tests and !windows and !apple
     suffix: /
     command: |-
-      "${INPUT}/build_abi_test_binaries_with_gcc.sh"
+      source "${INPUT}/prepare-functions-binary.sh";
+      prepare-linux-functions
+        "${TRIPLE}"
+        "${GCC_CFLAGS} ${COMMON_CFLAGS}"
         "${INPUT}"
-        "${OUTPUT}"
+        "${OUTPUT}";
+
+      source "${INPUT}/prepare-foreign-executable.sh";
+      prepare-linux-foreign-executable
         "${TRIPLE}"
         "${GCC_CFLAGS} ${COMMON_CFLAGS}"
         "${OBJDUMP_FLAGS}"
+        "${INPUT}"
+        "${OUTPUT}";
+
+      source "${INPUT}/prepare-the-runner.sh";
+      prepare-the-runner
+        "${TRIPLE}"
+        "${GCC_CFLAGS} ${COMMON_CFLAGS}"
+        "${INPUT}"
+        "${OUTPUT}"
+
+  - type: revng-qa.runtime-abi-tests
+    from:
+      - type: source
+        filter: for-runtime-abi-tests and !windows and apple
+    suffix: /
+    command: |-
+      source "${INPUT}/prepare-functions-binary.sh";
+      prepare-apple-functions
+        "${TRIPLE}"
+        "${GCC_CFLAGS} ${COMMON_CFLAGS}"
+        "${INPUT}"
+        "${OUTPUT}";
+
+      source "${INPUT}/prepare-foreign-executable.sh";
+      prepare-apple-foreign-executable
+        "${APPLE_TRIPLE}"
+        "${GCC_CFLAGS} ${COMMON_CFLAGS}"
+        "${OBJDUMP_FLAGS}"
+        "${APPLE_NAME}"
+        "${INPUT}"
+        "${OUTPUT}";
+
+      source "${INPUT}/prepare-the-runner.sh";
+      prepare-the-runner
+        "${TRIPLE}"
+        "${GCC_CFLAGS} ${COMMON_CFLAGS}"
+        "${INPUT}"
+        "${OUTPUT}"
 
   - type: revng-qa.runtime-abi-tests
     from:
@@ -229,15 +323,41 @@ commands:
         MSVC_TRIPLE="x86_64-winsdk-vc19-";
       elif [[ "${QEMU_NAME}" =~ ^i386$$ ]]; then
         MSVC_TRIPLE="i386-winsdk-vc19-";
+      elif [[ "${QEMU_NAME}" =~ ^aarch64$$ ]]; then
+        MSVC_TRIPLE="aarch64-winsdk-vc19-";
       else
         echo "Unsupported architecture" > /dev/stderr;
         exit 1;
       fi;
-      "${INPUT}/build_abi_test_binaries_with_msvc.sh"
-        "${INPUT}"
-        "${OUTPUT}"
-        "${TRIPLE}"
+
+      INPUT_DIRECTORY="$$(realpath "$INPUT")"
+      OUTPUT_DIRECTORY="$$(realpath "$OUTPUT")"
+
+      WORKDIR="$$(mktemp -d)" &&
+      trap 'rm -rf "$$WORKDIR"' EXIT &&
+      pushd "$$WORKDIR" >& /dev/null &&
+
+      source "${INPUT}/prepare-functions-binary.sh" &&
+      prepare-windows-functions
         "$${MSVC_TRIPLE}"
-        "${GCC_CFLAGS} ${COMMON_CFLAGS}"
         "${MSVC_CFLAGS} ${COMMON_CFLAGS}"
-        "${MSVC_LDFLAGS}";
+        "${MSVC_LDFLAGS}"
+        "$${INPUT_DIRECTORY}"
+        "$${OUTPUT_DIRECTORY}" &&
+
+      source "${INPUT}/prepare-foreign-executable.sh" &&
+      prepare-windows-foreign-executable
+        "$${MSVC_TRIPLE}"
+        "${MSVC_CFLAGS} ${COMMON_CFLAGS}"
+        "${MSVC_LDFLAGS}"
+        "$${INPUT_DIRECTORY}"
+        "$${OUTPUT_DIRECTORY}" &&
+
+      source "${INPUT}/prepare-the-runner.sh" &&
+      prepare-the-runner
+        "${TRIPLE}"
+        "${GCC_CFLAGS} ${COMMON_CFLAGS}"
+        "$${INPUT_DIRECTORY}"
+        "$${OUTPUT_DIRECTORY}" &&
+
+      popd >& /dev/null

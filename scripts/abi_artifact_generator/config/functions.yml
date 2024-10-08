@@ -103,7 +103,7 @@ argument_tests:
     - big_struct
     - big_struct
 
-  lots_of_arguments:
+  lots_of_one_byte_arguments:
     - uint8_t
     - uint8_t
     - uint8_t
@@ -127,6 +127,102 @@ argument_tests:
     - uint8_t
     - uint8_t
     - uint8_t
+  lots_of_two_byte_arguments:
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+  lots_of_four_byte_arguments:
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+  lots_of_eight_byte_arguments:
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+  lots_of_sixteen_byte_arguments:
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
 
   #
   # Equivalence tests.
@@ -358,7 +454,7 @@ argument_tests:
   unnaturally_aligned_struct_128_in_registers:
     - size_t
     - size_t
-    - unnaturally_aligned_struct_16
+    - unnaturally_aligned_struct_128
   unnaturally_aligned_struct_128_on_stack:
     - size_t
     - size_t
@@ -426,6 +522,98 @@ argument_tests:
     - unnaturally_aligned_struct_16
     - uint8_t
     - unnaturally_aligned_struct_16
+
+  #
+  # Dedicated tests for highlighting apple arm64 abi quirks
+  #
+  apple_double_aligned_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - uint8_t
+    - uint16_t
+  apple_reverse_double_aligned_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint16_t
+    - uint8_t
+    - uint8_t
+  apple_quad_aligned_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint32_t
+  apple_reverse_quad_aligned_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint32_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+  apple_multi_aligned_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint64_t
+  apple_reverse_multi_aligned_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint64_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
 
 return_value_tests:
   single_8_bit_return_value: "uint8_t"
