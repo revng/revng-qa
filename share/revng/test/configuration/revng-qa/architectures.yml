@@ -21,7 +21,7 @@ tags:
   - name: native
     implies: [compiler]
     variables:
-      POINTER_SIZE: "32"
+      POINTER_SIZE: "64"
   - name: dynamic
     implies: [compiler]
   - name: static
