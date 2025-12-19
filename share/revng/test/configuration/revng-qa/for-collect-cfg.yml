@@ -17,6 +17,13 @@ tags:
         - -fno-inline-small-functions
         - -fno-align-functions
         - -fno-optimize-sibling-calls
+  - name: msvc-minimal
+    variables:
+      MSVC_LDFLAGS:
+        - /nodefaultlib
+        - /subsystem:Console
+        - /entry:main
+        - kernel32.lib
 sources:
   - tags: [simple-executable, arm, dynamic, nostartfiles, for-analysis, for-collect-cfg]
     prefix: share/revng/test/tests/analysis/CollectCFG/arm
@@ -70,3 +77,12 @@ sources:
     prefix: share/revng/test/tests/analysis/CollectCFG/i386
     members:
       - dynamic-call.S
+  - tags: [simple-executable, windows, msvc-minimal, for-analysis, for-collect-cfg]
+    prefix: share/revng/test/tests/analysis/CollectCFG/windows
+    repeat-for:
+      - [vc19-x86-64]
+      - [vc19-aarch64]
+      - [vc19-i386]
+      # TODO: we'd need to check vc16-i386 as well, but fails in including windows.h
+    members:
+      - dynamic-call.c
