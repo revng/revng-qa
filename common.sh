@@ -4,6 +4,9 @@ set -euo pipefail
 
 COMMAND_NAME="$1"
 OUTPUT="${2-}"
+if [[ -n "$OUTPUT" ]]; then
+    _OUTPUT_ABSOLUTE=$(realpath "$OUTPUT")
+fi
 TEMPORARIES_LOG=$(mktemp --tmpdir tmp."$COMMAND_NAME"-temp-log.XXXXXXXXXX)
 
 function temp() {
@@ -20,7 +23,7 @@ function at_exit() {
     rm -f "$TEMPORARIES_LOG"
 
     # If this command has any output, ensure it has been produced
-    if [[ -n "$OUTPUT" && ! -e "$OUTPUT" ]]; then
+    if [[ -n "$OUTPUT" && ! -e "$_OUTPUT_ABSOLUTE" ]]; then
         echo "Output not produced" > /dev/stderr
         exit 1
     fi
