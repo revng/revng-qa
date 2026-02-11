@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Strict bash
 set -euo pipefail
 
