@@ -99,14 +99,14 @@ tags:
   - name: s390x
     implies: [cross-compiler]
     variables:
-      TRIPLE: s390x-ibm-linux-musl-
+      TRIPLE: s390x-unknown-linux-musl-
       POINTER_SIZE: "64"
       QEMU_NAME: s390x
       COMMON_CFLAGS:
         - -DTARGET_s390x
       CLANG_CFLAGS:
         # TODO: symlink `clang --target=$TARGET` to `$TARGET-clang`.
-        - --target=s390x-ibm-linux-musl
+        - --target=s390x-unknown-linux-musl
   - name: aarch64
     implies: [cross-compiler]
     variables:
