@@ -41,7 +41,7 @@ tags:
   - name: arm
     implies: [cross-compiler]
     variables:
-      TRIPLE: armv7a-hardfloat-linux-uclibceabi-
+      TRIPLE: armv7a-unknown-linux-uclibceabihf-
       POINTER_SIZE: "32"
       QEMU_NAME: arm
       GCC_CFLAGS:
@@ -50,11 +50,11 @@ tags:
         - -DTARGET_arm
       CLANG_CFLAGS:
         # TODO: symlink `clang --target=$TARGET` to `$TARGET-clang`.
-        - --target=armv7a-hardfloat-linux-uclibceabi
+        - --target=armv7a-unknown-linux-uclibceabihf
   - name: x86-64
     implies: [cross-compiler]
     variables:
-      TRIPLE: x86_64-gentoo-linux-musl-
+      TRIPLE: x86_64-unknown-linux-musl-
       POINTER_SIZE: "64"
       QEMU_NAME: x86_64
       OBJDUMP_FLAGS: -Mintel
@@ -62,7 +62,7 @@ tags:
         - -DTARGET_x86_64
       CLANG_CFLAGS:
         # TODO: symlink `clang --target=$TARGET` to `$TARGET-clang`.
-        - --target=x86_64-gentoo-linux-musl
+        - --target=x86_64-unknown-linux-musl
   - name: mips
     implies: [cross-compiler]
     variables:
@@ -88,14 +88,14 @@ tags:
   - name: i386
     implies: [cross-compiler]
     variables:
-      TRIPLE: i386-gentoo-linux-musl-
+      TRIPLE: i686-unknown-linux-musl-
       POINTER_SIZE: "32"
       QEMU_NAME: i386
       COMMON_CFLAGS:
         - -DTARGET_i386
       CLANG_CFLAGS:
         # TODO: symlink `clang --target=$TARGET` to `$TARGET-clang`.
-        - --target=i386-gentoo-linux-musl
+        - --target=i686-unknown-linux-musl
   - name: s390x
     implies: [cross-compiler]
     variables:
