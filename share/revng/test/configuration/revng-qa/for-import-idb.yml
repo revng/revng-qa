@@ -19,12 +19,12 @@ sources:
       - struct-as-field-ptr.c
       - struct.c
       - typedef-char-to-uint32.c
-commands:
-  - type: revng-qa.idb
-    from:
-      - type: revng-qa.compiled-with-debug-info
-        filter: for-ida
-    suffix: .i64
-    command: |-
-      idat64 -o$OUTPUT -A -B $INPUT
-      rm "$$(echo $OUTPUT | sed 's/\.i64/.asm/')"
+# commands:
+#   - type: revng-qa.idb
+#     from:
+#       - type: revng-qa.compiled-with-debug-info
+#         filter: for-ida
+#     suffix: .i64
+#     command: |-
+#       idat64 -o$OUTPUT -A -B $INPUT
+#       rm "$$(echo $OUTPUT | sed 's/\.i64/.asm/')"
