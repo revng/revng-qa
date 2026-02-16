@@ -26,7 +26,8 @@
 
 #include <endian.h>
 #include <stdint.h>
-#include <string.h>
+
+typedef uintptr_t size_t;
 
 int memcmp(const void *vl, const void *vr, size_t n) {
   const unsigned char *l = vl, *r = vr;
