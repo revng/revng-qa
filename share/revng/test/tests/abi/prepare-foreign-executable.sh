@@ -120,11 +120,11 @@ function prepare-windows-foreign-executable() {
   INPUT_DIRECTORY="$4"
   OUTPUT_DIRECTORY="$5"
 
-  timeout 30 ${TRIPLE}cl -c \
+  timeout 90 ${TRIPLE}cl -c \
     ${CFLAGS} -O2 -std:c11 -Zi -GS- \
     "z:\\${INPUT_DIRECTORY}/setup.c" \
     -Fo"z:\\${OUTPUT_DIRECTORY}/foreign-executable.obj"
-  timeout 30 ${TRIPLE}link \
+  timeout 90 ${TRIPLE}link \
     ${LDFLAGS} /opt:ref,noicf /filealign:4096 \
     /ignore:4281 /nodefaultlib /entry:main /subsystem:console \
     "z:\\${OUTPUT_DIRECTORY}/foreign-executable.obj" \
@@ -132,11 +132,11 @@ function prepare-windows-foreign-executable() {
     /pdb:"z:\\${OUTPUT_DIRECTORY}/foreign-executable.pdb" \
     /map:"z:\\${OUTPUT_DIRECTORY}/foreign-executable-symbols.txt"
     
-  timeout 120 ${MSVC_TRIPLE}dumpbin \
+  timeout 240 ${MSVC_TRIPLE}dumpbin \
     -nologo -headers \
     z:\\"${OUTPUT_DIRECTORY}/foreign-executable.exe" \
     -out:z:\\"${OUTPUT_DIRECTORY}/foreign-executable-sections.txt"
-  timeout 120 ${MSVC_TRIPLE}dumpbin \
+  timeout 240 ${MSVC_TRIPLE}dumpbin \
     -nologo -symbols -disasm:nobytes \
     z:\\"${OUTPUT_DIRECTORY}/foreign-executable.exe" \
     -out:z:\\"${OUTPUT_DIRECTORY}/foreign-executable-disassembly.txt"

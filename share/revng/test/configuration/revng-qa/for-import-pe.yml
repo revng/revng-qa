@@ -46,7 +46,7 @@ commands:
       ROOT="$$PWD";
       TEMP="$$(temp -d)";
       cd "$$TEMP";
-      timeout 30 ${MSVC_TRIPLE}cl z:\\$INPUT -Fez:\\"$$ROOT"/$OUTPUT $MSVC_CFLAGS $COMMON_CFLAGS -link $MSVC_LDFLAGS;
+      timeout 90 ${MSVC_TRIPLE}cl z:\\$INPUT -Fez:\\"$$ROOT"/$OUTPUT $MSVC_CFLAGS $COMMON_CFLAGS -link $MSVC_LDFLAGS;
       cd -
   - type: revng-qa.generated-pdb
     from:
@@ -57,7 +57,7 @@ commands:
       ROOT="$$PWD";
       TEMP="$$(temp -d)";
       cd "$$TEMP";
-      timeout 30 ${MSVC_TRIPLE}cl z:\\$INPUT $MSVC_CFLAGS $COMMON_CFLAGS -link /pdb:z:\\"$$ROOT"/$OUTPUT $MSVC_LDFLAGS;
+      timeout 90 ${MSVC_TRIPLE}cl z:\\$INPUT $MSVC_CFLAGS $COMMON_CFLAGS -link /pdb:z:\\"$$ROOT"/$OUTPUT $MSVC_LDFLAGS;
       cd -
 
   - type: revng-qa.disassembled

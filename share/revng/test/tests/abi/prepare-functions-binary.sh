@@ -41,7 +41,7 @@ function prepare-windows-functions() {
   INPUT_DIRECTORY="$4"
   OUTPUT_DIRECTORY="$5"
 
-  timeout 30 ${TRIPLE}cl \
+  timeout 90 ${TRIPLE}cl \
     ${CFLAGS} -O2 -std:c11 -Zi -GS- \
     "z:\\${INPUT_DIRECTORY}/functions.c" \
     -Fe"z:\\${OUTPUT_DIRECTORY}/functions.exe" \
