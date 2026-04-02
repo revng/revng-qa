@@ -10,7 +10,7 @@ int cmpfunc(const void *a, const void *b) {
   return (*(int *) a - *(int *) b);
 }
 
-int main() {
+int main(int argc, char *argv[]) {
   qsort(values, 5, sizeof(int), cmpfunc);
 
   return 0;

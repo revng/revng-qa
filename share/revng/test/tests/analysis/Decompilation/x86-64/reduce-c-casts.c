@@ -67,7 +67,7 @@ __attribute__((weak)) uint compare(uchar y) {
   }
 }
 
-__attribute__((weak)) int main() {
+__attribute__((weak)) int main(int argc, char *argv[]) {
   uint r1 = return_value();
   uchar l;
   uint r2 = compare(l);

@@ -39,7 +39,7 @@ WEAK int64_t compute(struct node *n __attribute__((nonnull))) {
   return result;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
   struct node *head = init_list();
   int64_t result = compute(head);
   release_list(head);

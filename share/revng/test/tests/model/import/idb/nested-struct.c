@@ -11,7 +11,7 @@ struct my_struct {
   int y;
 };
 
-int main() {
+int main(int argc, char *argv[]) {
   struct my_struct A;
   A.x = 3;
   A.y = 4;

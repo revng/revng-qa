@@ -8,6 +8,6 @@ uint32_t fn(uint32_t x) {
   return x;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
   return 1;
 }

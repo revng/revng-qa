@@ -173,6 +173,6 @@ WEAK void call_array_stack_argument(void) {
   side_effects();
 }
 
-int main() {
+int main(int argc, char *argv[]) {
   return 0;
 }
