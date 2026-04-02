@@ -90,7 +90,7 @@ WEAK uint64_t a;
 WEAK uint64_t b;
 WEAK uint64_t c;
 
-int main() {
+int main(int argc, char *argv[]) {
   from_class_12_to_class_11(a, b, c);
   from_class_12_to_class_10(a, b, c);
   from_class_12_to_class_9(a, b, c);

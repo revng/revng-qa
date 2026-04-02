@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <Windows.h>
 
-int main() {
+int main(int argc, char *argv[]) {
   ExitProcess(1);
   return 0;
 }

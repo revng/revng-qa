@@ -112,6 +112,6 @@ uint64_t caller() {
   return Unknown + Result;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
   return caller();
 }
