@@ -1,0 +1,29 @@
+#
+# This file is distributed under the MIT License. See LICENSE.md for details.
+#
+
+tags:
+  - name: for-floating-point
+
+  # We force VFPv3 with hardfloat calling convention on armv7a, in order to
+  # avoid the toolchain emitting calls to the libgcc helpers for double
+  # precision FP.
+  - name: arm-double-vfp
+    variables:
+      GCC_CFLAGS:
+        - -mfpu=vfpv3
+        - -mfloat-abi=hard
+
+sources:
+  - tags: [simple-executable, static, nostdlib, nostartfiles, for-floating-point]
+    repeat-for:
+      - [arm, arm-double-vfp]
+      - [mips]
+      - [mipsel]
+      - [x86-64]
+      - [s390x]
+      - [i386]
+      - [aarch64]
+    prefix: share/revng/test/tests/floating-point
+    members:
+      - floating-point.c
