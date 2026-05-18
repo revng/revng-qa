@@ -54,13 +54,12 @@ __attribute__((weak)) uint identity(uchar a) {
   return a + 1000;
 }
 
-__attribute__((weak)) uint compare(uchar y) {
-  uint z;
+__attribute__((weak)) uint compare(uchar y, uint z) {
   if (y >= 4) {
     uint r = identity(z);
     z = r + z;
     z = z + y;
-    return z - r;
+    return z + r;
   } else {
     ++z;
     return y + z;
@@ -69,8 +68,8 @@ __attribute__((weak)) uint compare(uchar y) {
 
 __attribute__((weak)) int main() {
   uint r1 = return_value();
-  uchar l;
-  uint r2 = compare(l);
+  uchar l = 12;
+  uint r2 = compare(l, 14);
 
   return 0;
 }
