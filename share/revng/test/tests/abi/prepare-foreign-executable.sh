@@ -64,18 +64,14 @@ function prepare-apple-foreign-executable() {
   INPUT_DIRECTORY="$5"
   OUTPUT_DIRECTORY="$6"
 
-  # TODO: add a symlink from `${TRIPLE}clang` to `clang --target=${TRIPLE}`
-  #       and use that instead
-  clang -c \
-    --target=${TRIPLE} \
+  ${TRIPLE}-clang -c \
     ${CFLAGS} -O3 \
     -fno-zero-initialized-in-bss -ffreestanding \
     -fno-optimize-sibling-calls -fno-pic \
     -Wno-unused-command-line-argument \
     "${INPUT_DIRECTORY}/setup.c" \
     -o "${OUTPUT_DIRECTORY}/foreign-executable.o"
-  clang -c \
-    --target=${TRIPLE} \
+  ${TRIPLE}-clang -c \
     ${CFLAGS} -O3 \
     -fno-zero-initialized-in-bss -ffreestanding \
     -nostdlib -nodefaultlibs -fno-pic \
