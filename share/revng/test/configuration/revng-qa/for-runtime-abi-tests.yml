@@ -236,7 +236,9 @@ sources:
       # - [i386-apple-abi]
 
       - [aarch64-aapcs64-abi]
-      - [aarch64-aapcs64-apple-abi]
+      # Disabled: builds for aarch64-apple-darwin11 but no darwin SDK is
+      # available; clang ends up consuming the host linux glibc headers.
+      # - [aarch64-aapcs64-apple-abi]
       - [aarch64-aapcs64-microsoft-abi, windows]
 
       - [arm-aapcs-abi]
@@ -284,34 +286,36 @@ commands:
         "${INPUT}"
         "${OUTPUT}"
 
-  - type: revng-qa.runtime-abi-tests
-    from:
-      - type: source
-        filter: for-runtime-abi-tests and !windows and apple
-    suffix: /
-    command: |-
-      source "${INPUT}/prepare-functions-binary.sh";
-      prepare-apple-functions
-        "${TRIPLE}"
-        "${GCC_CFLAGS} ${COMMON_CFLAGS}"
-        "${INPUT}"
-        "${OUTPUT}";
-
-      source "${INPUT}/prepare-foreign-executable.sh";
-      prepare-apple-foreign-executable
-        "${APPLE_TRIPLE}"
-        "${GCC_CFLAGS} ${COMMON_CFLAGS}"
-        "${OBJDUMP_FLAGS}"
-        "${APPLE_NAME}"
-        "${INPUT}"
-        "${OUTPUT}";
-
-      source "${INPUT}/prepare-the-runner.sh";
-      prepare-the-runner
-        "${TRIPLE}"
-        "${GCC_CFLAGS} ${COMMON_CFLAGS}"
-        "${INPUT}"
-        "${OUTPUT}"
+  # Disabled: builds for *-apple-darwin11 targets, but no darwin SDK
+  # is available; clang ends up consuming the host linux glibc headers.
+  # - type: revng-qa.runtime-abi-tests
+  #   from:
+  #     - type: source
+  #       filter: for-runtime-abi-tests and !windows and apple
+  #   suffix: /
+  #   command: |-
+  #     source "${INPUT}/prepare-functions-binary.sh";
+  #     prepare-apple-functions
+  #       "${TRIPLE}"
+  #       "${GCC_CFLAGS} ${COMMON_CFLAGS}"
+  #       "${INPUT}"
+  #       "${OUTPUT}";
+  #
+  #     source "${INPUT}/prepare-foreign-executable.sh";
+  #     prepare-apple-foreign-executable
+  #       "${APPLE_TRIPLE}"
+  #       "${GCC_CFLAGS} ${COMMON_CFLAGS}"
+  #       "${OBJDUMP_FLAGS}"
+  #       "${APPLE_NAME}"
+  #       "${INPUT}"
+  #       "${OUTPUT}";
+  #
+  #     source "${INPUT}/prepare-the-runner.sh";
+  #     prepare-the-runner
+  #       "${TRIPLE}"
+  #       "${GCC_CFLAGS} ${COMMON_CFLAGS}"
+  #       "${INPUT}"
+  #       "${OUTPUT}"
 
   - type: revng-qa.runtime-abi-tests
     from:

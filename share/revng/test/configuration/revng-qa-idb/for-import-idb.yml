@@ -20,7 +20,7 @@ sources:
       - struct.c
       - typedef-char-to-uint32.c
 commands:
-  - type: revng-qa.idb
+  - type: revng-qa-idb.idb
     from:
       - type: revng-qa.compiled-with-debug-info
         filter: for-ida
