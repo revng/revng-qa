@@ -14,7 +14,23 @@ TEMPORARIES_LOG=$(mktemp --tmpdir tmp."$COMMAND_NAME"-temp-log.XXXXXXXXXX)
 # native-dynamic recompile-isolated) so the ninja build can move
 # on instead of hanging. Override via REVNG_TEST_TIMEOUT=N (env).
 TIMEOUT_S="${REVNG_TEST_TIMEOUT:-600}"
-( sleep "$TIMEOUT_S"; kill -TERM $$ 2>/dev/null ) & _TIMEOUT_WATCHDOG_PID=$!
+_PARENT_PID=$$
+(
+    sleep "$TIMEOUT_S"
+    # SIGTERM the actual workload (revng2 / revng / …): the child(ren)
+    # of the parent shell. Just killing the parent bash isn't enough —
+    # the workload would be reparented and keep running.
+    for _c in $(ps -o pid= --ppid "$_PARENT_PID" 2>/dev/null); do
+        kill -TERM "$_c" 2>/dev/null || true
+    done
+    kill -TERM "$_PARENT_PID" 2>/dev/null || true
+    sleep 10
+    # Escalate to SIGKILL for anything that ignored SIGTERM.
+    for _c in $(ps -o pid= --ppid "$_PARENT_PID" 2>/dev/null); do
+        kill -KILL "$_c" 2>/dev/null || true
+    done
+    kill -KILL "$_PARENT_PID" 2>/dev/null || true
+) & _TIMEOUT_WATCHDOG_PID=$!
 disown $_TIMEOUT_WATCHDOG_PID 2>/dev/null || true
 
 function temp() {
