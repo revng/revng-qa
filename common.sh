@@ -15,6 +15,11 @@ TEMPORARIES_LOG=$(mktemp --tmpdir tmp."$COMMAND_NAME"-temp-log.XXXXXXXXXX)
 # on instead of hanging. Override via REVNG_TEST_TIMEOUT=N (env).
 TIMEOUT_S="${REVNG_TEST_TIMEOUT:-600}"
 _PARENT_PID=$$
+# Redirect the watchdog's stdin/stdout/stderr to /dev/null. Without
+# this the backgrounded subshell (and the `sleep` it execs) inherits
+# the ninja-rule pipes; even after the rule's bash exits, the still-
+# alive `sleep` keeps the pipe writer-side open, so ninja's read()
+# on the rule's stdout never sees EOF and the build wedges.
 (
     sleep "$TIMEOUT_S"
     # SIGTERM the actual workload (revng2 / revng / …): the child(ren)
@@ -30,7 +35,7 @@ _PARENT_PID=$$
         kill -KILL "$_c" 2>/dev/null || true
     done
     kill -KILL "$_PARENT_PID" 2>/dev/null || true
-) & _TIMEOUT_WATCHDOG_PID=$!
+) </dev/null >/dev/null 2>&1 & _TIMEOUT_WATCHDOG_PID=$!
 disown $_TIMEOUT_WATCHDOG_PID 2>/dev/null || true
 
 function temp() {
