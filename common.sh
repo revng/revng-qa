@@ -9,6 +9,14 @@ if [[ -n "$OUTPUT" ]]; then
 fi
 TEMPORARIES_LOG=$(mktemp --tmpdir tmp."$COMMAND_NAME"-temp-log.XXXXXXXXXX)
 
+# Per-rule watchdog. The default (600s) catches the few revng
+# invocations that occasionally wedge (e.g. s390x project init,
+# native-dynamic recompile-isolated) so the ninja build can move
+# on instead of hanging. Override via REVNG_TEST_TIMEOUT=N (env).
+TIMEOUT_S="${REVNG_TEST_TIMEOUT:-600}"
+( sleep "$TIMEOUT_S"; kill -TERM $$ 2>/dev/null ) & _TIMEOUT_WATCHDOG_PID=$!
+disown $_TIMEOUT_WATCHDOG_PID 2>/dev/null || true
+
 function temp() {
     NEW_FILE="$(mktemp --tmpdir tmp."$COMMAND_NAME".XXXXXXXXXX "$@")"
     echo "$NEW_FILE" >> "$TEMPORARIES_LOG"
@@ -16,6 +24,10 @@ function temp() {
 }
 
 function at_exit() {
+    # Stop the watchdog before any cleanup so it doesn't fire mid-exit.
+    kill "$_TIMEOUT_WATCHDOG_PID" 2>/dev/null || true
+    wait "$_TIMEOUT_WATCHDOG_PID" 2>/dev/null || true
+
     # Cleanup all temporary files created through temp
     while IFS= read -r TEMPORARY; do
         rm -rf "$TEMPORARY"

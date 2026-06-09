@@ -209,6 +209,7 @@ class Target:
     derived_targets_prefix: str
     command: str
     tags: List[Tag]
+    source_root: str = ""
     inputs: List["Target"] = field(default_factory=list)
     variables: Variables = field(default_factory=Variables)
 
@@ -225,12 +226,18 @@ SafeLoaderIgnoreUnknown.add_constructor(None, SafeLoaderIgnoreUnknown.ignore_unk
 
 
 class Configuration:
-    def __init__(self, data, allowed_types, filter_, install_path):
+    def __init__(self, data, allowed_types, filter_, install_paths):
         self.tags_list = {}
         self.targets = []
         self.commands = {}
         self.types = {"source"}
-        self.install_path = install_path
+        # List of install roots. Sources / pre-installed inputs are
+        # resolved by trying each root in order; per-YML metadata
+        # carries the "owning" root used for that YML's SOURCES_ROOT.
+        self.install_paths = [Path(p) for p in install_paths]
+        # The first install path is the default destination for the
+        # `install` rule (ninja install is rarely used in practice).
+        self.install_path = self.install_paths[0]
         self.allowed_types = [re.compile(allowed_type) for allowed_type in allowed_types]
         self.filter = BooleanParser(filter_)
         self.environment_variables = Variables()
@@ -239,6 +246,19 @@ class Configuration:
         self._load_tags(data)
         self._load_sources(data)
         self._load_commands(data)
+
+    def resolve(self, relpath, preferred=None):
+        """Find an existing file by trying `preferred` first, then every
+        install root. Returns the Path that exists, or None."""
+        if preferred is not None:
+            candidate = Path(preferred) / relpath
+            if candidate.exists():
+                return candidate
+        for root in self.install_paths:
+            candidate = root / relpath
+            if candidate.exists():
+                return candidate
+        return None
 
     def _evaluate(self, expression, tags):
         return expression.evaluate({tag.name: True for tag in tags})
@@ -317,11 +337,12 @@ class Configuration:
     def _load_source_group(self, group):
         tags = self.tags(group.get("tags", []))
         prefix = group.get("prefix", "")
+        group_root = group.get("_source_root", "")
 
         for path in group.get("members", []):
             path = os.path.join(prefix, path)
 
-            if not (self.install_path / path).exists():
+            if self.resolve(path, preferred=group_root) is None:
                 error(f"Can't find source file {path}")
 
             for repetition in group.get("repeat-for", [[]]):
@@ -340,6 +361,7 @@ class Configuration:
                     derived_targets_prefix=derived_targets_prefix,
                     tags=source_tags,
                     command="",
+                    source_root=group_root,
                 )
                 for tag in source_tags:
                     source_target.variables.merge(tag.variables)
@@ -427,11 +449,13 @@ class Configuration:
                 # Not a valid candidate
                 continue
 
+            command_source_root = command.get("_source_root", "")
             for input_targets in input_targets_list:
                 assert type(input_targets) is not set
                 sources = sources - set(input_targets)
                 self._create_target(
-                    input_targets, output_tags, command_name, command_type, command_suffix
+                    input_targets, output_tags, command_name, command_type, command_suffix,
+                    command_source_root,
                 )
 
         if sources:
@@ -441,7 +465,8 @@ class Configuration:
             )
 
     def _create_target(
-        self, input_targets, output_tags, command_name, command_type, command_suffix
+        self, input_targets, output_tags, command_name, command_type, command_suffix,
+        command_source_root="",
     ):
         final_tags = list(output_tags)
         for target in input_targets:
@@ -469,6 +494,7 @@ class Configuration:
             derived_targets_prefix=derived_targets_prefix,
             command=command_name,
             inputs=input_targets,
+            source_root=command_source_root,
         )
 
         # Initialize variables
@@ -481,13 +507,14 @@ class Configuration:
 
         input_target_paths = []
         for input_target in input_targets:
-            target_install_path = self.install_path / input_target.path
             if self.is_allowed(input_target):
                 input_target_paths.append(input_target.path)
-            elif (target_install_path).exists():
-                input_target_paths.append(str(target_install_path))
             else:
-                input_target_paths.append("UNAVAILABLE")
+                resolved = self.resolve(input_target.path, preferred=input_target.source_root)
+                if resolved is not None:
+                    input_target_paths.append(str(resolved))
+                else:
+                    input_target_paths.append("UNAVAILABLE")
 
         if len(input_target_paths) == 1:
             variables.set_private_variable(f"INPUT", input_target_paths[0])
@@ -495,10 +522,22 @@ class Configuration:
             for index, target in enumerate(input_target_paths):
                 variables.set_private_variable(f"INPUT{index+1}", target)
 
-        variables.set_private_variable(
-            "SOURCE", str(self.install_path / input_targets[0].source_path)
+        source_resolved = self.resolve(
+            input_targets[0].source_path,
+            preferred=input_targets[0].source_root,
         )
-        variables.set_private_variable("SOURCES_ROOT", str(self.install_path))
+        variables.set_private_variable(
+            "SOURCE",
+            str(source_resolved) if source_resolved is not None
+            else str(self.install_path / input_targets[0].source_path),
+        )
+        # SOURCES_ROOT: prefer the command's own owning root (so YMLs
+        # in revng/ see revng's tree, revng-qa/ YMLs see revng-qa's).
+        # Falls back to the first install root.
+        variables.set_private_variable(
+            "SOURCES_ROOT",
+            command_source_root or str(self.install_path),
+        )
 
         # Record target
         self.targets.append(new_target)
@@ -601,7 +640,7 @@ def emit_ninja(config, destination):
         ninja += f"rule {command_name}\n"
         ninja += f"    command = {command}\n"
         ninja += f"    description = {original_command}\n"
-        ninja += f"    shell = /bin/bash\n"
+        ninja += f"    shell = bash\n"
         ninja += "\n"
 
         for name, content in data["scripts"].items():
@@ -795,7 +834,11 @@ def main():
     parser.add_argument(
         "--graph", metavar="GRAPH_PATH", help="Path where the graph should be emitted."
     )
-    parser.add_argument("--install-path", metavar="INSTALL_PATH", default=".", help="Install path.")
+    parser.add_argument(
+        "--install-path", metavar="INSTALL_PATH", action="append",
+        help="Install path. Can be repeated to search multiple roots; "
+             "the first one is also used as the default install destination.",
+    )
     parser.add_argument("--destination", metavar="DESTINATION", default=".", help="Build path.")
     parser.add_argument(
         "--target-type",
@@ -812,24 +855,43 @@ def main():
     args = parser.parse_args()
     global verbose
     verbose = args.verbose
-    install_path = Path(args.install_path).resolve()
+    install_paths = [Path(p).resolve() for p in (args.install_path or ["."])]
 
-    # Load and merge all the data
+    # Load and merge all the data. For each input YML, tag its
+    # `sources` groups and `commands` with `_source_root` — the
+    # install root that contains this YML — so per-target
+    # SOURCES_ROOT can later be set to the right tree.
+    def find_owning_root(yml_path):
+        for root in install_paths:
+            try:
+                yml_path.relative_to(root)
+                return str(root)
+            except ValueError:
+                continue
+        return ""
+
     data = {}
     for input_path in args.input:
+        yml_path = Path(input_path).resolve()
+        owning_root = find_owning_root(yml_path)
         with open(input_path, "rb") as input_file:
             loaded = yaml.load(input_file, Loader=SafeLoaderIgnoreUnknown) or {}
             for key, value in loaded.items():
                 if type(value) is dict:
                     data.setdefault(key, []).append(value)
-                elif key in data:
+                    continue
+                if key in ("sources", "commands") and isinstance(value, list):
+                    for item in value:
+                        if isinstance(item, dict):
+                            item.setdefault("_source_root", owning_root)
+                if key in data:
                     data[key] += value
                 else:
                     data[key] = value
 
     allowed_types = set(args.target_type or [])
     filter_ = args.filter_tags
-    config = Configuration(data, allowed_types, filter_, install_path)
+    config = Configuration(data, allowed_types, filter_, install_paths)
 
     config.dump_state()
 
