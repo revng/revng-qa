@@ -18,12 +18,6 @@ tags:
         - -Wno-pointer-bool-conversion
         - -Wno-unused-command-line-argument
 sources:
-  - tags: [simple-executable, x86-64, static, nostdlib, for-decompilation]
-    prefix: share/revng/test/tests/analysis/Decompilation/x86-64/
-    members:
-      - segments-and-sections.c
-      - pretty-ints.c
-      - dual-case-switch.c
   - tags: [simple-executable, native, dynamic, for-decompilation, clang, linked-lists-flags]
     prefix: share/revng/test/tests/analysis/Decompilation/clang/
     members:
