@@ -3,7 +3,7 @@
 #
 
 tags:
-  - name: for-floating-point
+  - name: for-floating-point-helpers-inlining
 
   # We force VFPv3 with hardfloat calling convention on armv7a, in order to
   # avoid the toolchain emitting calls to the libgcc helpers for double
@@ -15,7 +15,7 @@ tags:
         - -mfloat-abi=hard
 
 sources:
-  - tags: [simple-executable, static, nostdlib, nostartfiles, for-floating-point]
+  - tags: [simple-executable, static, nostdlib, nostartfiles, for-floating-point-helpers-inlining]
     repeat-for:
       - [arm, arm-double-vfp]
       - [mips]
