@@ -24,7 +24,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ----------------------------------------------------------------------
 
-#include <endian.h>
 #include <stdint.h>
 #include <string.h>
 
