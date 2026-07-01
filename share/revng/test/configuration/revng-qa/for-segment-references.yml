@@ -1,0 +1,14 @@
+tags:
+  - name: for-segment-references
+    variables:
+      GCC_CFLAGS:
+        - -no-pie
+        - -fno-unroll-loops
+        - -fno-inline
+        - -O1
+        - -fno-stack-protector
+sources:
+  - tags: [simple-executable, native, dynamic, for-segment-references]
+    prefix: share/revng/test/tests/analysis/SegmentReferences/dynamic_native/
+    members:
+      - references.c

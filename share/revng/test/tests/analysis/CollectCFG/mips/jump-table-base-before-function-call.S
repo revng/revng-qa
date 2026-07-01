@@ -11,15 +11,15 @@ jumptable:
     .word two
     .word three
 __start:
-    sltiu   $v1,$v0,3
+    sltiu   $v1,$s0,3
     beqz    $v1,end
     nop
     lui     $gp,%hi(jumptable)
     addiu   $gp,$gp,%lo(jumptable)
     bal     function
     nop
-    sll     $v0,$v0,2
-    add     $gp,$gp,$v0
+    sll     $s0,$s0,2
+    add     $gp,$gp,$s0
     lw      $t9,0($gp)
     nop
     beqz    $t9,nullptr
