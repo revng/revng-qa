@@ -19,7 +19,7 @@ commands:
   - type: revng-qa.compiled-stripped
     from:
       - type: revng-qa.compiled-with-debug-info
-    command: llvm-objcopy --strip-all $INPUT $OUTPUT
+    command: ${TRIPLE}objcopy --strip-all $INPUT $OUTPUT
 
   - type: revng-qa.compiled
     tags: [with-debug-info]
