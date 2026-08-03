@@ -461,10 +461,6 @@ class Configuration:
         # Initialize variables
         variables = new_target.variables
 
-        for target in input_targets:
-            for tag in target.tags:
-                variables.merge(tag.variables)
-
         for tag in final_tags:
             variables.merge(tag.variables)
 
