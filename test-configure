@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import re
+import shlex
 import sys
 from collections import defaultdict
 from dataclasses import asdict, dataclass, field
@@ -232,7 +233,9 @@ class Configuration:
         self.install_path = install_path
         self.allowed_types = [re.compile(allowed_type) for allowed_type in allowed_types]
         self.filter = BooleanParser(filter_)
+        self.environment_variables = Variables()
 
+        self._load_environment_variables(data)
         self._load_tags(data)
         self._load_sources(data)
         self._load_commands(data)
@@ -266,6 +269,16 @@ class Configuration:
             tag = self.tags_list[tag_name]
             self._add_tags(tag, result)
         return result
+
+    def _load_environment_variables(self, data):
+        log("Parsing environment variables")
+
+        # Each input file contributes a mapping, merged using the usual variables policy
+        for entry in data.get("environment_variables", []):
+            for name in entry:
+                if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name):
+                    error(f"{name} is not a valid environment variable name")
+            self.environment_variables.parse(entry)
 
     def _load_tags(self, data):
         log("Parsing tags")
@@ -507,6 +520,7 @@ class Configuration:
                     fix_tags(item)
 
         json_data = {
+            "environment_variables": self.environment_variables.variables,
             "targets": [asdict(source) for source in self.targets],
             "commands": self.commands,
         }
@@ -531,6 +545,25 @@ def produces_output(command):
     return "$OUTPUT" in command or "${OUTPUT}" in command
 
 
+def environment_exports(variables):
+    """Produce the bash statement exporting the given variables, ready to be embedded in ninja"""
+    assignments = []
+    for name, value in variables.variables.items():
+        if type(value) is list:
+            value = " ".join(value)
+
+        # ninja has no way to represent a newline within a variable value
+        if "\n" in value:
+            error(f"Environment variable {name} cannot contain a newline")
+
+        assignments.append(f"{name}={shlex.quote(value)}")
+
+    if not assignments:
+        return ""
+
+    return ninja_escape("export " + " ".join(assignments)) + "; "
+
+
 def emit_ninja(config, destination):
     destination_path = Path(destination)
     if not destination_path.exists():
@@ -547,15 +580,18 @@ def emit_ninja(config, destination):
     ninja += "    command = ninja clean-$TARGET; ninja -k 0 $TARGET\n"
     ninja += "\n"
 
+    exports = environment_exports(config.environment_variables)
+
     for command_name, data in config.commands.items():
         command = data["command"]
 
-        # Inject loading common.sh
+        # Inject loading common.sh, then export the environment variables
         script_path = os.path.dirname(os.path.realpath(__file__))
         command_prefix = f'source "{script_path}/common.sh" "{command_name}"'
         if produces_output(command):
             command_prefix += ' "${OUTPUT}"'
         command_prefix += "; "
+        command_prefix += exports
         command = command_prefix + command
 
         # Escape new lines
@@ -784,7 +820,9 @@ def main():
         with open(input_path, "rb") as input_file:
             loaded = yaml.load(input_file, Loader=SafeLoaderIgnoreUnknown) or {}
             for key, value in loaded.items():
-                if key in data:
+                if type(value) is dict:
+                    data.setdefault(key, []).append(value)
+                elif key in data:
                     data[key] += value
                 else:
                     data[key] = value
