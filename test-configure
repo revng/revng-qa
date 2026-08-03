@@ -142,6 +142,11 @@ def short_hash(data):
     return hashlib.sha256(data.encode("utf8")).hexdigest()[:8]
 
 
+def ninja_escape(value):
+    """Escape value so that ninja passes it through as-is"""
+    return value.replace("$", "$$")
+
+
 @dataclass
 class Variables:
     variables: dict = field(default_factory=dict)
@@ -610,7 +615,7 @@ def emit_ninja(config, destination):
         for name, value in target.variables.variables.items():
             if type(value) is list:
                 value = " ".join(value)
-            ninja += f"    {name} = {value}\n"
+            ninja += f"    {name} = {ninja_escape(value)}\n"
 
         dependencies = " ".join(
             [
