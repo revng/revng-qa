@@ -527,7 +527,8 @@ class Configuration:
     def collect_dependencies(self, target: Target, only_allowed=False):
         result = []
         self._collect_dependencies(target, only_allowed, result)
-        return set(result)
+        # Deduplicate, preserving the visit order
+        return list(dict.fromkeys(result))
 
 
 def produces_output(command):
