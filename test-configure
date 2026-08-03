@@ -120,22 +120,22 @@ def most_similar_tuples(inputs, command_type):
 
 
 def sort_list(entries, key, dependencies):
-    # Collect entries by key and id
-    entries_by_key = defaultdict(set)
-    entries_by_id = {}
-    for entry in entries:
-        entries_by_id[id(entry)] = entry
-        entries_by_key[key(entry)].add(id(entry))
+    # Collect entries by key. Entries are identified by their index, so that the resulting order
+    # only depends on the input.
+    entries_by_key = defaultdict(list)
+    for index, entry in enumerate(entries):
+        entries_by_key[key(entry)].append(index)
 
     # Create graph
-    entries_graph = defaultdict(set)
-    for entry in entries:
-        entries_graph[id(entry)].update(
-            set().union(*[entries_by_key[dependency] for dependency in dependencies(entry)])
-        )
+    entries_graph = {}
+    for index, entry in enumerate(entries):
+        predecessors = set()
+        for dependency in dependencies(entry):
+            predecessors.update(entries_by_key[dependency])
+        entries_graph[index] = sorted(predecessors)
 
     # Sort the entries in reverse post-order
-    return [entries_by_id[entry_id] for entry_id in TopologicalSorter(entries_graph).static_order()]
+    return [entries[index] for index in TopologicalSorter(entries_graph).static_order()]
 
 
 def short_hash(data):
