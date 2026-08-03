@@ -700,16 +700,19 @@ def emit_graph(config):
         key = frozenset(command_set)
 
         if key not in command_set_sources:
-            command_set_sources[key] = (set(), next(styles))
-        command_set_sources[key][0].add(source_path)
+            command_set_sources[key] = ([], next(styles))
+        command_set_sources[key][0].append(source_path)
 
     edges = defaultdict(list)
     for edge_set, source_paths in command_set_sources.items():
-        for edge in edge_set:
+        for edge in sorted(edge_set):
             edges[edge].append(edge_set)
 
+    # Identify each set of commands by its position
+    command_set_ids = {command_set: index for index, command_set in enumerate(command_set_sources)}
+
     def get_id(obj):
-        return hex(abs(hash(obj)))
+        return command_set_ids[obj]
 
     result += """digraph {"""
     result += """  node [shape=box,style=bold,fontname=monospace];"""
