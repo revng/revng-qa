@@ -424,7 +424,7 @@ class Configuration:
         if sources:
             error(
                 "The following sources are unused:\n  "
-                + "\n  ".join([source.path for source in sources])
+                + "\n  ".join(sorted(source.path for source in sources))
             )
 
     def _create_target(
