@@ -1,0 +1,12 @@
+tags:
+  - name: for-dla
+    variables:
+      GCC_CFLAGS:
+        - -O2
+        - -fno-stack-protector
+
+sources:
+  - tags: [simple-executable, native, static, nostdlib, for-dla]
+    prefix: share/revng/test/tests/analysis/DataLayout/x86_64
+    members:
+      - dla-test.c
