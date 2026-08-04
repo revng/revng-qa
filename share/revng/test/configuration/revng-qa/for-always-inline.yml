@@ -1,0 +1,14 @@
+tags:
+  - name: for-always-inline
+    variables:
+      GCC_CFLAGS:
+        - -fno-inline
+        - -O1
+        - -fno-stack-protector
+sources:
+  - tags: [simple-executable, static, nostdlib, nostartfiles, for-always-inline]
+    repeat-for:
+      - [x86-64]
+    prefix: share/revng/test/tests/analysis/AlwaysInline
+    members:
+      - always-inline.c
