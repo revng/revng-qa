@@ -1,0 +1,16 @@
+tags:
+  - name: for-global-references
+    variables:
+      GCC_CFLAGS:
+        # We want optimized code
+        - -O2
+        # Disable a bunch of optimizations around calls
+        - -fno-inline
+        - -fno-optimize-sibling-calls
+        # Disable stack protector, to reduce noise
+        - -fno-stack-protector
+sources:
+  - tags: [simple-executable, native, dynamic, for-global-references]
+    prefix: share/revng/test/tests/analysis/GlobalReferences/
+    members:
+      - global-references.c
