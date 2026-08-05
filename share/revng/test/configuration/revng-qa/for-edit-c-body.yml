@@ -9,8 +9,18 @@ tags:
         - -fno-optimize-sibling-calls
         # Disable stack protector, to reduce noise
         - -fno-stack-protector
+  # Which of the two tests each program is for.
+  - name: for-goto-edits
+  - name: for-ambiguous-locals
 sources:
-  - tags: [simple-executable, native, dynamic, for-edit-c-body]
+  # `for-edit-c-body` carries the compilation flags; the tag next to it says
+  # which of the tests each program is for.
+  - tags: [simple-executable, native, dynamic, for-edit-c-body, for-goto-edits]
     prefix: share/revng/test/tests/analysis/EditCBody/
     members:
       - irreducible-goto.c
+  - tags:
+      [simple-executable, native, dynamic, for-edit-c-body, for-ambiguous-locals]
+    prefix: share/revng/test/tests/analysis/EditCBody/
+    members:
+      - ambiguous-locals.c
