@@ -521,17 +521,22 @@ class Configuration:
             for index, target in enumerate(input_target_paths):
                 variables.set_private_variable(f"INPUT{index+1}", target)
 
-        # SOURCE is the bare relative path to the source file (no
-        # resolution); compose it with COMMAND_ROOT (or some other
-        # root the YAML author knows about) to get an absolute path.
-        variables.set_private_variable("SOURCE", input_targets[0].source_path)
-        # COMMAND_ROOT: the install root that owns the YML defining
-        # this command — YAMLs in revng/ see revng's tree, revng-qa/
-        # YAMLs see revng-qa's. Falls back to the first install root
-        # for commands assembled without a known owner.
+        # SOURCES_ROOT / COMMAND_ROOT: the install root that owns the
+        # YML defining this command — YAMLs in revng/ see revng's tree,
+        # revng-qa/ YAMLs see revng-qa's. Falls back to the first
+        # install root for commands assembled without a known owner.
+        # SOURCES_ROOT is upstream/orchestra's name; COMMAND_ROOT is
+        # our earlier internal name — keep both so YAMLs from either
+        # era resolve.
+        owning_root = command_root or str(self.install_path)
+        variables.set_private_variable("SOURCES_ROOT", owning_root)
+        variables.set_private_variable("COMMAND_ROOT", owning_root)
+        # SOURCE is the *absolute* path to the source file, matching
+        # orchestra's semantics — YAMLs that `cd "$OUTPUT"` before using
+        # `${SOURCE}.filecheck.ll` (etc.) need the fully-qualified form.
         variables.set_private_variable(
-            "COMMAND_ROOT",
-            command_root or str(self.install_path),
+            "SOURCE",
+            str(Path(owning_root) / input_targets[0].source_path),
         )
 
         # Record target
