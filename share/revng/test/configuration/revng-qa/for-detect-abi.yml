@@ -44,4 +44,5 @@ sources:
       - return-value-multiple-paths.S
       - scratch-register.S
       - stack-pointer-is-not-an-argument.S
+      - sub-register-write.S
       - write-used-only-one-path.S
