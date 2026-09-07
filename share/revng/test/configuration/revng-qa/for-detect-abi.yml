@@ -35,6 +35,7 @@ sources:
       - callee-saved-register-in-callee.S
       - callee-saved-register.S
       - clobbered-register-in-callee.S
+      - flag-setting-write.S
       - register-clobbered-on-all-paths.S
       - regular-argument.S
       - regular-return-value.S
