@@ -7,6 +7,9 @@
 .global _start
 _start:
     call caller
+    # Read the result: `rax` being live after this call site is the only
+    # evidence that `caller` returns it, rather than leaving garbage behind.
+    test rax, rax
     ret
 
 .type callee, @function

@@ -35,13 +35,15 @@ sources:
       - callee-saved-register-in-callee.S
       - callee-saved-register.S
       - clobbered-register-in-callee.S
+      - flag-setting-write.S
       - register-clobbered-on-all-paths.S
       - regular-argument.S
       - regular-return-value.S
       - return-value-and-callee-saved-register-in-callee.S
       - return-value-and-clobbered-register-in-callee.S
-      - return-value-from-call-site.S
+      - forwarded-return-value.S
       - return-value-multiple-paths.S
       - scratch-register.S
       - stack-pointer-is-not-an-argument.S
+      - sub-register-write.S
       - write-used-only-one-path.S
