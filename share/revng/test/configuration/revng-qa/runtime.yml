@@ -7,7 +7,6 @@ tags:
         - -std=c99
         - -fno-pic
         - -fno-pie
-        - -ggdb3
         - -fno-stack-protector
 sources:
   - tags: [simple-executable, for-runtime, for-comparison]

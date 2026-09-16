@@ -1,5 +1,8 @@
 tags:
   - name: simple-executable
+    variables:
+      GCC_CFLAGS:
+        - -ggdb3
   - name: stripped
   - name: with-debug-info
 
