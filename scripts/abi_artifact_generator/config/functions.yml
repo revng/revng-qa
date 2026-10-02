@@ -14,11 +14,11 @@ structs:
   two_arrays_struct: ["uint32_t a[3]", "uint64_t b[3]"]
   big_struct: ["uint64_t a[8]"]
   huge_struct: ["uint64_t a[32]"]
-  double_aligned_struct: ["INT128_T a", "uint8_t b"]
+  struct_with_a_sixteen_byte_field: ["INT128_T a", "uint8_t b"]
   small_struct_of_structs: ["two_byte_struct a", "one_byte_struct b"]
   struct_of_structs: ["small_struct a[2]", "one_byte_struct b"]
   padded_struct_of_structs: ["one_byte_struct a", "big_struct b"]
-  double_padded_struct_of_structs: ["one_byte_struct a", "double_aligned_struct b"]
+  padded_struct_of_structs_with_a_sixteen_byte_field: ["one_byte_struct a", "struct_with_a_sixteen_byte_field b"]
 
 packed_structs:
   unnaturally_aligned_struct_16: ["char prepadding[1]", "uint16_t a", "char postpadding[1]"]
@@ -40,7 +40,7 @@ unions:
   array_union: ["uint32_t a[3]", "array_struct b"]
   big_union: ["uint64_t a", "big_struct b"]
   huge_union: ["uint64_t a", "huge_struct b"]
-  extra_alignment_union: ["uint64_t a", "extra_alignment_struct b"]
+  union_with_a_sixteen_byte_field: ["uint64_t a", "struct_with_a_sixteen_byte_field b"]
 
   small_union_of_structs: ["one_byte_struct a", "two_byte_struct b"]
   small_union_of_unions: ["one_byte_union a", "two_byte_union b"]
@@ -85,18 +85,18 @@ argument_tests:
   single_two_arrays_struct_argument: ["two_arrays_struct"]
   single_big_struct_argument: ["big_struct"]
   single_huge_struct_argument: ["huge_struct"]
-  single_double_aligned_struct_argument: ["double_aligned_struct"]
+  single_struct_with_a_sixteen_byte_field_argument: ["struct_with_a_sixteen_byte_field"]
   single_small_struct_of_structs_argument: ["small_struct_of_structs"]
   single_struct_of_structs_argument: ["struct_of_structs"]
   single_padded_struct_of_structs_argument: ["padded_struct_of_structs"]
-  single_double_padded_struct_of_structs_argument: ["double_padded_struct_of_structs"]
+  single_padded_struct_of_structs_with_a_sixteen_byte_field_argument: ["padded_struct_of_structs_with_a_sixteen_byte_field"]
 
   single_small_union_argument: ["small_union"]
   single_padded_union_argument: ["padded_union"]
   single_array_union_argument: ["array_union"]
   single_big_union_argument: ["big_union"]
   single_huge_union_argument: ["huge_union"]
-  single_double_aligned_union_argument: ["double_aligned_union"]
+  single_union_with_a_sixteen_byte_field_argument: ["union_with_a_sixteen_byte_field"]
   single_small_union_of_structs_argument: ["small_union_of_structs"]
   single_small_union_of_unions_argument: ["small_union_of_unions"]
   single_union_of_structs_argument: ["union_of_structs"]
@@ -422,9 +422,9 @@ argument_tests:
     - size_t
     - size_t
     - uint8_t
-    - double_aligned_struct
+    - struct_with_a_sixteen_byte_field
     - uint8_t
-    - double_aligned_struct
+    - struct_with_a_sixteen_byte_field
   eight_byte_aligned_union_on_stack:
     - size_t
     - size_t
@@ -435,9 +435,9 @@ argument_tests:
     - size_t
     - size_t
     - uint8_t
-    - double_aligned_union
+    - union_with_a_sixteen_byte_field
     - uint8_t
-    - double_aligned_union
+    - union_with_a_sixteen_byte_field
   eight_byte_aligned_scalar_on_stack:
     - size_t
     - size_t
@@ -559,7 +559,7 @@ argument_tests:
     - padded_struct_of_structs
     - uint8_t
     - padded_struct_of_structs
-  double_padded_struct_of_structs_on_stack:
+  padded_struct_of_structs_with_a_sixteen_byte_field_on_stack:
     - size_t
     - size_t
     - size_t
@@ -569,41 +569,42 @@ argument_tests:
     - size_t
     - size_t
     - uint8_t
-    - double_padded_struct_of_structs
+    - padded_struct_of_structs_with_a_sixteen_byte_field
     - uint8_t
-    - double_padded_struct_of_structs
+    - padded_struct_of_structs_with_a_sixteen_byte_field
     - uint8_t
-    - double_padded_struct_of_structs
+    - padded_struct_of_structs_with_a_sixteen_byte_field
 
   #
   # Tests targeting alignment issues in registers (ARM-specific).
   #
 
-  double_aligned_scalar_on_the_stack_64:
+  padded_sixteen_byte_scalar_in_registers:
+    - uint8_t
+    - UINT128_T
+  padded_eight_byte_scalar_in_registers:
+    - uint8_t
+    - uint64_t
+
+  padded_sixteen_byte_scalar_after_a_big_struct:
     - big_struct
     - uint8_t
     - INT128_T
-  double_aligned_scalar_on_top_of_the_stack_64:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - INT128_T
-  double_aligned_scalar_on_the_stack_32:
+  eight_byte_scalar_after_a_big_struct:
     - big_struct
     - uint8_t
     - uint64_t
 
-  double_aligned_scalar_in_registers_64:
-    - uint8_t
-    - UINT128_T
-  double_aligned_scalar_in_registers_32:
-    - uint8_t
-    - uint64_t
-  double_aligned_scalar_on_top_of_the_stack_32:
+  sixteen_byte_scalar_after_seven_gprs:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - INT128_T
+  sixteen_byte_scalar_after_three_gprs:
     - size_t
     - size_t
     - size_t
@@ -755,7 +756,7 @@ argument_tests:
   #
   # Dedicated tests for highlighting apple arm64 abi quirks
   #
-  apple_double_aligned_on_stack:
+  apple_extra_alignment_on_stack:
     - size_t
     - size_t
     - size_t
@@ -767,7 +768,7 @@ argument_tests:
     - uint8_t
     - uint8_t
     - uint16_t
-  apple_reverse_double_aligned_on_stack:
+  apple_reverse_extra_alignment_on_stack:
     - size_t
     - size_t
     - size_t
