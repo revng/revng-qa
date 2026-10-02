@@ -170,25 +170,72 @@ tags:
         # Safeguard in case somebody tries using it with gcc
         - -DABIDEF=UNSUPPORTED
 
-  - name: arm-aapcs-abi
+  # 32-bit AAPCS has a hard-float and a soft-float variant, differing only in
+  # how FP arguments are passed.
+  #
+  # We actively do not want these flags to be used when compiling the runner,
+  # as such, a separate variable is added for them.
+  #
+  # `-mhard-float` alone is rejected ("selected processor lacks an FPU"), so
+  # either a `-mfpu` or one of the `-mcpu`s with neon support must be named.
+  - name: arm-aapcs-hardfloat-abi
     implies: [arm]
     variables:
-      ABI_NAME: AAPCS
+      ABI_NAME: AAPCS_hardfloat
+      FOREIGN_CFLAGS:
+        - -mhard-float
+        - -mfpu=neon-vfpv3
 
-  - name: arm-aapcs-apple-abi
+  - name: arm-aapcs-softfloat-abi
+    implies: [arm]
+    variables:
+      ABI_NAME: AAPCS_softfloat
+      FOREIGN_CFLAGS:
+        - -msoft-float
+
+  - name: arm-aapcs-apple-hardfloat-abi
     implies: [apple-arm]
     variables:
-      ABI_NAME: AAPCS
+      ABI_NAME: AAPCS_hardfloat
+      FOREIGN_CFLAGS:
+        - -mhard-float
+        - -mfpu=neon-vfpv3
 
-  - name: mips-systemv-abi
+  - name: arm-aapcs-apple-softfloat-abi
+    implies: [apple-arm]
+    variables:
+      ABI_NAME: AAPCS_softfloat
+      FOREIGN_CFLAGS:
+        - -msoft-float
+
+  # o32 also has separate hard-float and soft-float variants.
+  - name: mips-systemv-hardfloat-abi
     implies: [mips]
     variables:
-      ABI_NAME: SystemV_MIPS_o32
+      ABI_NAME: SystemV_MIPS_o32_hardfloat
+      FOREIGN_CFLAGS:
+        - -mhard-float
 
-  - name: mipsel-systemv-abi
+  - name: mips-systemv-softfloat-abi
+    implies: [mips]
+    variables:
+      ABI_NAME: SystemV_MIPS_o32_softfloat
+      FOREIGN_CFLAGS:
+        - -msoft-float
+
+  - name: mipsel-systemv-hardfloat-abi
     implies: [mipsel]
     variables:
-      ABI_NAME: SystemV_MIPSEL_o32
+      ABI_NAME: SystemV_MIPSEL_o32_hardfloat
+      FOREIGN_CFLAGS:
+        - -mhard-float
+
+  - name: mipsel-systemv-softfloat-abi
+    implies: [mipsel]
+    variables:
+      ABI_NAME: SystemV_MIPSEL_o32_softfloat
+      FOREIGN_CFLAGS:
+        - -msoft-float
 
   - name: s390x-systemz-abi
     implies: [s390x]
@@ -239,14 +286,17 @@ sources:
       - [aarch64-aapcs64-apple-abi]
       - [aarch64-aapcs64-microsoft-abi, windows]
 
-      - [arm-aapcs-abi]
+      - [arm-aapcs-hardfloat-abi]
+      - [arm-aapcs-softfloat-abi]
 
       # Disabled for now because `ld64.lld` does not recognize the architecture
       # TODO: look further into this.
       # - [arm-aapcs-apple-abi]
 
-      - [mips-systemv-abi]
-      - [mipsel-systemv-abi]
+      - [mips-systemv-hardfloat-abi]
+      - [mips-systemv-softfloat-abi]
+      - [mipsel-systemv-hardfloat-abi]
+      - [mipsel-systemv-softfloat-abi]
 
       # TODO: re-enable once qemu stops segfaulting on these binaries
       #       (when we update it?).
@@ -271,7 +321,7 @@ commands:
       source "${INPUT}/prepare-foreign-executable.sh";
       prepare-linux-foreign-executable
         "${TRIPLE}"
-        "${GCC_CFLAGS} ${COMMON_CFLAGS}"
+        "${GCC_CFLAGS} ${FOREIGN_CFLAGS} ${COMMON_CFLAGS}"
         "${OBJDUMP_FLAGS}"
         "${INPUT}"
         "${OUTPUT}";
@@ -299,7 +349,7 @@ commands:
       source "${INPUT}/prepare-foreign-executable.sh";
       prepare-apple-foreign-executable
         "${APPLE_TRIPLE}"
-        "${GCC_CFLAGS} ${COMMON_CFLAGS}"
+        "${GCC_CFLAGS} ${FOREIGN_CFLAGS} ${COMMON_CFLAGS}"
         "${OBJDUMP_FLAGS}"
         "${APPLE_NAME}"
         "${INPUT}"
