@@ -436,18 +436,17 @@ argument_tests:
     - uint8_t
     - uint64_t
 
-  # NOTE: these tests would require us to increase the expressive power of RFTs
-  # double_aligned_scalar_in_registers_64:
-  #   - uint8_t
-  #   - UINT128_T
-  # double_aligned_scalar_in_registers_32:
-  #   - uint8_t
-  #   - uint64_t
-  # double_aligned_scalar_on_top_of_the_stack_32:
-  #   - size_t
-  #   - size_t
-  #   - size_t
-  #   - uint64_t
+  double_aligned_scalar_in_registers_64:
+    - uint8_t
+    - UINT128_T
+  double_aligned_scalar_in_registers_32:
+    - uint8_t
+    - uint64_t
+  double_aligned_scalar_on_top_of_the_stack_32:
+    - size_t
+    - size_t
+    - size_t
+    - uint64_t
 
   #
   # Tests for non-naturally aligned structs.
