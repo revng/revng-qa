@@ -26,7 +26,31 @@ packed_structs:
   unnaturally_aligned_struct_64: ["char prepadding[2]", "uint64_t a", "char postpadding[6]"]
   unnaturally_aligned_struct_128: ["char prepadding[2]", "INT128_T a", "char postpadding[14]"]
 
-unions: []
+unions:
+  one_byte_union: ["uint8_t a", "one_byte_struct b"]
+  two_byte_union: ["uint16_t a", "two_byte_struct b"]
+  three_byte_union: ["uint16_t a", "three_byte_struct b"]
+  four_byte_union: ["uint32_t a", "four_byte_struct b"]
+  seven_byte_union: ["uint32_t a", "seven_byte_struct b"]
+  eight_byte_union: ["uint64_t a", "eight_byte_struct b"]
+  sixteen_byte_union: ["uint64_t a", "sixteen_byte_struct b"]
+
+  small_union: ["uint8_t a", "small_struct b"] # the integer is smaller
+  padded_union: ["uint64_t a", "padded_struct b"] # the struct is smaller
+  array_union: ["uint32_t a[3]", "array_struct b"]
+  big_union: ["uint64_t a", "big_struct b"]
+  huge_union: ["uint64_t a", "huge_struct b"]
+  extra_alignment_union: ["uint64_t a", "extra_alignment_struct b"]
+
+  small_union_of_structs: ["one_byte_struct a", "two_byte_struct b"]
+  small_union_of_unions: ["one_byte_union a", "two_byte_union b"]
+  union_of_structs: ["seven_byte_struct a", "eight_byte_struct b"]
+  union_of_unions: ["seven_byte_union a", "eight_byte_union b"]
+
+  unnaturally_aligned_union_16: ["uint8_t a", "unnaturally_aligned_struct_16 b"]
+  unnaturally_aligned_union_32: ["uint8_t a", "unnaturally_aligned_struct_32 b"]
+  unnaturally_aligned_union_64: ["uint8_t a", "unnaturally_aligned_struct_64 b"]
+  unnaturally_aligned_union_128: ["uint8_t a", "unnaturally_aligned_struct_128 b"]
 
 argument_tests:
   #
@@ -47,6 +71,14 @@ argument_tests:
   single_eight_byte_struct_argument: ["eight_byte_struct"]
   single_sixteen_byte_struct_argument: ["sixteen_byte_struct"]
 
+  single_one_byte_union_argument: ["one_byte_union"]
+  single_two_byte_union_argument: ["two_byte_union"]
+  single_three_byte_union_argument: ["three_byte_union"]
+  single_four_byte_union_argument: ["four_byte_union"]
+  single_seven_byte_union_argument: ["seven_byte_union"]
+  single_eight_byte_union_argument: ["eight_byte_union"]
+  single_sixteen_byte_union_argument: ["sixteen_byte_union"]
+
   single_small_struct_argument: ["small_struct"]
   single_padded_struct_argument: ["padded_struct"]
   single_array_struct_argument: ["array_struct"]
@@ -59,6 +91,17 @@ argument_tests:
   single_padded_struct_of_structs_argument: ["padded_struct_of_structs"]
   single_double_padded_struct_of_structs_argument: ["double_padded_struct_of_structs"]
 
+  single_small_union_argument: ["small_union"]
+  single_padded_union_argument: ["padded_union"]
+  single_array_union_argument: ["array_union"]
+  single_big_union_argument: ["big_union"]
+  single_huge_union_argument: ["huge_union"]
+  single_double_aligned_union_argument: ["double_aligned_union"]
+  single_small_union_of_structs_argument: ["small_union_of_structs"]
+  single_small_union_of_unions_argument: ["small_union_of_unions"]
+  single_union_of_structs_argument: ["union_of_structs"]
+  single_union_of_unions_argument: ["union_of_unions"]
+
   single_void_pointer_argument: ["void *"]
   single_int_pointer_argument: ["uint32_t *"]
 
@@ -66,6 +109,11 @@ argument_tests:
   single_unnaturally_aligned_struct_64_argument: ["unnaturally_aligned_struct_64"]
   single_unnaturally_aligned_struct_32_argument: ["unnaturally_aligned_struct_32"]
   single_unnaturally_aligned_struct_16_argument: ["unnaturally_aligned_struct_16"]
+
+  single_unnaturally_aligned_union_16_argument: ["unnaturally_aligned_union_16"]
+  single_unnaturally_aligned_union_32_argument: ["unnaturally_aligned_union_32"]
+  single_unnaturally_aligned_union_64_argument: ["unnaturally_aligned_union_64"]
+  single_unnaturally_aligned_union_128_argument: ["unnaturally_aligned_union_128"]
 
   # TODO: floating point arguments.
 
@@ -77,6 +125,10 @@ argument_tests:
     - small_struct
     - small_struct
     - small_struct
+  mixed_small_arguments:
+    - small_union
+    - small_struct
+    - small_union
   mixed_integer_arguments:
     - int64_t
     - uint32_t
@@ -89,6 +141,12 @@ argument_tests:
     - int16_t
     - big_struct
     - INT128_T
+  mixed_int_union_arguments:
+    - int64_t
+    - padded_union
+    - int16_t
+    - big_union
+    - INT128_T
   mixed_int_struct_pointer_arguments:
     - padded_struct *
     - padded_struct
@@ -96,10 +154,21 @@ argument_tests:
     - int8_t
     - huge_struct
     - void *
+  mixed_int_union_pointer_arguments:
+    - padded_union *
+    - padded_union
+    - UINT128_T *
+    - int8_t
+    - huge_union
+    - void *
   six_register_test:
     - array_struct
     - INT128_T
     - array_struct
+  six_register_test_with_unions:
+    - array_union
+    - INT128_T
+    - array_union
 
   #
   # Simple stack argument tests.
@@ -109,6 +178,10 @@ argument_tests:
     - big_struct
     - big_struct
     - big_struct
+  multiple_stack_unions:
+    - big_union
+    - big_union
+    - big_union
 
   lots_of_one_byte_arguments:
     - uint8_t
@@ -287,6 +360,19 @@ argument_tests:
     - small_struct
     - uint8_t
     - small_struct
+  two_byte_aligned_union_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - small_union
+    - uint8_t
+    - small_union
   four_byte_aligned_struct_on_stack:
     - size_t
     - size_t
@@ -300,6 +386,19 @@ argument_tests:
     - big_struct
     - uint8_t
     - big_struct
+  four_byte_aligned_union_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - big_union
+    - uint8_t
+    - big_union
   four_byte_aligned_scalar_on_stack:
     - size_t
     - size_t
@@ -326,6 +425,19 @@ argument_tests:
     - double_aligned_struct
     - uint8_t
     - double_aligned_struct
+  eight_byte_aligned_union_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - double_aligned_union
+    - uint8_t
+    - double_aligned_union
   eight_byte_aligned_scalar_on_stack:
     - size_t
     - size_t
@@ -348,6 +460,10 @@ argument_tests:
     - size_t
     - size_t
     - struct_of_structs
+  union_of_unions_in_registers:
+    - size_t
+    - size_t
+    - union_of_unions
   struct_of_structs_on_stack:
     - size_t
     - size_t
@@ -358,6 +474,16 @@ argument_tests:
     - size_t
     - size_t
     - struct_of_structs
+  union_of_unions_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - union_of_unions
   misaligned_struct_of_structs_on_stack:
     - size_t
     - size_t
@@ -373,6 +499,21 @@ argument_tests:
     - struct_of_structs
     - uint8_t
     - struct_of_structs
+  misaligned_union_of_unions_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - union_of_unions
+    - uint8_t
+    - union_of_unions
+    - uint8_t
+    - union_of_unions
   small_struct_of_structs_on_stack:
     - size_t
     - size_t
@@ -388,6 +529,21 @@ argument_tests:
     - small_struct_of_structs
     - uint8_t
     - small_struct_of_structs
+  small_union_of_unions_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - small_union_of_unions
+    - uint8_t
+    - small_union_of_unions
+    - uint8_t
+    - small_union_of_unions
   padded_struct_of_structs_on_stack:
     - size_t
     - size_t
@@ -460,6 +616,10 @@ argument_tests:
     - size_t
     - size_t
     - unnaturally_aligned_struct_128
+  unnaturally_aligned_union_128_in_registers:
+    - size_t
+    - size_t
+    - unnaturally_aligned_union_128
   unnaturally_aligned_struct_128_on_stack:
     - size_t
     - size_t
@@ -473,11 +633,28 @@ argument_tests:
     - unnaturally_aligned_struct_128
     - uint8_t
     - unnaturally_aligned_struct_128
+  unnaturally_aligned_union_128_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - unnaturally_aligned_union_128
+    - uint8_t
+    - unnaturally_aligned_union_128
 
   unnaturally_aligned_struct_64_in_registers:
     - size_t
     - size_t
     - unnaturally_aligned_struct_64
+  unnaturally_aligned_union_64_in_registers:
+    - size_t
+    - size_t
+    - unnaturally_aligned_union_64
   unnaturally_aligned_struct_64_on_stack:
     - size_t
     - size_t
@@ -491,11 +668,28 @@ argument_tests:
     - unnaturally_aligned_struct_64
     - uint8_t
     - unnaturally_aligned_struct_64
+  unnaturally_aligned_union_64_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - unnaturally_aligned_union_64
+    - uint8_t
+    - unnaturally_aligned_union_64
 
   unnaturally_aligned_struct_32_in_registers:
     - size_t
     - size_t
     - unnaturally_aligned_struct_32
+  unnaturally_aligned_union_32_in_registers:
+    - size_t
+    - size_t
+    - unnaturally_aligned_union_32
   unnaturally_aligned_struct_32_on_stack:
     - size_t
     - size_t
@@ -509,11 +703,28 @@ argument_tests:
     - unnaturally_aligned_struct_32
     - uint8_t
     - unnaturally_aligned_struct_32
+  unnaturally_aligned_union_32_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - unnaturally_aligned_union_32
+    - uint8_t
+    - unnaturally_aligned_union_32
 
   unnaturally_aligned_struct_16_in_registers:
     - size_t
     - size_t
     - unnaturally_aligned_struct_16
+  unnaturally_aligned_union_16_in_registers:
+    - size_t
+    - size_t
+    - unnaturally_aligned_union_16
   unnaturally_aligned_struct_16_on_stack:
     - size_t
     - size_t
@@ -527,6 +738,19 @@ argument_tests:
     - unnaturally_aligned_struct_16
     - uint8_t
     - unnaturally_aligned_struct_16
+  unnaturally_aligned_union_16_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - unnaturally_aligned_union_16
+    - uint8_t
+    - unnaturally_aligned_union_16
 
   #
   # Dedicated tests for highlighting apple arm64 abi quirks
@@ -635,9 +859,22 @@ return_value_tests:
   single_eight_byte_struct_return_value: "eight_byte_struct"
   single_sixteen_byte_struct_return_value: "sixteen_byte_struct"
 
+  single_one_byte_union_return_value: "one_byte_union"
+  single_two_byte_union_return_value: "two_byte_union"
+  single_three_byte_union_return_value: "three_byte_union"
+  single_four_byte_union_return_value: "four_byte_union"
+  single_seven_byte_union_return_value: "seven_byte_union"
+  single_eight_byte_union_return_value: "eight_byte_union"
+  single_sixteen_byte_union_return_value: "sixteen_byte_union"
+
   single_small_struct_return_value: "small_struct"
   single_padded_struct_return_value: "padded_struct"
   single_array_struct_return_value: "array_struct"
+
+  single_small_union_return_value: "small_union"
+  single_padded_union_return_value: "padded_union"
+  single_array_union_return_value: "array_union"
+
   single_small_struct_of_structs_return_value: "small_struct_of_structs"
   single_struct_of_structs_return_value: "struct_of_structs"
 
@@ -646,11 +883,19 @@ return_value_tests:
   single_unnaturally_aligned_struct_64_return_value: "unnaturally_aligned_struct_64"
   single_unnaturally_aligned_struct_128_return_value: "unnaturally_aligned_struct_128"
 
+  single_unnaturally_aligned_union_16_return_value: "unnaturally_aligned_union_16"
+  single_unnaturally_aligned_union_32_return_value: "unnaturally_aligned_union_32"
+  single_unnaturally_aligned_union_64_return_value: "unnaturally_aligned_union_64"
+  single_unnaturally_aligned_union_128_return_value: "unnaturally_aligned_union_128"
+
   single_void_pointer_return_value: "void *"
   single_int_pointer_return_value: "uint32_t *"
   single_struct_pointer_return_value: "huge_struct *"
 
   single_big_struct_return_value: "big_struct"
   single_huge_struct_return_value: "huge_struct"
+
+  single_big_union_return_value: "big_union"
+  single_huge_union_return_value: "huge_union"
 
   # TODO: floating point return values.
