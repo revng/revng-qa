@@ -87,6 +87,19 @@ typedef struct {
 #pragma pack(pop)
 
 /*
+ * Helper unions used by the functions
+ */
+
+/*{ for name, fields in unions.items() -}*/
+typedef union {
+/*{ for field in fields -}*/
+  /*( field | indent(2, true) )*/;
+/*{ endfor -}*/
+} /*( name )*/;
+
+/*{ endfor -}*/
+
+/*
  * Functions designed to test argument passing
  */
 
