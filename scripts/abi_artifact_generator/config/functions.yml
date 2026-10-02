@@ -62,6 +62,11 @@ argument_tests:
   single_void_pointer_argument: ["void *"]
   single_int_pointer_argument: ["uint32_t *"]
 
+  single_unnaturally_aligned_struct_128_argument: ["unnaturally_aligned_struct_128"]
+  single_unnaturally_aligned_struct_64_argument: ["unnaturally_aligned_struct_64"]
+  single_unnaturally_aligned_struct_32_argument: ["unnaturally_aligned_struct_32"]
+  single_unnaturally_aligned_struct_16_argument: ["unnaturally_aligned_struct_16"]
+
   # TODO: floating point arguments.
 
   #
@@ -451,7 +456,6 @@ argument_tests:
   #
   # Tests for non-naturally aligned structs.
   #
-  single_unnaturally_aligned_struct_128_argument: ["unnaturally_aligned_struct_128"]
   unnaturally_aligned_struct_128_in_registers:
     - size_t
     - size_t
@@ -469,7 +473,7 @@ argument_tests:
     - unnaturally_aligned_struct_128
     - uint8_t
     - unnaturally_aligned_struct_128
-  single_unnaturally_aligned_struct_64_argument: ["unnaturally_aligned_struct_64"]
+
   unnaturally_aligned_struct_64_in_registers:
     - size_t
     - size_t
@@ -487,7 +491,7 @@ argument_tests:
     - unnaturally_aligned_struct_64
     - uint8_t
     - unnaturally_aligned_struct_64
-  single_unnaturally_aligned_struct_32_argument: ["unnaturally_aligned_struct_32"]
+
   unnaturally_aligned_struct_32_in_registers:
     - size_t
     - size_t
@@ -505,7 +509,7 @@ argument_tests:
     - unnaturally_aligned_struct_32
     - uint8_t
     - unnaturally_aligned_struct_32
-  single_unnaturally_aligned_struct_16_argument: ["unnaturally_aligned_struct_16"]
+
   unnaturally_aligned_struct_16_in_registers:
     - size_t
     - size_t
