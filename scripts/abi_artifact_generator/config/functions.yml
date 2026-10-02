@@ -20,11 +20,65 @@ structs:
   padded_struct_of_structs: ["one_byte_struct a", "big_struct b"]
   padded_struct_of_structs_with_a_sixteen_byte_field: ["one_byte_struct a", "struct_with_a_sixteen_byte_field b"]
 
+  float_struct: ["float a"]
+  two_float_struct: ["float a", "float b"]
+  three_float_struct: ["float a", "float b", "float c"]
+  four_float_struct: ["float a", "float b", "float c", "float d"]
+  five_float_struct: ["float a", "float b", "float c", "float d", "float e"]
+  six_float_struct: ["float a", "float b", "float c", "float d", "float e", "float f"]
+  seven_float_struct: ["float a", "float b", "float c", "float d", "float e", "float f", "float g"]
+  eight_float_struct:
+    ["float a", "float b", "float c", "float d", "float e", "float f", "float g", "float h"]
+
+  double_struct: ["double a"]
+  two_double_struct: ["double a", "double b"]
+  three_double_struct: ["double a", "double b", "double c"]
+  four_double_struct: ["double a", "double b", "double c", "double d"]
+
+  float_double_struct: ["float a", "double b"]
+  double_float_struct: ["double a", "float b"]
+
+  float_double_float_struct: ["float a", "double b", "float c"]
+  double_float_double_struct: ["double a", "float b", "double c"]
+  float_double_double_struct: ["float a", "double b", "double c"]
+  double_float_float_struct: ["double a", "float b", "float c"]
+
+  int_float_struct: ["uint32_t a", "float b"]
+  float_int_struct: ["float a", "uint32_t b"]
+
+  int_double_struct: ["int64_t a", "double b"]
+  double_int_struct: ["double a", "int64_t b"]
+
+  padded_float_struct: ["uint8_t a", "float b"]
+  padded_double_struct: ["uint8_t a", "double b"]
+
+  float_array_struct: ["float a[3]"]
+  double_array_struct: ["double a[3]"]
+
+  double_aligned_float_struct: ["INT128_T a", "float b"]
+  double_aligned_double_struct: ["INT128_T a", "double b"]
+
+  small_struct_of_structs_with_floats: ["two_byte_struct a", "float_struct b"]
+  struct_of_structs_with_floats: ["four_byte_struct a", "double_struct b"]
+
+  padded_struct_of_structs_with_floats: ["one_byte_struct a", "eight_float_struct b"]
+  double_padded_struct_of_structs_with_floats: ["one_byte_struct a", "double_aligned_double_struct b"]
+
+  nested_float_struct: ["one_byte_struct a", "two_byte_struct b", "float_struct c"]
+  deeply_nested_float_struct: ["one_byte_struct a", "two_byte_struct b", "nested_float_struct c"]
+  needle_in_a_haystack_float_struct:
+    ["one_byte_struct a", "two_byte_struct b", "deeply_nested_float_struct c"]
+
+  # TODO: add other floating point types (16-bit, 128-bit, etc)
+
 packed_structs:
   unnaturally_aligned_struct_16: ["char prepadding[1]", "uint16_t a", "char postpadding[1]"]
   unnaturally_aligned_struct_32: ["char prepadding[2]", "uint32_t a", "char postpadding[2]"]
   unnaturally_aligned_struct_64: ["char prepadding[2]", "uint64_t a", "char postpadding[6]"]
   unnaturally_aligned_struct_128: ["char prepadding[2]", "INT128_T a", "char postpadding[14]"]
+
+  unnaturally_aligned_float_struct: ["char prepadding[2]", "float a", "char postpadding[2]"]
+  unnaturally_aligned_double_struct: ["char prepadding[2]", "double a", "char postpadding[2]"]
 
 unions:
   one_byte_union: ["uint8_t a", "one_byte_struct b"]
@@ -52,6 +106,37 @@ unions:
   unnaturally_aligned_union_64: ["uint8_t a", "unnaturally_aligned_struct_64 b"]
   unnaturally_aligned_union_128: ["uint8_t a", "unnaturally_aligned_struct_128 b"]
 
+  float_or_int_union: ["float a", "uint32_t b"]
+  float_or_bigger_int_union: ["float a", "uint64_t b"]
+  float_or_smaller_int_union: ["float a", "uint16_t b"]
+
+  double_or_int_union: ["double a", "uint64_t b"]
+  double_or_bigger_int_union: ["double a", "INT128_T b"]
+  double_or_smaller_int_union: ["double a", "uint32_t b"]
+
+  float_or_double_union: ["float a", "double b"]
+  float_or_float_struct_union: ["float a", "float_struct b"]
+  float_or_two_float_struct_union: ["float a", "two_float_struct b"]
+  float_or_double_struct_union: ["float a", "double_struct b"]
+
+  double_or_float_struct_union: ["double a", "float_struct b"]
+  double_or_two_float_struct_union: ["double a", "two_float_struct b"]
+  double_or_double_struct_union: ["double a", "double_struct b"]
+
+  float_array_union: ["float a[3]", "float_array_struct b"]
+  double_array_union: ["double a[3]", "double_array_struct b"]
+  four_double_struct_union: ["double a", "four_double_struct b"]
+
+  unnaturally_aligned_float_union: ["uint8_t a", "unnaturally_aligned_float_struct b"]
+  unnaturally_aligned_double_union: ["uint8_t a", "unnaturally_aligned_double_struct b"]
+
+  unnaturally_aligned_float_struct_union: ["char prepadding[2]", "float a", "char postpadding[2]"]
+  unnaturally_aligned_double_struct_union: ["char prepadding[2]", "double a", "char postpadding[2]"]
+
+  nested_float_struct_union: ["uint64_t a", "nested_float_struct b"]
+  deeply_nested_float_struct_union: ["uint64_t a", "deeply_nested_float_struct b"]
+  needle_in_a_haystack_float_struct_union: ["uint64_t a", "needle_in_a_haystack_float_struct b"]
+
 argument_tests:
   #
   # Simple single argument tests
@@ -62,6 +147,9 @@ argument_tests:
   single_32_bit_argument: ["uint32_t"]
   single_64_bit_argument: ["int64_t"]
   single_128_bit_argument: ["INT128_T"]
+
+  single_float_argument: ["float"]
+  single_double_argument: ["double"]
 
   single_one_byte_struct_argument: ["one_byte_struct"]
   single_two_byte_struct_argument: ["two_byte_struct"]
@@ -115,7 +203,74 @@ argument_tests:
   single_unnaturally_aligned_union_64_argument: ["unnaturally_aligned_union_64"]
   single_unnaturally_aligned_union_128_argument: ["unnaturally_aligned_union_128"]
 
-  # TODO: floating point arguments.
+  single_float_struct_argument: ["float_struct"]
+  single_two_float_struct_argument: ["two_float_struct"]
+  single_three_float_struct_argument: ["three_float_struct"]
+  single_four_float_struct_argument: ["four_float_struct"]
+  single_five_float_struct_argument: ["five_float_struct"]
+  single_six_float_struct_argument: ["six_float_struct"]
+  single_seven_float_struct_argument: ["seven_float_struct"]
+  single_eight_float_struct_argument: ["eight_float_struct"]
+
+  single_double_struct_argument: ["double_struct"]
+  single_two_double_struct_argument: ["two_double_struct"]
+  single_three_double_struct_argument: ["three_double_struct"]
+  single_four_double_struct_argument: ["four_double_struct"]
+
+  single_float_double_struct_argument: ["float_double_struct"]
+  single_double_float_struct_argument: ["double_float_struct"]
+  single_float_double_float_struct_argument: ["float_double_float_struct"]
+  single_double_float_double_struct_argument: ["double_float_double_struct"]
+  single_float_double_double_struct_argument: ["float_double_double_struct"]
+  single_double_float_float_struct_argument: ["double_float_float_struct"]
+
+  single_int_float_struct_argument: ["int_float_struct"]
+  single_float_int_struct_argument: ["float_int_struct"]
+  single_int_double_struct_argument: ["int_double_struct"]
+  single_double_int_struct_argument: ["double_int_struct"]
+  single_padded_float_struct_argument: ["padded_float_struct"]
+  single_padded_double_struct_argument: ["padded_double_struct"]
+  single_float_array_struct_argument: ["float_array_struct"]
+  single_double_array_struct_argument: ["double_array_struct"]
+
+  single_double_aligned_float_struct_argument: ["double_aligned_float_struct"]
+  single_double_aligned_double_struct_argument: ["double_aligned_double_struct"]
+  single_small_struct_of_structs_with_floats_argument: ["small_struct_of_structs_with_floats"]
+  single_struct_of_structs_with_floats_argument: ["struct_of_structs_with_floats"]
+  single_padded_struct_of_structs_with_floats_argument: ["padded_struct_of_structs_with_floats"]
+  single_double_padded_struct_of_structs_with_floats_argument: ["double_padded_struct_of_structs_with_floats"]
+
+  single_unnaturally_aligned_float_struct_argument: ["unnaturally_aligned_float_struct"]
+  single_unnaturally_aligned_double_struct_argument: ["unnaturally_aligned_double_struct"]
+
+  single_float_or_int_union_argument: ["float_or_int_union"]
+  single_float_or_bigger_int_union_argument: ["float_or_bigger_int_union"]
+  single_float_or_smaller_int_union_argument: ["float_or_smaller_int_union"]
+  single_double_or_int_union_argument: ["double_or_int_union"]
+  single_double_or_bigger_int_union_argument: ["double_or_bigger_int_union"]
+  single_double_or_smaller_int_union_argument: ["double_or_smaller_int_union"]
+
+  single_float_or_double_union_argument: ["float_or_double_union"]
+  single_float_or_float_struct_union_argument: ["float_or_float_struct_union"]
+  single_float_or_two_float_struct_union_argument: ["float_or_two_float_struct_union"]
+  single_float_or_double_struct_union_argument: ["float_or_double_struct_union"]
+  single_double_or_float_struct_union_argument: ["double_or_float_struct_union"]
+  single_double_or_two_float_struct_union_argument: ["double_or_two_float_struct_union"]
+  single_double_or_double_struct_union_argument: ["double_or_double_struct_union"]
+
+  single_float_array_union_argument: ["float_array_union"]
+  single_double_array_union_argument: ["double_array_union"]
+
+  single_unnaturally_aligned_float_union_argument: ["unnaturally_aligned_float_union"]
+  single_unnaturally_aligned_double_union_argument: ["unnaturally_aligned_double_union"]
+
+  single_nested_float_struct_argument: ["nested_float_struct"]
+  single_deeply_nested_float_struct_argument: ["deeply_nested_float_struct"]
+  single_needle_in_a_haystack_float_struct_argument: ["needle_in_a_haystack_float_struct"]
+  single_nested_float_struct_union_argument: ["nested_float_struct_union"]
+  single_deeply_nested_float_struct_union_argument: ["deeply_nested_float_struct_union"]
+  single_needle_in_a_haystack_float_struct_union_argument:
+    ["needle_in_a_haystack_float_struct_union"]
 
   #
   # Tests for the interactions between multiple differently sized arguments.
@@ -135,17 +290,37 @@ argument_tests:
     - int16_t
     - uint8_t
     - UINT128_T
+  mixed_integer_and_float_arguments:
+    - int64_t
+    - float
+    - int16_t
+    - double
+    - uint8_t
+    - UINT128_T
   mixed_int_struct_arguments:
     - int64_t
     - padded_struct
     - int16_t
     - big_struct
     - INT128_T
+  mixed_int_float_struct_arguments:
+    - double
+    - double_struct
+    - int16_t
+    - big_struct
+    - float_struct
+    - INT128_T
   mixed_int_union_arguments:
     - int64_t
     - padded_union
     - int16_t
     - big_union
+    - INT128_T
+  mixed_int_float_union_arguments:
+    - int64_t
+    - padded_union
+    - float
+    - four_double_struct_union
     - INT128_T
   mixed_int_struct_pointer_arguments:
     - padded_struct *
@@ -165,10 +340,78 @@ argument_tests:
     - array_struct
     - INT128_T
     - array_struct
+  six_register_test_with_floats:
+    - float
+    - float
+    - INT128_T
+    - array_struct
+  six_register_test_with_doubles:
+    - double
+    - double
+    - INT128_T
+    - array_struct
   six_register_test_with_unions:
     - array_union
     - INT128_T
     - array_union
+
+  #
+  # Test mixing integers and floating point types
+  #
+
+  two_integer_arguments:
+    - uint32_t
+    - uint32_t
+  three_integer_arguments:
+    - uint32_t
+    - uint32_t
+    - uint32_t
+  five_integer_arguments:
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+  two_float_arguments:
+    - float
+    - float
+  three_float_arguments:
+    - float
+    - float
+    - float
+  five_float_arguments:
+    - float
+    - float
+    - float
+    - float
+    - float
+  two_double_arguments:
+    - double
+    - double
+  three_double_arguments:
+    - double
+    - double
+    - double
+  five_double_arguments:
+    - double
+    - double
+    - double
+    - double
+    - double
+
+  integer_float_pair:
+    - uint32_t
+    - float
+  integer_double_pair:
+    - uint32_t
+    - double
+
+  float_integer_pair:
+    - float
+    - uint32_t
+  double_integer_pair:
+    - double
+    - uint32_t
 
   #
   # Simple stack argument tests.
@@ -182,6 +425,14 @@ argument_tests:
     - big_union
     - big_union
     - big_union
+  multiple_stack_floats:
+    - eight_float_struct
+    - eight_float_struct
+    - eight_float_struct
+  multiple_stack_doubles:
+    - four_double_struct
+    - four_double_struct
+    - four_double_struct
 
   lots_of_one_byte_arguments:
     - uint8_t
@@ -303,6 +554,55 @@ argument_tests:
     - UINT128_T
     - UINT128_T
     - UINT128_T
+
+  lots_of_four_byte_float_arguments:
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+  lots_of_eight_byte_float_arguments:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
 
   #
   # Equivalence tests.
@@ -453,6 +753,90 @@ argument_tests:
     - INT128_T
 
   #
+  # Test for floating point arguments on stack
+  #
+  float_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - float
+  double_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - double
+  float_struct_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - float_struct
+  double_struct_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - double_struct
+  two_float_struct_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - two_float_struct
+  two_double_struct_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - two_double_struct
+  multi_float_struct_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - eight_float_struct
+  multi_double_struct_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - four_double_struct
+
+  #
   # Tests for nested structs.
   #
 
@@ -574,6 +958,89 @@ argument_tests:
     - padded_struct_of_structs_with_a_sixteen_byte_field
     - uint8_t
     - padded_struct_of_structs_with_a_sixteen_byte_field
+
+  #
+  # Needle in a haystack tests.
+  #
+  nested_float_struct_argument_in_registers:
+    - uint32_t
+    - nested_float_struct
+  deeply_nested_float_struct_argument_in_registers:
+    - uint32_t
+    - deeply_nested_float_struct
+  needle_in_a_haystack_float_struct_argument_in_registers:
+    - uint32_t
+    - needle_in_a_haystack_float_struct
+  nested_float_struct_union_argument_in_registers:
+    - uint32_t
+    - nested_float_struct_union
+  deeply_nested_float_struct_union_argument_in_registers:
+    - uint32_t
+    - deeply_nested_float_struct_union
+  needle_in_a_haystack_float_struct_union_argument_in_registers:
+    - uint32_t
+    - needle_in_a_haystack_float_struct_union
+
+  nested_float_struct_argument_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - nested_float_struct
+  deeply_nested_float_struct_argument_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - deeply_nested_float_struct
+  needle_in_a_haystack_float_struct_argument_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - needle_in_a_haystack_float_struct
+  nested_float_struct_union_argument_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - nested_float_struct_union
+  deeply_nested_float_struct_union_argument_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - deeply_nested_float_struct_union
+  needle_in_a_haystack_float_struct_union_argument_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - needle_in_a_haystack_float_struct_union
 
   #
   # Tests targeting alignment issues in registers (ARM-specific).
@@ -753,6 +1220,76 @@ argument_tests:
     - uint8_t
     - unnaturally_aligned_union_16
 
+  unnaturally_aligned_float_struct_in_registers:
+    - size_t
+    - size_t
+    - unnaturally_aligned_float_struct
+  unnaturally_aligned_float_union_in_registers:
+    - size_t
+    - size_t
+    - unnaturally_aligned_float_struct_union
+  unnaturally_aligned_float_struct_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - unnaturally_aligned_float_struct
+    - uint8_t
+    - unnaturally_aligned_float_struct
+  unnaturally_aligned_float_struct_union_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - unnaturally_aligned_float_struct_union
+    - uint8_t
+    - unnaturally_aligned_float_struct_union
+
+  unnaturally_aligned_double_struct_in_registers:
+    - size_t
+    - size_t
+    - unnaturally_aligned_double_struct
+  unnaturally_aligned_double_struct_union_in_registers:
+    - size_t
+    - size_t
+    - unnaturally_aligned_double_struct_union
+  unnaturally_aligned_double_struct_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - unnaturally_aligned_double_struct
+    - uint8_t
+    - unnaturally_aligned_double_struct
+  unnaturally_aligned_double_struct_union_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - unnaturally_aligned_double_struct_union
+    - uint8_t
+    - unnaturally_aligned_double_struct_union
+
   #
   # Dedicated tests for highlighting apple arm64 abi quirks
   #
@@ -893,6 +1430,9 @@ return_value_tests:
   single_64_bit_return_value: "int64_t"
   single_128_bit_return_value: "UINT128_T"
 
+  single_float_return_value: "float"
+  single_double_return_value: "double"
+
   single_one_byte_struct_return_value: "one_byte_struct"
   single_two_byte_struct_return_value: "two_byte_struct"
   single_three_byte_struct_return_value: "three_byte_struct"
@@ -940,4 +1480,70 @@ return_value_tests:
   single_big_union_return_value: "big_union"
   single_huge_union_return_value: "huge_union"
 
-  # TODO: floating point return values.
+  single_float_struct_return_value: "float_struct"
+  single_two_float_struct_return_value: "two_float_struct"
+  single_three_float_struct_return_value: "three_float_struct"
+  single_four_float_struct_return_value: "four_float_struct"
+  single_five_float_struct_return_value: "five_float_struct"
+  single_six_float_struct_return_value: "six_float_struct"
+  single_seven_float_struct_return_value: "seven_float_struct"
+  single_eight_float_struct_return_value: "eight_float_struct"
+
+  single_double_struct_return_value: "double_struct"
+  single_two_double_struct_return_value: "two_double_struct"
+  single_three_double_struct_return_value: "three_double_struct"
+  single_four_double_struct_return_value: "four_double_struct"
+
+  single_float_double_struct_return_value: "float_double_struct"
+  single_double_float_struct_return_value: "double_float_struct"
+  single_float_double_float_struct_return_value: "float_double_float_struct"
+  single_double_float_double_struct_return_value: "double_float_double_struct"
+  single_float_double_double_struct_return_value: "float_double_double_struct"
+  single_double_float_float_struct_return_value: "double_float_float_struct"
+
+  single_int_float_struct_return_value: "int_float_struct"
+  single_float_int_struct_return_value: "float_int_struct"
+  single_int_double_struct_return_value: "int_double_struct"
+  single_double_int_struct_return_value: "double_int_struct"
+  single_padded_float_struct_return_value: "padded_float_struct"
+  single_padded_double_struct_return_value: "padded_double_struct"
+  single_float_array_struct_return_value: "float_array_struct"
+  single_double_array_struct_return_value: "double_array_struct"
+
+  single_double_aligned_float_struct_return_value: "double_aligned_float_struct"
+  single_double_aligned_double_struct_return_value: "double_aligned_double_struct"
+  single_small_struct_of_structs_with_floats_return_value: "small_struct_of_structs_with_floats"
+  single_struct_of_structs_with_floats_return_value: "struct_of_structs_with_floats"
+  single_padded_struct_of_structs_with_floats_return_value: "padded_struct_of_structs_with_floats"
+  single_double_padded_struct_of_structs_with_floats_return_value: "double_padded_struct_of_structs_with_floats"
+
+  single_unnaturally_aligned_float_struct_return_value: "unnaturally_aligned_float_struct"
+  single_unnaturally_aligned_double_struct_return_value: "unnaturally_aligned_double_struct"
+
+  single_float_or_int_union_return_value: "float_or_int_union"
+  single_float_or_bigger_int_union_return_value: "float_or_bigger_int_union"
+  single_float_or_smaller_int_union_return_value: "float_or_smaller_int_union"
+  single_double_or_int_union_return_value: "double_or_int_union"
+  single_double_or_bigger_int_union_return_value: "double_or_bigger_int_union"
+  single_double_or_smaller_int_union_return_value: "double_or_smaller_int_union"
+
+  single_float_or_double_union_return_value: "float_or_double_union"
+  single_float_or_float_struct_union_return_value: "float_or_float_struct_union"
+  single_float_or_two_float_struct_union_return_value: "float_or_two_float_struct_union"
+  single_float_or_double_struct_union_return_value: "float_or_double_struct_union"
+  single_double_or_float_struct_union_return_value: "double_or_float_struct_union"
+  single_double_or_two_float_struct_union_return_value: "double_or_two_float_struct_union"
+  single_double_or_double_struct_union_return_value: "double_or_double_struct_union"
+
+  single_float_array_union_return_value: "float_array_union"
+  single_double_array_union_return_value: "double_array_union"
+
+  single_unnaturally_aligned_float_union_return_value: "unnaturally_aligned_float_union"
+  single_unnaturally_aligned_double_union_return_value: "unnaturally_aligned_double_union"
+
+  single_nested_float_struct_return_value: "nested_float_struct"
+  single_deeply_nested_float_struct_return_value: "deeply_nested_float_struct"
+  single_needle_in_a_haystack_float_struct_return_value: "needle_in_a_haystack_float_struct"
+  single_nested_float_struct_union_return_value: "nested_float_struct_union"
+  single_deeply_nested_float_struct_union_return_value: "deeply_nested_float_struct_union"
+  single_needle_in_a_haystack_float_struct_union_return_value: "needle_in_a_haystack_float_struct_union"
