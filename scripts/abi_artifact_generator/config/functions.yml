@@ -26,6 +26,8 @@ packed_structs:
   unnaturally_aligned_struct_64: ["char prepadding[2]", "uint64_t a", "char postpadding[6]"]
   unnaturally_aligned_struct_128: ["char prepadding[2]", "INT128_T a", "char postpadding[14]"]
 
+unions: []
+
 argument_tests:
   #
   # Simple single argument tests

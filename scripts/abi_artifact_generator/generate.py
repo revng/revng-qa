@@ -104,6 +104,7 @@ def render_functions(jinja_environment, config, functions, out_dir: str):
         "maximum_argument_size": config["maximum_argument_size"],
         "structs": functions["structs"],
         "packed_structs": functions["packed_structs"],
+        "unions": functions["unions"],
         "argument_functions": functions["argument_tests"],
         "return_value_functions": functions["return_value_tests"],
     }
