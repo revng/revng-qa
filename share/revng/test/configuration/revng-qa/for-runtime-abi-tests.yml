@@ -245,9 +245,8 @@ sources:
       # TODO: look further into this.
       # - [arm-aapcs-apple-abi]
 
-      # TODO: re-enable once mips testing suite is fixed.
-      # - [mips-systemv-abi]
-      # - [mipsel-systemv-abi]
+      - [mips-systemv-abi]
+      - [mipsel-systemv-abi]
 
       # TODO: re-enable once qemu stops segfaulting on these binaries
       #       (when we update it?).
