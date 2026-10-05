@@ -2,6 +2,8 @@
 # This file is distributed under the MIT License. See LICENSE.md for details.
 #
 
+set -euo pipefail
+
 function prepare-linux-functions() {
   if [ $# -ne 4 ]; then
     echo 'prepare-linux-functions ${TRIPLE} ${CFLAGS} ${INPUT_DIRECTORY} ${OUTPUT_DIRECTORY}' > /dev/stderr
