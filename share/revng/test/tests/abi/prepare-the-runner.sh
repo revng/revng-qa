@@ -2,6 +2,8 @@
 # This file is distributed under the MIT License. See LICENSE.md for details.
 #
 
+set -euo pipefail
+
 function prepare-the-runner() {
   if [ $# -ne 4 ]; then
     echo 'prepare-the-runner ${TRIPLE} ${CFLAGS} ${INPUT_DIRECTORY} ${OUTPUT_DIRECTORY}' > /dev/stderr

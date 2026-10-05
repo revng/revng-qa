@@ -101,7 +101,8 @@ intptr_t cabi_aggregate_on_stack(intptr_t A,
 }
 
 intptr_t call_cabi_aggregate_on_stack() {
-  return Unknown + cabi_aggregate_on_stack(1, 2, 3, 4, 5, 6, (TwoIntegers){ 1, 2 });
+  return Unknown
+         + cabi_aggregate_on_stack(1, 2, 3, 4, 5, 6, (TwoIntegers){ 1, 2 });
 }
 
 // CABIFunctionType with aggregate partly in the registers and partly on the
@@ -116,7 +117,8 @@ intptr_t cabi_aggregate_on_stack_and_registers(intptr_t A,
 }
 
 intptr_t call_cabi_aggregate_on_stack_and_registers() {
-  return Unknown + cabi_aggregate_on_stack_and_registers(1,
+  return Unknown
+         + cabi_aggregate_on_stack_and_registers(1,
                                                          2,
                                                          3,
                                                          4,
