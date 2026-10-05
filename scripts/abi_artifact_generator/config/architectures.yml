@@ -1,28 +1,101 @@
 ---
+# Every architecture is a list of register groups.
+#
+# A group in this context is a list of registers that share their size and
+# the capture function.
+#
+# Each entry contains:
+# - the name of the group (`group`), which defines the capture function
+#   (`capture_${group_name}`)
+# - the width of every register in the group (`register_size`),
+# - and the revng-style names of the registers themselves (`register_list`).
+#   They are verified revng-side to match the output of
+#   `model::Register::getRegisterName()`.
+#
+# The first group must always be the GPR group (its size has special meaning).
+#
 "x86_64":
-  register_size: 8
-  register_list: [rax, rbx, rcx, rdx, rsi, rdi, r8, r9, r10, r11, r12, r13, r14, r15]
+  # x86_64 exposes NGREG=23 gregs (REG_R8..REG_CR2) plus 16 SSE
+  # (zmm0..zmm15) and 8 x87 (st0..st7) FP registers via FXSAVE. Each FP
+  # register is captured at 16 bytes (xmm-size).
+  #
+  # The upper lanes (ymm/zmm) are not available when using legacy FXSAVE.
+  # But we do not need those just yet.
+  #
+  # The `gpr` group is in the kernel-defined `uc_mcontext.gregs[]` order
+  # (REG_R8=0 ... REG_CR2=22). But we stop at `rip` (REG_RIP=16), discarding
+  # all the entries after that.
+  - group: gpr
+    register_size: 8
+    register_list: [r8, r9, r10, r11, r12, r13, r14, r15, rdi, rsi, rbp, rbx, rdx, rax, rcx, rsp, rip]
+  - group: zmm
+    register_size: 16
+    register_list: [zmm0, zmm1, zmm2, zmm3, zmm4, zmm5, zmm6, zmm7, zmm8, zmm9, zmm10, zmm11, zmm12, zmm13, zmm14, zmm15]
+  - group: st
+    register_size: 16
+    register_list: [st0, st1, st2, st3, st4, st5, st6, st7]
 
 "i386":
-  register_size: 4
-  register_list: [eax, ebx, ecx, edx, esi, edi]
+  # i386 glibc/musl expose NGREG=19 gregs (REG_GS=0 ... REG_SS=18)
+  #
+  # We only capture starting from `edi` (REG_EDI=4) and until `eax`
+  # (REG_EAX=11).
+  #
+  # TODO: the FP groups (16 x `zmm` + 8 x `st`) were removed because they
+  #       were not working correctly. And x86 is out of scope for now anyway.
+  - group: gpr
+    register_size: 4
+    register_list: [edi, esi, ebp, esp, ebx, edx, ecx, eax]
 
 "aarch64":
-  register_size: 8
-  register_list: [x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29]
+  # aarch64 exposes 31 general-purpose slots (x0..x30).
+  #
+  # FPSIMD also gives us 32 vector registers (v0..v31) at 16 bytes each.
+  - group: gpr
+    register_size: 8
+    register_list: [x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, lr,  sp]
+  - group: v
+    register_size: 16
+    register_list: [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31]
 
 "arm":
-  register_size: 4
-  register_list: [r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12]
+  # arm exposes 16 general-purpose slots at offset 3 in `uc_mcontext` (r0..r15).
+  #
+  # Plus 16 NEON quad registers (q0..q15) at 16 bytes each, captured by walking
+  # the VFP sigframe that follows `uc_sigmask`.
+  - group: gpr
+    register_size: 4
+    register_list: [r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13, r14, r15]
+  - group: q
+    register_size: 16
+    register_list: [q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15]
 
 "mips":
-  register_size: 4
-  register_list: [$v0, $v1, $a0, $a1, $a2, $a3, $s0, $s1, $s2, $s3, $s4, $s5, $s6, $s7, $t8, $t9, $k0, $k1]
+  # mips/musl exposes 32 gregs ($zero..$ra) and 32 FP registers (f0..f31).
+  #
+  # `$zero` and `$at` are left out: `$zero` is hardwired to 0 and `$at` is the
+  # assembler's temporary. The list below starts with `gregs[2]`.
+  - group: gpr
+    register_size: 4
+    register_list: [v0, v1, a0, a1, a2, a3, t0, t1, t2, t3, t4, t5, t6, t7, s0, s1, s2, s3, s4, s5, s6, s7, t8, t9, k0, k1, gp, sp, fp, ra]
+  - group: f
+    register_size: 4
+    register_list: [f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31]
 
 "mipsel":
-  register_size: 4
-  register_list: [$v0, $v1, $a0, $a1, $a2, $a3, $s0, $s1, $s2, $s3, $s4, $s5, $s6, $s7, $t8, $t9, $k0, $k1]
+  # Identical to `mips`.
+  - group: gpr
+    register_size: 4
+    register_list: [v0, v1, a0, a1, a2, a3, t0, t1, t2, t3, t4, t5, t6, t7, s0, s1, s2, s3, s4, s5, s6, s7, t8, t9, k0, k1, gp, sp, fp, ra]
+  - group: f
+    register_size: 4
+    register_list: [f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31]
 
 "s390x":
-  register_size: 4
-  register_list: [r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13, r14, r15, f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15]
+  # s390x exposes 16 gregs (r0..r15) and 16 FP registers (f0..f15).
+  - group: gpr
+    register_size: 8
+    register_list: [r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13, r14, r15]
+  - group: f
+    register_size: 8
+    register_list: [f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15]
