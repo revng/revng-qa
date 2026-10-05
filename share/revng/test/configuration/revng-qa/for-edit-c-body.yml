@@ -19,8 +19,7 @@ sources:
     prefix: share/revng/test/tests/analysis/EditCBody/
     members:
       - irreducible-goto.c
-  - tags:
-      [simple-executable, native, dynamic, for-edit-c-body, for-ambiguous-locals]
+  - tags: [simple-executable, native, dynamic, for-edit-c-body, for-ambiguous-locals]
     prefix: share/revng/test/tests/analysis/EditCBody/
     members:
       - ambiguous-locals.c

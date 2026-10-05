@@ -41,7 +41,7 @@ graph TB
   ExpectedBytes(ExpectedBytes)
   FoundBytes(FoundBytes)
   class Type,Address,AddressBytes,ExpectedBytes,FoundBytes black
-  
+
   String(String)
   Integer(Integer)
   ByteArray(ByteArray)
