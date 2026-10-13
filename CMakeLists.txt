@@ -13,9 +13,9 @@ install(
 add_custom_target(
   generated_abi_artifact_sources ALL
   COMMAND
-    "python3" "${CMAKE_SOURCE_DIR}/scripts/abi_artifact_generator/generate.py"
-    "${CMAKE_SOURCE_DIR}/scripts/abi_artifact_generator/templates/"
-    "${CMAKE_SOURCE_DIR}/scripts/abi_artifact_generator/config/"
+    "python3" "${CMAKE_SOURCE_DIR}/scripts/abi-artifact-generator/generate.py"
+    "${CMAKE_SOURCE_DIR}/scripts/abi-artifact-generator/templates/"
+    "${CMAKE_SOURCE_DIR}/scripts/abi-artifact-generator/config/"
     "${CMAKE_BINARY_DIR}/abi_artifact_generated/")
 
 install(DIRECTORY "${CMAKE_BINARY_DIR}/abi_artifact_generated/"
