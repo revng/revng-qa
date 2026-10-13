@@ -72,6 +72,8 @@ structs:
   # TODO: add other floating point types (16-bit, 128-bit, etc)
 
 packed_structs:
+  # `unnaturally aligned` means: a struct/union that recursively contains at
+  # least one non-naturally-aligned field.
   unnaturally_aligned_struct_16: ["char prepadding[1]", "uint16_t a", "char postpadding[1]"]
   unnaturally_aligned_struct_32: ["char prepadding[2]", "uint32_t a", "char postpadding[2]"]
   unnaturally_aligned_struct_64: ["char prepadding[2]", "uint64_t a", "char postpadding[6]"]
@@ -101,6 +103,8 @@ unions:
   union_of_structs: ["seven_byte_struct a", "eight_byte_struct b"]
   union_of_unions: ["seven_byte_union a", "eight_byte_union b"]
 
+  # `unnaturally aligned` means: a struct/union that recursively contains at
+  # least one non-naturally-aligned field.
   unnaturally_aligned_union_16: ["uint8_t a", "unnaturally_aligned_struct_16 b"]
   unnaturally_aligned_union_32: ["uint8_t a", "unnaturally_aligned_struct_32 b"]
   unnaturally_aligned_union_64: ["uint8_t a", "unnaturally_aligned_struct_64 b"]
@@ -127,9 +131,10 @@ unions:
   double_array_union: ["double a[3]", "double_array_struct b"]
   four_double_struct_union: ["double a", "four_double_struct b"]
 
+  # `unnaturally aligned` means: a struct/union that recursively contains at
+  # least one non-naturally-aligned field.
   unnaturally_aligned_float_union: ["uint8_t a", "unnaturally_aligned_float_struct b"]
   unnaturally_aligned_double_union: ["uint8_t a", "unnaturally_aligned_double_struct b"]
-
   unnaturally_aligned_float_struct_union: ["char prepadding[2]", "float a", "char postpadding[2]"]
   unnaturally_aligned_double_struct_union: ["char prepadding[2]", "double a", "char postpadding[2]"]
 
