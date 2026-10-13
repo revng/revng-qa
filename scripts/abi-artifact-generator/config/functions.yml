@@ -17,7 +17,7 @@ structs:
   huge_struct: ["uint64_t a[32]"]
 
   # A struct with double-word-aligned field (under some ABIs)
-  struct_with_a_sixteen_byte_field: ["INT128_T a", "uint8_t b"]
+  struct_with_a_sixteen_byte_field: ["int128_t a", "uint8_t b"]
 
   # Nested structs
   small_struct_of_structs: ["two_byte_struct a", "one_byte_struct b"]
@@ -65,8 +65,8 @@ structs:
   float_array_struct: ["float a[3]"]
   double_array_struct: ["double a[3]"]
 
-  double_aligned_float_struct: ["INT128_T a", "float b"]
-  double_aligned_double_struct: ["INT128_T a", "double b"]
+  double_aligned_float_struct: ["int128_t a", "float b"]
+  double_aligned_double_struct: ["int128_t a", "double b"]
 
   # Nested structs with floats and doubles
   small_struct_of_structs_with_floats: ["two_byte_struct a", "float_struct b"]
@@ -88,7 +88,7 @@ packed_structs:
   unnaturally_aligned_struct_16: ["char prepadding[1]", "uint16_t a", "char postpadding[1]"]
   unnaturally_aligned_struct_32: ["char prepadding[2]", "uint32_t a", "char postpadding[2]"]
   unnaturally_aligned_struct_64: ["char prepadding[2]", "uint64_t a", "char postpadding[6]"]
-  unnaturally_aligned_struct_128: ["char prepadding[2]", "INT128_T a", "char postpadding[14]"]
+  unnaturally_aligned_struct_128: ["char prepadding[2]", "int128_t a", "char postpadding[14]"]
 
   unnaturally_aligned_float_struct: ["char prepadding[2]", "float a", "char postpadding[2]"]
   unnaturally_aligned_double_struct: ["char prepadding[2]", "double a", "char postpadding[2]"]
@@ -130,7 +130,7 @@ unions:
   float_or_smaller_int_union: ["float a", "uint16_t b"]
 
   double_or_int_union: ["double a", "uint64_t b"]
-  double_or_bigger_int_union: ["double a", "INT128_T b"]
+  double_or_bigger_int_union: ["double a", "int128_t b"]
   double_or_smaller_int_union: ["double a", "uint32_t b"]
 
   float_or_double_union: ["float a", "double b"]
@@ -168,7 +168,7 @@ argument_tests:
   single_16_bit_argument: ["int16_t"]
   single_32_bit_argument: ["uint32_t"]
   single_64_bit_argument: ["int64_t"]
-  single_128_bit_argument: ["INT128_T"]
+  single_128_bit_argument: ["int128_t"]
 
   # Floats
   single_float_argument: ["float"]
@@ -313,70 +313,70 @@ argument_tests:
     - uint32_t
     - int16_t
     - uint8_t
-    - UINT128_T
+    - uint128_t
   mixed_integer_and_float_arguments:
     - int64_t
     - float
     - int16_t
     - double
     - uint8_t
-    - UINT128_T
+    - uint128_t
   mixed_int_struct_arguments:
     - int64_t
     - padded_struct
     - int16_t
     - big_struct
-    - INT128_T
+    - int128_t
   mixed_int_float_struct_arguments:
     - double
     - double_struct
     - int16_t
     - big_struct
     - float_struct
-    - INT128_T
+    - int128_t
   mixed_int_union_arguments:
     - int64_t
     - padded_union
     - int16_t
     - big_union
-    - INT128_T
+    - int128_t
   mixed_int_float_union_arguments:
     - int64_t
     - padded_union
     - float
     - four_double_struct_union
-    - INT128_T
+    - int128_t
   mixed_int_struct_pointer_arguments:
     - padded_struct *
     - padded_struct
-    - UINT128_T *
+    - uint128_t *
     - int8_t
     - huge_struct
     - void *
   mixed_int_union_pointer_arguments:
     - padded_union *
     - padded_union
-    - UINT128_T *
+    - uint128_t *
     - int8_t
     - huge_union
     - void *
   six_register_test:
     - array_struct
-    - INT128_T
+    - int128_t
     - array_struct
   six_register_test_with_floats:
     - float
     - float
-    - INT128_T
+    - int128_t
     - array_struct
   six_register_test_with_doubles:
     - double
     - double
-    - INT128_T
+    - int128_t
     - array_struct
   six_register_test_with_unions:
     - array_union
-    - INT128_T
+    - int128_t
     - array_union
 
   #
@@ -555,29 +555,29 @@ argument_tests:
     - uint64_t
     - uint64_t
   lots_of_sixteen_byte_arguments:
-    - UINT128_T
-    - UINT128_T
-    - UINT128_T
-    - UINT128_T
-    - UINT128_T
-    - UINT128_T
-    - UINT128_T
-    - UINT128_T
-    - UINT128_T
-    - UINT128_T
-    - UINT128_T
-    - UINT128_T
-    - UINT128_T
-    - UINT128_T
-    - UINT128_T
-    - UINT128_T
-    - UINT128_T
-    - UINT128_T
-    - UINT128_T
-    - UINT128_T
-    - UINT128_T
-    - UINT128_T
-    - UINT128_T
+    - uint128_t
+    - uint128_t
+    - uint128_t
+    - uint128_t
+    - uint128_t
+    - uint128_t
+    - uint128_t
+    - uint128_t
+    - uint128_t
+    - uint128_t
+    - uint128_t
+    - uint128_t
+    - uint128_t
+    - uint128_t
+    - uint128_t
+    - uint128_t
+    - uint128_t
+    - uint128_t
+    - uint128_t
+    - uint128_t
+    - uint128_t
+    - uint128_t
+    - uint128_t
 
   lots_of_four_byte_float_arguments:
     - float
@@ -772,9 +772,9 @@ argument_tests:
     - gpr_t
     - gpr_t
     - uint8_t
-    - INT128_T
+    - int128_t
     - uint8_t
-    - INT128_T
+    - int128_t
 
   #
   # Test for floating point arguments on stack
@@ -1072,7 +1072,7 @@ argument_tests:
 
   padded_sixteen_byte_scalar_in_registers:
     - uint8_t
-    - UINT128_T
+    - uint128_t
   padded_eight_byte_scalar_in_registers:
     - uint8_t
     - uint64_t
@@ -1080,7 +1080,7 @@ argument_tests:
   padded_sixteen_byte_scalar_after_a_big_struct:
     - big_struct
     - uint8_t
-    - INT128_T
+    - int128_t
   eight_byte_scalar_after_a_big_struct:
     - big_struct
     - uint8_t
@@ -1094,7 +1094,7 @@ argument_tests:
     - gpr_t
     - gpr_t
     - gpr_t
-    - INT128_T
+    - int128_t
   sixteen_byte_scalar_after_three_gprs:
     - gpr_t
     - gpr_t
@@ -1453,7 +1453,7 @@ return_value_tests:
   single_16_bit_return_value: "int16_t"
   single_32_bit_return_value: "uint32_t"
   single_64_bit_return_value: "int64_t"
-  single_128_bit_return_value: "UINT128_T"
+  single_128_bit_return_value: "uint128_t"
 
   # Floats
   single_float_return_value: "float"
