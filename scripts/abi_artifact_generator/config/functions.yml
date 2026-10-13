@@ -756,7 +756,7 @@ argument_tests:
   #
   # Dedicated tests for highlighting apple arm64 abi quirks
   #
-  apple_extra_alignment_on_stack:
+  apple_two_byte_aligned_primitive_on_stack:
     - size_t
     - size_t
     - size_t
@@ -768,7 +768,7 @@ argument_tests:
     - uint8_t
     - uint8_t
     - uint16_t
-  apple_reverse_extra_alignment_on_stack:
+  apple_reverse_two_byte_aligned_primitive_on_stack:
     - size_t
     - size_t
     - size_t
@@ -780,7 +780,18 @@ argument_tests:
     - uint16_t
     - uint8_t
     - uint8_t
-  apple_quad_aligned_on_stack:
+  apple_padded_two_byte_aligned_primitive_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - uint16_t
+  apple_four_byte_aligned_primitive_on_stack:
     - size_t
     - size_t
     - size_t
@@ -794,7 +805,7 @@ argument_tests:
     - uint8_t
     - uint8_t
     - uint32_t
-  apple_reverse_quad_aligned_on_stack:
+  apple_reverse_four_byte_aligned_primitive_on_stack:
     - size_t
     - size_t
     - size_t
@@ -808,7 +819,20 @@ argument_tests:
     - uint8_t
     - uint8_t
     - uint8_t
-  apple_multi_aligned_on_stack:
+  apple_padded_four_byte_aligned_primitive_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint32_t
+  apple_eight_byte_aligned_primitive_on_stack:
     - size_t
     - size_t
     - size_t
@@ -826,7 +850,7 @@ argument_tests:
     - uint8_t
     - uint8_t
     - uint64_t
-  apple_reverse_multi_aligned_on_stack:
+  apple_reverse_eight_byte_aligned_primitive_on_stack:
     - size_t
     - size_t
     - size_t
@@ -844,6 +868,23 @@ argument_tests:
     - uint8_t
     - uint8_t
     - uint8_t
+  apple_padded_eight_byte_aligned_primitive_on_stack:
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - size_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint64_t
 
 return_value_tests:
   single_8_bit_return_value: "uint8_t"
