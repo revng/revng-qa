@@ -640,118 +640,118 @@ argument_tests:
   # Tests for non-trivially aligned stack arguments.
   #
 
-  size_test:
-    - size_t
+  gpr_test:
+    - gpr_t
   forced_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
   two_byte_aligned_struct_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - small_struct
     - uint8_t
     - small_struct
   two_byte_aligned_union_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - small_union
     - uint8_t
     - small_union
   four_byte_aligned_struct_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - big_struct
     - uint8_t
     - big_struct
   four_byte_aligned_union_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - big_union
     - uint8_t
     - big_union
   four_byte_aligned_scalar_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - uint64_t
     - uint8_t
     - uint64_t
   eight_byte_aligned_struct_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - struct_with_a_sixteen_byte_field
     - uint8_t
     - struct_with_a_sixteen_byte_field
   eight_byte_aligned_union_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - union_with_a_sixteen_byte_field
     - uint8_t
     - union_with_a_sixteen_byte_field
   eight_byte_aligned_scalar_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - INT128_T
     - uint8_t
@@ -761,84 +761,84 @@ argument_tests:
   # Test for floating point arguments on stack
   #
   float_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - float
   double_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - double
   float_struct_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - float_struct
   double_struct_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - double_struct
   two_float_struct_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - two_float_struct
   two_double_struct_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - two_double_struct
   multi_float_struct_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - eight_float_struct
   multi_double_struct_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - four_double_struct
 
   #
@@ -846,42 +846,42 @@ argument_tests:
   #
 
   struct_of_structs_in_registers:
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
     - struct_of_structs
   union_of_unions_in_registers:
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
     - union_of_unions
   struct_of_structs_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - struct_of_structs
   union_of_unions_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - union_of_unions
   misaligned_struct_of_structs_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - struct_of_structs
     - uint8_t
@@ -889,14 +889,14 @@ argument_tests:
     - uint8_t
     - struct_of_structs
   misaligned_union_of_unions_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - union_of_unions
     - uint8_t
@@ -904,14 +904,14 @@ argument_tests:
     - uint8_t
     - union_of_unions
   small_struct_of_structs_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - small_struct_of_structs
     - uint8_t
@@ -919,14 +919,14 @@ argument_tests:
     - uint8_t
     - small_struct_of_structs
   small_union_of_unions_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - small_union_of_unions
     - uint8_t
@@ -934,14 +934,14 @@ argument_tests:
     - uint8_t
     - small_union_of_unions
   padded_struct_of_structs_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - padded_struct_of_structs
     - uint8_t
@@ -949,14 +949,14 @@ argument_tests:
     - uint8_t
     - padded_struct_of_structs
   padded_struct_of_structs_with_a_sixteen_byte_field_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - padded_struct_of_structs_with_a_sixteen_byte_field
     - uint8_t
@@ -987,64 +987,64 @@ argument_tests:
     - needle_in_a_haystack_float_struct_union
 
   nested_float_struct_argument_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - nested_float_struct
   deeply_nested_float_struct_argument_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - deeply_nested_float_struct
   needle_in_a_haystack_float_struct_argument_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - needle_in_a_haystack_float_struct
   nested_float_struct_union_argument_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - nested_float_struct_union
   deeply_nested_float_struct_union_argument_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - deeply_nested_float_struct_union
   needle_in_a_haystack_float_struct_union_argument_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - needle_in_a_haystack_float_struct_union
 
   #
@@ -1068,228 +1068,228 @@ argument_tests:
     - uint64_t
 
   sixteen_byte_scalar_after_seven_gprs:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - INT128_T
   sixteen_byte_scalar_after_three_gprs:
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint64_t
 
   #
   # Tests for non-naturally aligned structs.
   #
   unnaturally_aligned_struct_128_in_registers:
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
     - unnaturally_aligned_struct_128
   unnaturally_aligned_union_128_in_registers:
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
     - unnaturally_aligned_union_128
   unnaturally_aligned_struct_128_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - unnaturally_aligned_struct_128
     - uint8_t
     - unnaturally_aligned_struct_128
   unnaturally_aligned_union_128_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - unnaturally_aligned_union_128
     - uint8_t
     - unnaturally_aligned_union_128
 
   unnaturally_aligned_struct_64_in_registers:
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
     - unnaturally_aligned_struct_64
   unnaturally_aligned_union_64_in_registers:
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
     - unnaturally_aligned_union_64
   unnaturally_aligned_struct_64_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - unnaturally_aligned_struct_64
     - uint8_t
     - unnaturally_aligned_struct_64
   unnaturally_aligned_union_64_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - unnaturally_aligned_union_64
     - uint8_t
     - unnaturally_aligned_union_64
 
   unnaturally_aligned_struct_32_in_registers:
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
     - unnaturally_aligned_struct_32
   unnaturally_aligned_union_32_in_registers:
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
     - unnaturally_aligned_union_32
   unnaturally_aligned_struct_32_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - unnaturally_aligned_struct_32
     - uint8_t
     - unnaturally_aligned_struct_32
   unnaturally_aligned_union_32_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - unnaturally_aligned_union_32
     - uint8_t
     - unnaturally_aligned_union_32
 
   unnaturally_aligned_struct_16_in_registers:
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
     - unnaturally_aligned_struct_16
   unnaturally_aligned_union_16_in_registers:
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
     - unnaturally_aligned_union_16
   unnaturally_aligned_struct_16_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - unnaturally_aligned_struct_16
     - uint8_t
     - unnaturally_aligned_struct_16
   unnaturally_aligned_union_16_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - unnaturally_aligned_union_16
     - uint8_t
     - unnaturally_aligned_union_16
 
   unnaturally_aligned_float_struct_in_registers:
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
     - unnaturally_aligned_float_struct
   unnaturally_aligned_float_union_in_registers:
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
     - unnaturally_aligned_float_struct_union
   unnaturally_aligned_float_struct_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - unnaturally_aligned_float_struct
     - uint8_t
     - unnaturally_aligned_float_struct
   unnaturally_aligned_float_struct_union_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - unnaturally_aligned_float_struct_union
     - uint8_t
     - unnaturally_aligned_float_struct_union
 
   unnaturally_aligned_double_struct_in_registers:
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
     - unnaturally_aligned_double_struct
   unnaturally_aligned_double_struct_union_in_registers:
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
     - unnaturally_aligned_double_struct_union
   unnaturally_aligned_double_struct_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - unnaturally_aligned_double_struct
     - uint8_t
     - unnaturally_aligned_double_struct
   unnaturally_aligned_double_struct_union_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - unnaturally_aligned_double_struct_union
     - uint8_t
@@ -1299,90 +1299,90 @@ argument_tests:
   # Dedicated tests for highlighting apple arm64 abi quirks
   #
   apple_two_byte_aligned_primitive_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - uint8_t
     - uint16_t
   apple_reverse_two_byte_aligned_primitive_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint16_t
     - uint8_t
     - uint8_t
   apple_padded_two_byte_aligned_primitive_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - uint16_t
   apple_four_byte_aligned_primitive_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - uint8_t
     - uint8_t
     - uint8_t
     - uint32_t
   apple_reverse_four_byte_aligned_primitive_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint32_t
     - uint8_t
     - uint8_t
     - uint8_t
     - uint8_t
   apple_padded_four_byte_aligned_primitive_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - uint8_t
     - uint8_t
     - uint32_t
   apple_eight_byte_aligned_primitive_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - uint8_t
     - uint8_t
@@ -1393,14 +1393,14 @@ argument_tests:
     - uint8_t
     - uint64_t
   apple_reverse_eight_byte_aligned_primitive_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint64_t
     - uint8_t
     - uint8_t
@@ -1411,14 +1411,14 @@ argument_tests:
     - uint8_t
     - uint8_t
   apple_padded_eight_byte_aligned_primitive_on_stack:
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
-    - size_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
     - uint8_t
     - uint8_t
     - uint8_t
