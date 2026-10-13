@@ -49,6 +49,8 @@ typedef struct {
 #define UINT128_T replacement_for___uint128_t
 #endif
 
+typedef size_t gpr_t;
+
 /*
  * Helper structs used by the functions
  */
