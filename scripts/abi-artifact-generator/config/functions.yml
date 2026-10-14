@@ -1,213 +1,275 @@
 ---
-structs:
-  one_byte_struct: ["uint8_t a"]
-  two_byte_struct: ["uint16_t a"]
-  three_byte_struct: ["uint16_t a", "uint8_t b"]
-  four_byte_struct: ["uint32_t a"]
-  seven_byte_struct: ["uint32_t a", "uint16_t b", "uint8_t c"]
-  eight_byte_struct: ["uint64_t a"]
-  sixteen_byte_struct: ["uint64_t a", "uint64_t b"]
-
-  small_struct: ["uint16_t a", "uint16_t b"]
-  padded_struct: ["uint8_t a", "uint16_t b"]
-  array_struct: ["uint64_t a[2]"]
-  two_arrays_struct: ["uint32_t a[3]", "uint64_t b[3]"]
-  big_struct: ["uint64_t a[8]"]
-  huge_struct: ["uint64_t a[32]"]
-  struct_with_a_sixteen_byte_field: ["INT128_T a", "uint8_t b"]
-  small_struct_of_structs: ["two_byte_struct a", "one_byte_struct b"]
-  struct_of_structs: ["small_struct a[2]", "one_byte_struct b"]
-  padded_struct_of_structs: ["one_byte_struct a", "big_struct b"]
-  padded_struct_of_structs_with_a_sixteen_byte_field: ["one_byte_struct a", "struct_with_a_sixteen_byte_field b"]
-
-  float_struct: ["float a"]
-  two_float_struct: ["float a", "float b"]
-  three_float_struct: ["float a", "float b", "float c"]
-  four_float_struct: ["float a", "float b", "float c", "float d"]
-  five_float_struct: ["float a", "float b", "float c", "float d", "float e"]
-  six_float_struct: ["float a", "float b", "float c", "float d", "float e", "float f"]
-  seven_float_struct: ["float a", "float b", "float c", "float d", "float e", "float f", "float g"]
-  eight_float_struct:
-    ["float a", "float b", "float c", "float d", "float e", "float f", "float g", "float h"]
-
-  double_struct: ["double a"]
-  two_double_struct: ["double a", "double b"]
-  three_double_struct: ["double a", "double b", "double c"]
-  four_double_struct: ["double a", "double b", "double c", "double d"]
-
-  float_double_struct: ["float a", "double b"]
-  double_float_struct: ["double a", "float b"]
-
-  float_double_float_struct: ["float a", "double b", "float c"]
-  double_float_double_struct: ["double a", "float b", "double c"]
-  float_double_double_struct: ["float a", "double b", "double c"]
-  double_float_float_struct: ["double a", "float b", "float c"]
-
-  int_float_struct: ["uint32_t a", "float b"]
-  float_int_struct: ["float a", "uint32_t b"]
-
-  int_double_struct: ["int64_t a", "double b"]
-  double_int_struct: ["double a", "int64_t b"]
-
-  padded_float_struct: ["uint8_t a", "float b"]
-  padded_double_struct: ["uint8_t a", "double b"]
-
-  float_array_struct: ["float a[3]"]
-  double_array_struct: ["double a[3]"]
-
-  double_aligned_float_struct: ["INT128_T a", "float b"]
-  double_aligned_double_struct: ["INT128_T a", "double b"]
-
-  small_struct_of_structs_with_floats: ["two_byte_struct a", "float_struct b"]
-  struct_of_structs_with_floats: ["four_byte_struct a", "double_struct b"]
-
-  padded_struct_of_structs_with_floats: ["one_byte_struct a", "eight_float_struct b"]
-  double_padded_struct_of_structs_with_floats: ["one_byte_struct a", "double_aligned_double_struct b"]
-
-  nested_float_struct: ["one_byte_struct a", "two_byte_struct b", "float_struct c"]
-  deeply_nested_float_struct: ["one_byte_struct a", "two_byte_struct b", "nested_float_struct c"]
-  needle_in_a_haystack_float_struct:
-    ["one_byte_struct a", "two_byte_struct b", "deeply_nested_float_struct c"]
-
-  # TODO: add other floating point types (16-bit, 128-bit, etc)
-
-packed_structs:
-  # `unnaturally aligned` means: a struct/union that recursively contains at
-  # least one non-naturally-aligned field.
-  unnaturally_aligned_struct_16: ["char prepadding[1]", "uint16_t a", "char postpadding[1]"]
-  unnaturally_aligned_struct_32: ["char prepadding[2]", "uint32_t a", "char postpadding[2]"]
-  unnaturally_aligned_struct_64: ["char prepadding[2]", "uint64_t a", "char postpadding[6]"]
-  unnaturally_aligned_struct_128: ["char prepadding[2]", "INT128_T a", "char postpadding[14]"]
-
-  unnaturally_aligned_float_struct: ["char prepadding[2]", "float a", "char postpadding[2]"]
-  unnaturally_aligned_double_struct: ["char prepadding[2]", "double a", "char postpadding[2]"]
-
-unions:
-  one_byte_union: ["uint8_t a", "one_byte_struct b"]
-  two_byte_union: ["uint16_t a", "two_byte_struct b"]
-  three_byte_union: ["uint16_t a", "three_byte_struct b"]
-  four_byte_union: ["uint32_t a", "four_byte_struct b"]
-  seven_byte_union: ["uint32_t a", "seven_byte_struct b"]
-  eight_byte_union: ["uint64_t a", "eight_byte_struct b"]
-  sixteen_byte_union: ["uint64_t a", "sixteen_byte_struct b"]
-
-  small_union: ["uint8_t a", "small_struct b"] # the integer is smaller
-  padded_union: ["uint64_t a", "padded_struct b"] # the struct is smaller
-  array_union: ["uint32_t a[3]", "array_struct b"]
-  big_union: ["uint64_t a", "big_struct b"]
-  huge_union: ["uint64_t a", "huge_struct b"]
-  union_with_a_sixteen_byte_field: ["uint64_t a", "struct_with_a_sixteen_byte_field b"]
-
-  small_union_of_structs: ["one_byte_struct a", "two_byte_struct b"]
-  small_union_of_unions: ["one_byte_union a", "two_byte_union b"]
-  union_of_structs: ["seven_byte_struct a", "eight_byte_struct b"]
-  union_of_unions: ["seven_byte_union a", "eight_byte_union b"]
-
-  # `unnaturally aligned` means: a struct/union that recursively contains at
-  # least one non-naturally-aligned field.
-  unnaturally_aligned_union_16: ["uint8_t a", "unnaturally_aligned_struct_16 b"]
-  unnaturally_aligned_union_32: ["uint8_t a", "unnaturally_aligned_struct_32 b"]
-  unnaturally_aligned_union_64: ["uint8_t a", "unnaturally_aligned_struct_64 b"]
-  unnaturally_aligned_union_128: ["uint8_t a", "unnaturally_aligned_struct_128 b"]
-
-  float_or_int_union: ["float a", "uint32_t b"]
-  float_or_bigger_int_union: ["float a", "uint64_t b"]
-  float_or_smaller_int_union: ["float a", "uint16_t b"]
-
-  double_or_int_union: ["double a", "uint64_t b"]
-  double_or_bigger_int_union: ["double a", "INT128_T b"]
-  double_or_smaller_int_union: ["double a", "uint32_t b"]
-
-  float_or_double_union: ["float a", "double b"]
-  float_or_float_struct_union: ["float a", "float_struct b"]
-  float_or_two_float_struct_union: ["float a", "two_float_struct b"]
-  float_or_double_struct_union: ["float a", "double_struct b"]
-
-  double_or_float_struct_union: ["double a", "float_struct b"]
-  double_or_two_float_struct_union: ["double a", "two_float_struct b"]
-  double_or_double_struct_union: ["double a", "double_struct b"]
-
-  float_array_union: ["float a[3]", "float_array_struct b"]
-  double_array_union: ["double a[3]", "double_array_struct b"]
-  four_double_struct_union: ["double a", "four_double_struct b"]
-
-  # `unnaturally aligned` means: a struct/union that recursively contains at
-  # least one non-naturally-aligned field.
-  unnaturally_aligned_float_union: ["uint8_t a", "unnaturally_aligned_float_struct b"]
-  unnaturally_aligned_double_union: ["uint8_t a", "unnaturally_aligned_double_struct b"]
-  unnaturally_aligned_float_struct_union: ["char prepadding[2]", "float a", "char postpadding[2]"]
-  unnaturally_aligned_double_struct_union: ["char prepadding[2]", "double a", "char postpadding[2]"]
-
-  nested_float_struct_union: ["uint64_t a", "nested_float_struct b"]
-  deeply_nested_float_struct_union: ["uint64_t a", "deeply_nested_float_struct b"]
-  needle_in_a_haystack_float_struct_union: ["uint64_t a", "needle_in_a_haystack_float_struct b"]
+# Since the list of the test functions has grown considerably, let's introduce
+# some structure.
+# Namely, consider the following yaml to be split into a set of test groups,
+# where each group is denoted by a `group X.Y` comment at its start.
+# Here's a brief explanation of each group:
+#
+# - Group 1: simple arguments.
+#   All of these functions accept exactly one argument.
+#
+#   It is divided into sub-groups:
+#
+#   - 1.1. Integer primitives and pointers.
+#   - 1.2. Floating point primitives.
+#   - 1.3. Simple structs and unions.
+#   - 1.4. Special structs and unions (big, padded, misaligned, etc)
+#   - 1.5. Simple structs and unions with *only* floating point fields.
+#   - 1.6. Simple structs and unions with a mix floating point and integer
+#         fields.
+#   - 1.7. Special structs and unions (big, padded, misaligned, etc)
+#         with floating point fields.
+#
+# - Group 2: multiple arguments.
+#
+#   There is no `.X` subdivision of this group as it's the smallest one.
+#   It is mostly there to serve as a canary for the more complicated tests
+#   from the following groups (namely group 4).
+#
+# - Group 3: stack arguments.
+#
+#   Note that this group is located further down compared to other groups
+#   (making the groups appear out of order) - the reason for that is that having
+#   a dedicated yaml key (read: specialized generator logic) removes the need to
+#   spell `gpr_t` 8 times for each test entry.
+#
+#   It is divided into sub-groups:
+#
+#   - 3.1. Canary tests indicating the stack itself works correctly.
+#   - 3.2. Simple stack arguments preceeded by padded dummy arguments.
+#   - 3.3. Double-gpr-aligned stack arguments.
+#   - 3.4. Unnaturally sized stack arguments.
+#   - 3.5. Unnaturally aligned stack arguments.
+#   - 3.6. Stack arguments involving floating point.
+#
+# - Group 4: dedicated tests for each boolean.
+#
+#   Note that not all the tests belong to this section, some sub-groups
+#   instead contain comments with names of the tests from the previous groups
+#   that trigger the corresponding boolean.
+#
+#   Also note that this group is scattered across `argument_tests` and
+#   `stack_argument_tests` as some booleans are easier to highlight in one
+#   or the other.
+#
+# - Group 5: return value tests.
+#
+#   Note that this group mirrors group 1 exactly. It is divided into the exact
+#   same set of sub-groups. Moreover, most of the comments placed in the
+#   group 1 apply to these just as well.
 
 argument_tests:
   #
-  # Simple single argument tests
+  # Group 1. Simple arguments
   #
 
+  # Group 1.1. Integers and pointers
+  #
+  # The simplest cases possible: a single GPR argument of a given width,
+  # these cover the typical c primitives.
+  #
+  # Note that differentiation between the signed and unsigned variants is
+  # superficial, as the ABIs we support do not act on the distinction between
+  # the two. That is to say, there's no reason to provide two versions of each
+  # test, but just in case, the signedness is mixed.
+  #
+  # - 1 byte
   single_8_bit_argument: ["uint8_t"]
+  # - 2 bytes
   single_16_bit_argument: ["int16_t"]
+  # - 4 bytes
   single_32_bit_argument: ["uint32_t"]
+  # - 8 bytes
   single_64_bit_argument: ["int64_t"]
+  # - 16 bytes
+  #
+  # Note that this one is not available for every architecture. The binaries
+  # produced by a compiler that does not advertize the support use a fallback
+  # struct of equivalent size instead.
   single_128_bit_argument: ["INT128_T"]
 
+  # Same as above, but using a pointer as the type.
+  single_void_pointer_argument: ["void *"]
+  single_struct_pointer_argument: ["four_byte_struct *"]
+
+  # `gpr_t` is a typedef we use in the stack tests to make sure a certain number
+  # of registers is occupied (thus forcing the next argument to be placed on
+  # the stack).
+  #
+  # This test is just a canary to make sure whatever problem happened is not
+  # with the type itself.
+  single_gpr_argument: ["gpr_t"]
+
+  # Group 1.2. Floats
+  #
+  # The floating point counterparts of the above.
+  #
+  # TODO: add more sizes once revng supports those.
+  #
+  # - 4 bytes
   single_float_argument: ["float"]
+  # - 8 bytes
   single_double_argument: ["double"]
 
+  # Group 1.3. Simple structs and unions.
+  #
+  # Each of these represents a struct/union of *at least* the given size, with
+  # the potential of trailing padding following the fields.
+  #
+  # Note that some of them are marked as "unnaturally sized", those are
+  # intentionally not padded to their alignment. See their definition in the
+  # `structs:` section below for more context.
+  #
+  # - 1 byte
   single_one_byte_struct_argument: ["one_byte_struct"]
+  # - 2 bytes
   single_two_byte_struct_argument: ["two_byte_struct"]
+  # - 3 bytes
+  single_unnaturally_sized_three_byte_struct_argument: ["unnaturally_sized_three_byte_struct"]
+  # - 3 bytes but padded to 4.
   single_three_byte_struct_argument: ["three_byte_struct"]
+  # - 4 bytes, identical to the above.
   single_four_byte_struct_argument: ["four_byte_struct"]
+  # - 6 bytes (not padded!)
+  single_unnaturally_sized_six_byte_struct_argument: ["unnaturally_sized_six_byte_struct"]
+  # - 7 bytes
+  single_unnaturally_sized_seven_byte_struct_argument: ["unnaturally_sized_seven_byte_struct"]
+  # - 7 bytes but padded to 8.
   single_seven_byte_struct_argument: ["seven_byte_struct"]
+  # - 8 bytes
   single_eight_byte_struct_argument: ["eight_byte_struct"]
+  # - 9 bytes (not padded!)
+  single_unnaturally_sized_nine_byte_struct_argument: ["unnaturally_sized_nine_byte_struct"]
+  # - 14 bytes (not padded!)
+  single_unnaturally_sized_forteen_byte_struct_argument: ["unnaturally_sized_forteen_byte_struct"]
+  # - 16 bytes
   single_sixteen_byte_struct_argument: ["sixteen_byte_struct"]
 
-  single_one_byte_union_argument: ["one_byte_union"]
-  single_two_byte_union_argument: ["two_byte_union"]
-  single_three_byte_union_argument: ["three_byte_union"]
-  single_four_byte_union_argument: ["four_byte_union"]
-  single_seven_byte_union_argument: ["seven_byte_union"]
-  single_eight_byte_union_argument: ["eight_byte_union"]
-  single_sixteen_byte_union_argument: ["sixteen_byte_union"]
+  # The same structs, but as union fields, accompanied with either a smaller or
+  # a bigger primitive.
+  #
+  # This helps us detect any mismatch of behavior between a struct and a union,
+  # all other things equal.
+  #
+  # Note that there are ABIs that compute argument "kind" per-GPR-sized-chunk as
+  # opposed to only cutting on the argument boundary (like `SystemV-x86-64`).
+  # Which is why there are seemingly unnecessary tests here intentionally
+  # putting primitives against structs against each other.
+  #
+  # Note, since both halves of the union have the same kind here, this is mostly
+  # for the sake of verifying the classification system does not break in
+  # typical cases, whereas the floating point versions of these (see groups 1.5
+  # and especially 1.6 for) are what's really testing the classification system.
+  #
+  # Think of it this way: if only the floating point versions of these tests
+  # fail - the problem is with the classfication system. If some of these tests
+  # fail with them - the problem is likely somewhere else.
+  #
+  # As in, these serve as the ground truth ensuring that classification system
+  # inputs reach it in a valid shape.
+  #
+  # - 1-byte
+  single_one_byte_struct_union_with_a_smaller_scalar_argument: ["one_byte_struct_union_with_a_smaller_scalar"]
+  single_one_byte_struct_union_with_a_bigger_scalar_argument: ["one_byte_struct_union_with_a_bigger_scalar"]
+  # - 2-byte
+  single_two_byte_struct_union_with_a_smaller_scalar_argument: ["two_byte_struct_union_with_a_smaller_scalar"]
+  single_two_byte_struct_union_with_a_bigger_scalar_argument: ["two_byte_struct_union_with_a_bigger_scalar"]
+  # - 3 bytes
+  single_unnaturally_sized_three_byte_union_with_a_smaller_scalar_argument: ["unnaturally_sized_three_byte_union_with_a_smaller_scalar"]
+  single_unnaturally_sized_three_byte_union_with_a_bigger_scalar_argument: ["unnaturally_sized_three_byte_union_with_a_bigger_scalar"]
+  # - 3 bytes padded to 4.
+  single_three_byte_struct_union_with_a_smaller_scalar_argument: ["three_byte_struct_union_with_a_smaller_scalar"]
+  single_three_byte_struct_union_with_a_bigger_scalar_argument: ["three_byte_struct_union_with_a_bigger_scalar"]
+  # - 4 bytes
+  single_four_byte_struct_union_with_a_smaller_scalar_argument: ["four_byte_struct_union_with_a_smaller_scalar"]
+  single_four_byte_struct_union_with_a_bigger_scalar_argument: ["four_byte_struct_union_with_a_bigger_scalar"]
+  # - 7 bytes
+  single_unnaturally_sized_seven_byte_union_with_a_smaller_scalar_argument: ["unnaturally_sized_seven_byte_union_with_a_smaller_scalar"]
+  single_unnaturally_sized_seven_byte_union_with_a_bigger_scalar_argument: ["unnaturally_sized_seven_byte_union_with_a_bigger_scalar"]
+  # - 7 bytes padded to 8.
+  single_seven_byte_struct_union_with_a_smaller_scalar_argument: ["seven_byte_struct_union_with_a_smaller_scalar"]
+  single_seven_byte_struct_union_with_a_bigger_scalar_argument: ["seven_byte_struct_union_with_a_bigger_scalar"]
+  # - 8 bytes
+  single_eight_byte_struct_union_with_a_smaller_scalar_argument: ["eight_byte_struct_union_with_a_smaller_scalar"]
+  single_eight_byte_struct_union_with_a_bigger_scalar_argument: ["eight_byte_struct_union_with_a_bigger_scalar"]
+  # - 9 bytes (not padded!)
+  single_unnaturally_sized_nine_byte_struct_union_with_a_smaller_scalar_argument: ["unnaturally_sized_nine_byte_struct_union_with_a_smaller_scalar"]
+  single_unnaturally_sized_nine_byte_struct_union_with_a_bigger_scalar_argument: ["unnaturally_sized_nine_byte_struct_union_with_a_bigger_scalar"]
+  # - 14 bytes (not padded!)
+  single_unnaturally_sized_forteen_byte_struct_with_a_smaller_scalar_argument: ["unnaturally_sized_forteen_byte_struct_with_a_smaller_scalar"]
+  single_unnaturally_sized_forteen_byte_struct_with_a_bigger_scalar_argument: ["unnaturally_sized_forteen_byte_struct_with_a_bigger_scalar"]
+  # - 16 bytes
+  single_sixteen_byte_struct_union_with_a_smaller_scalar_argument: ["sixteen_byte_struct_union_with_a_smaller_scalar"]
 
-  single_small_struct_argument: ["small_struct"]
-  single_padded_struct_argument: ["padded_struct"]
+  # Group 1.4. Special structs and unions.
+
+  # The goal of the "big" (quoted because some of them are not that big) structs
+  # and unions is to verify the situation where the registers cannot fit
+  # the argument so the stack is forced.
+  #
+  # Note that the `array_*`-labeled one is only two-gpr-sized. That's
+  # intentional - it should be treated as a normal struct in non-position-based
+  # ABIs while being treated as a big struct (think pointer-to-copy) in position
+  # based ones (as it does not fit into a single register).
+  #
+  # Note that's why there's a special "32-bit" edition of the array struct.
+  #
+  # Bigger ones are self-explanatory.
   single_array_struct_argument: ["array_struct"]
-  single_two_arrays_struct_argument: ["two_arrays_struct"]
+  single_array_struct_32_bit_argument: ["array_struct_32_bit"]
   single_big_struct_argument: ["big_struct"]
   single_huge_struct_argument: ["huge_struct"]
-  single_struct_with_a_sixteen_byte_field_argument: ["struct_with_a_sixteen_byte_field"]
-  single_small_struct_of_structs_argument: ["small_struct_of_structs"]
-  single_struct_of_structs_argument: ["struct_of_structs"]
-  single_padded_struct_of_structs_argument: ["padded_struct_of_structs"]
-  single_padded_struct_of_structs_with_a_sixteen_byte_field_argument: ["padded_struct_of_structs_with_a_sixteen_byte_field"]
-
-  single_small_union_argument: ["small_union"]
-  single_padded_union_argument: ["padded_union"]
   single_array_union_argument: ["array_union"]
+  single_array_union_32_bit_argument: ["array_union_32_bit"]
   single_big_union_argument: ["big_union"]
   single_huge_union_argument: ["huge_union"]
-  single_union_with_a_sixteen_byte_field_argument: ["union_with_a_sixteen_byte_field"]
-  single_small_union_of_structs_argument: ["small_union_of_structs"]
-  single_small_union_of_unions_argument: ["small_union_of_unions"]
-  single_union_of_structs_argument: ["union_of_structs"]
-  single_union_of_unions_argument: ["union_of_unions"]
 
-  single_void_pointer_argument: ["void *"]
-  single_int_pointer_argument: ["uint32_t *"]
+  # Structs and unions with double-gpr-aligned (under some ABIs) fields.
+  #
+  # The goal of the aggregates with double-gpr-aligned fields is to make sure
+  # we correctly handle the non-trivial amount of both inter-field and trailing
+  # padding.
+  single_struct_with_a_sixteen_byte_field_at_the_start_argument: ["struct_with_a_sixteen_byte_field_at_the_start"]
+  single_struct_with_a_sixteen_byte_field_at_the_end_argument: ["struct_with_a_sixteen_byte_field_at_the_end"]
+  single_union_with_a_sixteen_byte_field_at_the_start_argument: ["union_with_a_sixteen_byte_field_at_the_start"]
+  single_union_with_a_sixteen_byte_field_at_the_end_argument: ["union_with_a_sixteen_byte_field_at_the_end"]
 
-  single_unnaturally_aligned_struct_128_argument: ["unnaturally_aligned_struct_128"]
-  single_unnaturally_aligned_struct_64_argument: ["unnaturally_aligned_struct_64"]
-  single_unnaturally_aligned_struct_32_argument: ["unnaturally_aligned_struct_32"]
+  # Nested structs and unions.
+  #
+  # These tests are basic, they serve as canaries for the alignment computation
+  # system. If these fail, it is either severely broken or its inputs don't
+  # reach it correctly.
+  #
+  # In simple words, if the more complicated alignment tests fail, these are
+  # a good indication on whether the problem thing is the alignment computation
+  # itself or something before it - as the alignment computation for these is
+  # trivial (while still involving a proper visit of the type system).
+  #
+  # Note that group 1.6 (integer-float-mixing-aggregates) contains deeply nested
+  # versions of these, but they are omitted from the non-floating-point sections
+  # to reduce the number of tests.
+  single_small_struct_of_structs_argument: ["small_struct_of_structs"]
+  single_struct_of_structs_argument: ["struct_of_structs"]
+
+  # Unnaturally aligned structs and unions, where "unnaturally aligned" means
+  # a struct or union that recursively contains at least one non-naturally-
+  # aligned field (field offset of which is not a multiple of its own alignment)
   single_unnaturally_aligned_struct_16_argument: ["unnaturally_aligned_struct_16"]
-
+  single_unnaturally_aligned_struct_32_argument: ["unnaturally_aligned_struct_32"]
+  single_unnaturally_aligned_struct_64_argument: ["unnaturally_aligned_struct_64"]
+  single_unnaturally_aligned_struct_128_argument: ["unnaturally_aligned_struct_128"]
   single_unnaturally_aligned_union_16_argument: ["unnaturally_aligned_union_16"]
   single_unnaturally_aligned_union_32_argument: ["unnaturally_aligned_union_32"]
   single_unnaturally_aligned_union_64_argument: ["unnaturally_aligned_union_64"]
   single_unnaturally_aligned_union_128_argument: ["unnaturally_aligned_union_128"]
 
+  # Group 1.5. Simple structs and unions with float fields.
+  #
+  # Note that there are a lot of these. Namely, this is because there are
+  # ABIs (for example, ARM-32) that unroll such structs into a series of
+  # floating point arguments and *pack* them into vectors, which, practically,
+  # means that quite a few such fields can be passed while only occupying
+  # a relatively small register number.
   single_float_struct_argument: ["float_struct"]
   single_two_float_struct_argument: ["two_float_struct"]
   single_three_float_struct_argument: ["three_float_struct"]
@@ -216,12 +278,21 @@ argument_tests:
   single_six_float_struct_argument: ["six_float_struct"]
   single_seven_float_struct_argument: ["seven_float_struct"]
   single_eight_float_struct_argument: ["eight_float_struct"]
+  single_nine_float_struct_argument: ["nine_float_struct"]
 
   single_double_struct_argument: ["double_struct"]
   single_two_double_struct_argument: ["two_double_struct"]
   single_three_double_struct_argument: ["three_double_struct"]
   single_four_double_struct_argument: ["four_double_struct"]
+  single_five_double_struct_argument: ["five_double_struct"]
 
+  # Similar of the above, the mixed tests are extra explicit because some ABIs
+  # (for example, ARM-32) pack them into vectors - meaning non-trivial logic
+  # applies to them.
+  #
+  # NOTE: these specific functions should NOT be packed as the structs use
+  #       mixed typing! But they are still important to make sure the related
+  #       logic does not *try to* pack them in.
   single_float_double_struct_argument: ["float_double_struct"]
   single_double_float_struct_argument: ["double_float_struct"]
   single_float_double_float_struct_argument: ["float_double_float_struct"]
@@ -229,32 +300,13 @@ argument_tests:
   single_float_double_double_struct_argument: ["float_double_double_struct"]
   single_double_float_float_struct_argument: ["double_float_float_struct"]
 
-  single_int_float_struct_argument: ["int_float_struct"]
-  single_float_int_struct_argument: ["float_int_struct"]
-  single_int_double_struct_argument: ["int_double_struct"]
-  single_double_int_struct_argument: ["double_int_struct"]
-  single_padded_float_struct_argument: ["padded_float_struct"]
-  single_padded_double_struct_argument: ["padded_double_struct"]
-  single_float_array_struct_argument: ["float_array_struct"]
-  single_double_array_struct_argument: ["double_array_struct"]
-
-  single_double_aligned_float_struct_argument: ["double_aligned_float_struct"]
-  single_double_aligned_double_struct_argument: ["double_aligned_double_struct"]
-  single_small_struct_of_structs_with_floats_argument: ["small_struct_of_structs_with_floats"]
-  single_struct_of_structs_with_floats_argument: ["struct_of_structs_with_floats"]
-  single_padded_struct_of_structs_with_floats_argument: ["padded_struct_of_structs_with_floats"]
-  single_double_padded_struct_of_structs_with_floats_argument: ["double_padded_struct_of_structs_with_floats"]
-
-  single_unnaturally_aligned_float_struct_argument: ["unnaturally_aligned_float_struct"]
-  single_unnaturally_aligned_double_struct_argument: ["unnaturally_aligned_double_struct"]
-
-  single_float_or_int_union_argument: ["float_or_int_union"]
-  single_float_or_bigger_int_union_argument: ["float_or_bigger_int_union"]
-  single_float_or_smaller_int_union_argument: ["float_or_smaller_int_union"]
-  single_double_or_int_union_argument: ["double_or_int_union"]
-  single_double_or_bigger_int_union_argument: ["double_or_bigger_int_union"]
-  single_double_or_smaller_int_union_argument: ["double_or_smaller_int_union"]
-
+  # These unions are simple, but important, for the same reason as above: we
+  # need to make sure they are excluded from the packing logic.
+  #
+  # On top of that, they also serve as canaries for the alignment computation:
+  # they allow us to easily tell whether the floating point alignment is
+  # a problem or struct/union/array-related computation is (depending on a set
+  # of tests that fail at the same time).
   single_float_or_double_union_argument: ["float_or_double_union"]
   single_float_or_float_struct_union_argument: ["float_or_float_struct_union"]
   single_float_or_two_float_struct_union_argument: ["float_or_two_float_struct_union"]
@@ -262,131 +314,180 @@ argument_tests:
   single_double_or_float_struct_union_argument: ["double_or_float_struct_union"]
   single_double_or_two_float_struct_union_argument: ["double_or_two_float_struct_union"]
   single_double_or_double_struct_union_argument: ["double_or_double_struct_union"]
-
   single_float_array_union_argument: ["float_array_union"]
   single_double_array_union_argument: ["double_array_union"]
+  single_four_double_struct_union_argument: ["four_double_struct_union"]
 
-  single_unnaturally_aligned_float_union_argument: ["unnaturally_aligned_float_union"]
-  single_unnaturally_aligned_double_union_argument: ["unnaturally_aligned_double_union"]
+  # Group 1.6. Integer-float-mixing structs and unions.
+  #
+  # These are important, first and foremost, for the ABIs that classify their
+  # arguments into kinds (for example, `SystemV-x86-64`), as we want to make
+  # sure the kind we compute matches the one that lead the compiler to place
+  # the argument where it did.
+  single_int_float_struct_argument: ["int_float_struct"]
+  single_float_int_struct_argument: ["float_int_struct"]
+  single_int_double_struct_argument: ["int_double_struct"]
+  single_double_int_struct_argument: ["double_int_struct"]
 
+  # Note that bigger, intentionally multi-GPR sized ones are extra important
+  # because `SystemV-x86-64` computes the kind per-gpr-sized-chunk as opposed
+  # to trusting the argument boundary - hence, extra cases.
+  single_float_int_float_struct_argument: ["float_int_float_struct"]
+  single_int_float_int_struct_argument: ["int_float_int_struct"]
+  single_float_int_int_struct_argument: ["float_int_int_struct"]
+  single_int_float_float_struct_argument: ["int_float_float_struct"]
+  single_int_double_int_struct_argument: ["int_double_int_struct"]
+  single_double_int_double_struct_argument: ["double_int_double_struct"]
+  single_int_double_double_struct_argument: ["int_double_double_struct"]
+  single_double_int_int_struct_argument: ["double_int_int_struct"]
+
+  # Including ones with pronounced padding.
+  single_padded_float_struct_argument: ["padded_float_struct"]
+  single_padded_double_struct_argument: ["padded_double_struct"]
+
+  # Unions situation is relatively simple, as we just want to make sure we hit
+  # the `int > float` case.
+  #
+  # That being said, just in cases, let's keep the differently sized integers.
+  single_float_or_int_union_argument: ["float_or_int_union"]
+  single_float_or_bigger_int_union_argument: ["float_or_bigger_int_union"]
+  single_float_or_smaller_int_union_argument: ["float_or_smaller_int_union"]
+  single_double_or_int_union_argument: ["double_or_int_union"]
+  single_double_or_bigger_int_union_argument: ["double_or_bigger_int_union"]
+  single_double_or_smaller_int_union_argument: ["double_or_smaller_int_union"]
+
+  # Group 1.7. Special structs and unions (big, padded, misaligned, etc)
+  #            with floating point fields.
+  #
+  # Note that this group mirrors 1.4 pretty closely, so take a look there for
+  # some extra context that applies here just as well.
+
+  # Big structs (see group 1.4).
+  single_float_array_struct_argument: ["float_array_struct"]
+  single_double_array_struct_argument: ["double_array_struct"]
+  single_big_float_struct_argument: ["big_float_struct"]
+  single_big_double_struct_argument: ["big_double_struct"]
+  single_huge_float_struct_argument: ["huge_float_struct"]
+  single_huge_double_struct_argument: ["huge_double_struct"]
+
+  # Double-gpr-aligned fields (see group 1.4).
+  single_float_struct_with_a_sixteen_byte_field_at_the_start_argument: ["float_struct_with_a_sixteen_byte_field_at_the_start"]
+  single_float_struct_with_a_sixteen_byte_field_at_the_end_argument: ["float_struct_with_a_sixteen_byte_field_at_the_end"]
+  single_double_struct_with_a_sixteen_byte_field_at_the_start_argument: ["double_struct_with_a_sixteen_byte_field_at_the_start"]
+  single_double_struct_with_a_sixteen_byte_field_at_the_end_argument: ["double_struct_with_a_sixteen_byte_field_at_the_end"]
+  single_float_union_with_a_sixteen_byte_field_at_the_start_argument: ["float_union_with_a_sixteen_byte_field_at_the_start"]
+  single_float_union_with_a_sixteen_byte_field_at_the_end_argument: ["float_union_with_a_sixteen_byte_field_at_the_end"]
+  single_double_union_with_a_sixteen_byte_field_at_the_start_argument: ["double_union_with_a_sixteen_byte_field_at_the_start"]
+  single_double_union_with_a_sixteen_byte_field_at_the_end_argument: ["double_union_with_a_sixteen_byte_field_at_the_end"]
+
+  # Nested structs (see group 1.4).
   single_nested_float_struct_argument: ["nested_float_struct"]
   single_deeply_nested_float_struct_argument: ["deeply_nested_float_struct"]
   single_needle_in_a_haystack_float_struct_argument: ["needle_in_a_haystack_float_struct"]
   single_nested_float_struct_union_argument: ["nested_float_struct_union"]
   single_deeply_nested_float_struct_union_argument: ["deeply_nested_float_struct_union"]
-  single_needle_in_a_haystack_float_struct_union_argument:
-    ["needle_in_a_haystack_float_struct_union"]
+  single_needle_in_a_haystack_float_struct_union_argument: ["needle_in_a_haystack_float_struct_union"]
+
+  # Unnaturally aligned (see group 1.4).
+  single_unnaturally_aligned_float_struct_argument: ["unnaturally_aligned_float_struct"]
+  single_unnaturally_aligned_double_struct_argument: ["unnaturally_aligned_double_struct"]
+  single_unnaturally_aligned_float_union_argument: ["unnaturally_aligned_float_union"]
+  single_unnaturally_aligned_double_union_argument: ["unnaturally_aligned_double_union"]
 
   #
-  # Tests for the interactions between multiple differently sized arguments.
+  # Group 2. Multiple arguments.
   #
 
-  three_small_struct_arguments:
-    - small_struct
-    - small_struct
-    - small_struct
-  mixed_small_arguments:
-    - small_union
-    - small_struct
-    - small_union
-  mixed_integer_arguments:
-    - int64_t
-    - uint32_t
-    - int16_t
-    - uint8_t
-    - UINT128_T
-  mixed_integer_and_float_arguments:
-    - int64_t
-    - float
-    - int16_t
-    - double
-    - uint8_t
-    - UINT128_T
-  mixed_int_struct_arguments:
-    - int64_t
-    - padded_struct
-    - int16_t
-    - big_struct
-    - INT128_T
-  mixed_int_float_struct_arguments:
-    - double
-    - double_struct
-    - int16_t
-    - big_struct
-    - float_struct
-    - INT128_T
-  mixed_int_union_arguments:
-    - int64_t
-    - padded_union
-    - int16_t
-    - big_union
-    - INT128_T
-  mixed_int_float_union_arguments:
-    - int64_t
-    - padded_union
-    - float
-    - four_double_struct_union
-    - INT128_T
-  mixed_int_struct_pointer_arguments:
-    - padded_struct *
-    - padded_struct
-    - UINT128_T *
-    - int8_t
-    - huge_struct
-    - void *
-  mixed_int_union_pointer_arguments:
-    - padded_union *
-    - padded_union
-    - UINT128_T *
-    - int8_t
-    - huge_union
-    - void *
-  six_register_test:
-    - array_struct
-    - INT128_T
-    - array_struct
-  six_register_test_with_floats:
-    - float
-    - float
-    - INT128_T
-    - array_struct
-  six_register_test_with_doubles:
-    - double
-    - double
-    - INT128_T
-    - array_struct
-  six_register_test_with_unions:
-    - array_union
-    - INT128_T
-    - array_union
+  # These tests are simple and are very unlikely to be the only failing ones.
+  # When any of them do fail, it's a good indication that something important
+  # is broken (like the list of registers, etc).
 
-  #
-  # Test mixing integers and floating point types
-  #
+  # These make sure the presense of multiple primitives at once does not
+  # break anything.
+  two_32_bit_integer_arguments:
+    - uint32_t
+    - uint32_t
+  three_32_bit_integer_arguments:
+    - uint32_t
+    - uint32_t
+    - uint32_t
+  two_64_bit_integer_arguments:
+    - uint64_t
+    - uint64_t
+  three_64_bit_integer_arguments:
+    - uint64_t
+    - uint64_t
+    - uint64_t
+  mixed_32_64_bit_integer_arguments:
+    - uint32_t
+    - uint64_t
+    - uint32_t
+  mixed_64_32_bit_integer_arguments:
+    - uint64_t
+    - uint32_t
+    - uint64_t
 
-  two_integer_arguments:
-    - uint32_t
-    - uint32_t
-  three_integer_arguments:
-    - uint32_t
-    - uint32_t
-    - uint32_t
-  five_integer_arguments:
-    - uint32_t
-    - uint32_t
-    - uint32_t
-    - uint32_t
-    - uint32_t
+  # These make sure the presense of multiple aggregates at once does not
+  # break anything.
+  two_struct_arguments:
+    - four_byte_struct
+    - four_byte_struct
+  three_struct_arguments:
+    - four_byte_struct
+    - four_byte_struct
+    - four_byte_struct
+  two_union_arguments:
+    - four_byte_struct_union_with_a_smaller_scalar
+    - four_byte_struct_union_with_a_smaller_scalar
+  three_union_arguments:
+    - four_byte_struct_union_with_a_smaller_scalar
+    - four_byte_struct_union_with_a_smaller_scalar
+    - four_byte_struct_union_with_a_smaller_scalar
+  mixed_struct_union_arguments:
+    - four_byte_struct_union_with_a_smaller_scalar
+    - four_byte_struct
+    - four_byte_struct_union_with_a_smaller_scalar
+
+  # These make sure a mix of primitives and aggregates does not break anything.
+  mixed_int_32_struct_32_arguments:
+    - int32_t
+    - four_byte_struct
+    - int32_t
+  mixed_struct_32_int_32_arguments:
+    - four_byte_struct
+    - int32_t
+    - four_byte_struct
+  mixed_int_64_struct_32_arguments:
+    - int64_t
+    - four_byte_struct
+    - int64_t
+  mixed_struct_32_int_64_arguments:
+    - four_byte_struct
+    - int64_t
+    - four_byte_struct
+  mixed_int_32_struct_64_arguments:
+    - int32_t
+    - eight_byte_struct
+    - int32_t
+  mixed_struct_64_int_32_arguments:
+    - eight_byte_struct
+    - int32_t
+    - eight_byte_struct
+  mixed_int_64_struct_64_arguments:
+    - int64_t
+    - eight_byte_struct
+    - int64_t
+  mixed_struct_64_int_64_arguments:
+    - eight_byte_struct
+    - int64_t
+    - eight_byte_struct
+
+  # These make sure the presense of multiple floating point types at once does
+  # not break anything.
   two_float_arguments:
     - float
     - float
   three_float_arguments:
-    - float
-    - float
-    - float
-  five_float_arguments:
-    - float
-    - float
     - float
     - float
     - float
@@ -397,6 +498,132 @@ argument_tests:
     - double
     - double
     - double
+  mixed_float_double_arguments:
+    - float
+    - double
+    - float
+  mixed_double_float_arguments:
+    - double
+    - float
+    - double
+
+  # These make sure the mix of floating point primitives and aggregates does not
+  # break anything.
+  mixed_float_float_struct_arguments:
+    - float
+    - float_struct
+    - float
+  mixed_float_struct_float_arguments:
+    - float_struct
+    - float
+    - float_struct
+  mixed_double_float_struct_arguments:
+    - double
+    - float_struct
+    - double
+  mixed_float_struct_double_arguments:
+    - float_struct
+    - double
+    - float_struct
+  mixed_float_double_struct_arguments:
+    - float
+    - double_struct
+    - float
+  mixed_double_struct_float_arguments:
+    - double_struct
+    - float
+    - double_struct
+  mixed_double_double_struct_arguments:
+    - double
+    - double_struct
+    - double
+  mixed_double_struct_double_arguments:
+    - double_struct
+    - double
+    - double_struct
+
+  # These make sure the mix of floating point primitives with regular primitives
+  # does not break anything.
+  mixed_float_int_32_arguments:
+    - float
+    - int32_t
+    - float
+  mixed_int_32_float_arguments:
+    - int32_t
+    - float
+    - int32_t
+  mixed_double_int_32_arguments:
+    - double
+    - int32_t
+    - double
+  mixed_int_32_double_arguments:
+    - int32_t
+    - double
+    - int32_t
+  mixed_float_int_64_arguments:
+    - float
+    - int64_t
+    - float
+  mixed_int_64_float_arguments:
+    - int64_t
+    - float
+    - int64_t
+  mixed_double_int_64_arguments:
+    - double
+    - int64_t
+    - double
+  mixed_int_64_double_arguments:
+    - int64_t
+    - double
+    - int64_t
+  
+  # Including aggregates containing only integer fields.
+  mixed_float_struct_32_arguments:
+    - float
+    - four_byte_struct
+    - float
+  mixed_struct_32_float_arguments:
+    - four_byte_struct
+    - float
+    - four_byte_struct
+  mixed_double_struct_32_arguments:
+    - double
+    - four_byte_struct
+    - double
+  mixed_struct_32_double_arguments:
+    - four_byte_struct
+    - double
+    - four_byte_struct
+  mixed_float_struct_64_arguments:
+    - float
+    - eight_byte_struct
+    - float
+  mixed_struct_64_float_arguments:
+    - eight_byte_struct
+    - float
+    - eight_byte_struct
+  mixed_double_struct_64_arguments:
+    - double
+    - eight_byte_struct
+    - double
+  mixed_struct_64_double_arguments:
+    - eight_byte_struct
+    - double
+    - eight_byte_struct
+
+  # Bigger argument counts
+  five_integer_arguments:
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+  five_float_arguments:
+    - float
+    - float
+    - float
+    - float
+    - float
   five_double_arguments:
     - double
     - double
@@ -404,41 +631,21 @@ argument_tests:
     - double
     - double
 
-  integer_float_pair:
-    - uint32_t
-    - float
-  integer_double_pair:
-    - uint32_t
-    - double
-
-  float_integer_pair:
-    - float
-    - uint32_t
-  double_integer_pair:
-    - double
-    - uint32_t
-
+  # Even bigger argument counts
   #
-  # Simple stack argument tests.
+  # This test is not about any ABI - it is designed to detect problems with
+  # the test system itself.
   #
-
-  multiple_stack_arguments:
-    - big_struct
-    - big_struct
-    - big_struct
-  multiple_stack_unions:
-    - big_union
-    - big_union
-    - big_union
-  multiple_stack_floats:
-    - eight_float_struct
-    - eight_float_struct
-    - eight_float_struct
-  multiple_stack_doubles:
-    - four_double_struct
-    - four_double_struct
-    - four_double_struct
-
+  # There are only so many distinct small values, so 23 one-byte arguments with
+  # five iterations of fresh data each make collisions essentially guaranteed.
+  # This is the worst case as far as checking is concerned. If we can handle
+  # this correctly - we can handle all the other cases just as well.
+  #
+  # Note that there are more than one test in this group to simplify debugging:
+  # if only the one- and, maybe, some two-byte tests fail, the test system is
+  # clearly to blame. But if the wider ones fail too, it's a strong indication
+  # that something else is at play, such as the stack not being read correctly
+  # or padding is miss-computed.
   lots_of_one_byte_arguments:
     - uint8_t
     - uint8_t
@@ -560,6 +767,7 @@ argument_tests:
     - UINT128_T
     - UINT128_T
 
+  # And the same with floating point arguments just in case.
   lots_of_four_byte_float_arguments:
     - float
     - float
@@ -609,780 +817,614 @@ argument_tests:
     - double
     - double
 
-  #
-  # Equivalence tests.
-  #
-
-  equivalence_test_0_ground_truth:
-    - uint64_t
-    - small_struct *
-    - small_struct
-  equivalence_test_1_64_bit:
-    - uint64_t
-    - uint64_t
-    - uint32_t
-  equivalence_test_2_64_bit:
-    - uint64_t
-    - uint64_t
-    - uint16_t
-    - uint16_t
-  equivalence_test_1_32_bit:
-    - uint64_t
-    - uint32_t
-    - uint32_t
-  equivalence_test_2_32_bit:
-    - uint64_t
-    - uint32_t
-    - uint16_t
-    - uint16_t
-
-  #
-  # Tests for non-trivially aligned stack arguments.
-  #
-
-  gpr_test:
-    - gpr_t
-  forced_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-  two_byte_aligned_struct_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - small_struct
-    - uint8_t
-    - small_struct
-  two_byte_aligned_union_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - small_union
-    - uint8_t
-    - small_union
-  four_byte_aligned_struct_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - big_struct
-    - uint8_t
-    - big_struct
-  four_byte_aligned_union_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - big_union
-    - uint8_t
-    - big_union
-  four_byte_aligned_scalar_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - uint64_t
-    - uint8_t
-    - uint64_t
-  eight_byte_aligned_struct_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - struct_with_a_sixteen_byte_field
-    - uint8_t
-    - struct_with_a_sixteen_byte_field
-  eight_byte_aligned_union_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - union_with_a_sixteen_byte_field
-    - uint8_t
-    - union_with_a_sixteen_byte_field
-  eight_byte_aligned_scalar_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - INT128_T
-    - uint8_t
-    - INT128_T
-
-  #
-  # Test for floating point arguments on stack
-  #
-  float_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - float
-  double_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - double
-  float_struct_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - float_struct
-  double_struct_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - double_struct
-  two_float_struct_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - two_float_struct
-  two_double_struct_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - two_double_struct
-  multi_float_struct_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - eight_float_struct
-  multi_double_struct_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - four_double_struct
-
-  #
-  # Tests for nested structs.
-  #
-
-  struct_of_structs_in_registers:
-    - gpr_t
-    - gpr_t
-    - struct_of_structs
-  union_of_unions_in_registers:
-    - gpr_t
-    - gpr_t
-    - union_of_unions
-  struct_of_structs_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - struct_of_structs
-  union_of_unions_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - union_of_unions
-  misaligned_struct_of_structs_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - struct_of_structs
-    - uint8_t
-    - struct_of_structs
-    - uint8_t
-    - struct_of_structs
-  misaligned_union_of_unions_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - union_of_unions
-    - uint8_t
-    - union_of_unions
-    - uint8_t
-    - union_of_unions
-  small_struct_of_structs_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - small_struct_of_structs
-    - uint8_t
-    - small_struct_of_structs
-    - uint8_t
-    - small_struct_of_structs
-  small_union_of_unions_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - small_union_of_unions
-    - uint8_t
-    - small_union_of_unions
-    - uint8_t
-    - small_union_of_unions
-  padded_struct_of_structs_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - padded_struct_of_structs
-    - uint8_t
-    - padded_struct_of_structs
-    - uint8_t
-    - padded_struct_of_structs
-  padded_struct_of_structs_with_a_sixteen_byte_field_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - padded_struct_of_structs_with_a_sixteen_byte_field
-    - uint8_t
-    - padded_struct_of_structs_with_a_sixteen_byte_field
-    - uint8_t
-    - padded_struct_of_structs_with_a_sixteen_byte_field
-
-  #
-  # Needle in a haystack tests.
-  #
-  nested_float_struct_argument_in_registers:
-    - uint32_t
-    - nested_float_struct
-  deeply_nested_float_struct_argument_in_registers:
-    - uint32_t
-    - deeply_nested_float_struct
-  needle_in_a_haystack_float_struct_argument_in_registers:
-    - uint32_t
-    - needle_in_a_haystack_float_struct
-  nested_float_struct_union_argument_in_registers:
-    - uint32_t
-    - nested_float_struct_union
-  deeply_nested_float_struct_union_argument_in_registers:
-    - uint32_t
-    - deeply_nested_float_struct_union
-  needle_in_a_haystack_float_struct_union_argument_in_registers:
-    - uint32_t
-    - needle_in_a_haystack_float_struct_union
-
-  nested_float_struct_argument_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - nested_float_struct
-  deeply_nested_float_struct_argument_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - deeply_nested_float_struct
-  needle_in_a_haystack_float_struct_argument_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - needle_in_a_haystack_float_struct
-  nested_float_struct_union_argument_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - nested_float_struct_union
-  deeply_nested_float_struct_union_argument_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - deeply_nested_float_struct_union
-  needle_in_a_haystack_float_struct_union_argument_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - needle_in_a_haystack_float_struct_union
-
-  #
-  # Tests targeting alignment issues in registers (ARM-specific).
-  #
-
-  padded_sixteen_byte_scalar_in_registers:
-    - uint8_t
-    - UINT128_T
-  padded_eight_byte_scalar_in_registers:
-    - uint8_t
-    - uint64_t
-
-  padded_sixteen_byte_scalar_after_a_big_struct:
-    - big_struct
-    - uint8_t
-    - INT128_T
-  eight_byte_scalar_after_a_big_struct:
-    - big_struct
-    - uint8_t
-    - uint64_t
-
-  sixteen_byte_scalar_after_seven_gprs:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - INT128_T
-  sixteen_byte_scalar_after_three_gprs:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint64_t
-
-  #
-  # Tests for non-naturally aligned structs.
-  #
+  # Unnaturally aligned structs preceeded by a single `gpr_t`.
+  # These help to highlight the padding register usage.
   unnaturally_aligned_struct_128_in_registers:
-    - gpr_t
     - gpr_t
     - unnaturally_aligned_struct_128
   unnaturally_aligned_union_128_in_registers:
     - gpr_t
-    - gpr_t
     - unnaturally_aligned_union_128
-  unnaturally_aligned_struct_128_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - unnaturally_aligned_struct_128
-    - uint8_t
-    - unnaturally_aligned_struct_128
-  unnaturally_aligned_union_128_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - unnaturally_aligned_union_128
-    - uint8_t
-    - unnaturally_aligned_union_128
-
   unnaturally_aligned_struct_64_in_registers:
-    - gpr_t
     - gpr_t
     - unnaturally_aligned_struct_64
   unnaturally_aligned_union_64_in_registers:
     - gpr_t
-    - gpr_t
     - unnaturally_aligned_union_64
-  unnaturally_aligned_struct_64_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - unnaturally_aligned_struct_64
-    - uint8_t
-    - unnaturally_aligned_struct_64
-  unnaturally_aligned_union_64_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - unnaturally_aligned_union_64
-    - uint8_t
-    - unnaturally_aligned_union_64
-
   unnaturally_aligned_struct_32_in_registers:
-    - gpr_t
     - gpr_t
     - unnaturally_aligned_struct_32
   unnaturally_aligned_union_32_in_registers:
     - gpr_t
-    - gpr_t
     - unnaturally_aligned_union_32
-  unnaturally_aligned_struct_32_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - unnaturally_aligned_struct_32
-    - uint8_t
-    - unnaturally_aligned_struct_32
-  unnaturally_aligned_union_32_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - unnaturally_aligned_union_32
-    - uint8_t
-    - unnaturally_aligned_union_32
-
   unnaturally_aligned_struct_16_in_registers:
-    - gpr_t
     - gpr_t
     - unnaturally_aligned_struct_16
   unnaturally_aligned_union_16_in_registers:
     - gpr_t
-    - gpr_t
     - unnaturally_aligned_union_16
-  unnaturally_aligned_struct_16_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - unnaturally_aligned_struct_16
-    - uint8_t
-    - unnaturally_aligned_struct_16
-  unnaturally_aligned_union_16_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - unnaturally_aligned_union_16
-    - uint8_t
-    - unnaturally_aligned_union_16
-
   unnaturally_aligned_float_struct_in_registers:
-    - gpr_t
     - gpr_t
     - unnaturally_aligned_float_struct
   unnaturally_aligned_float_union_in_registers:
     - gpr_t
-    - gpr_t
-    - unnaturally_aligned_float_struct_union
-  unnaturally_aligned_float_struct_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - unnaturally_aligned_float_struct
-    - uint8_t
-    - unnaturally_aligned_float_struct
-  unnaturally_aligned_float_struct_union_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - unnaturally_aligned_float_struct_union
-    - uint8_t
-    - unnaturally_aligned_float_struct_union
-
+    - unnaturally_aligned_float_union
   unnaturally_aligned_double_struct_in_registers:
     - gpr_t
-    - gpr_t
     - unnaturally_aligned_double_struct
-  unnaturally_aligned_double_struct_union_in_registers:
+  unnaturally_aligned_double_union_in_registers:
     - gpr_t
-    - gpr_t
-    - unnaturally_aligned_double_struct_union
-  unnaturally_aligned_double_struct_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - unnaturally_aligned_double_struct
-    - uint8_t
-    - unnaturally_aligned_double_struct
-  unnaturally_aligned_double_struct_union_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - uint8_t
-    - unnaturally_aligned_double_struct_union
-    - uint8_t
-    - unnaturally_aligned_double_struct_union
+    - unnaturally_aligned_double_union
 
   #
-  # Dedicated tests for highlighting apple arm64 abi quirks
+  # Group 4. Boolean-specific tests (the first half).
   #
+
+  # `ArgumentsArePositionBased`
+  #
+  # Register-related behavior is highlighted by
+  # the `mixed_int_32_float_arguments` test:
+  # - `true`: it will use the first and the third GPR.
+  # - `false`: it will use the first and the second GPR.
+  #
+  # Big value related behavior is highlighted by
+  # the `single_big_struct_argument` test:
+  # - `true`: it will pass the struct as a pointer-to-copy in the first GPR.
+  # - `false`: it will pass the struct using the stack.
+
+  # `OnlyStartDoubleArgumentsFromAnEvenRegister`
+  #
+  # - `true`: it will use the first 4 GPRs (where the second one is padding).
+  # - `false`: it will use the first 3 GPRs.
+  padded_sixteen_byte_scalar_in_registers:
+    - uint8_t
+    - UINT128_T
+
+  # Identical to the above but targetting 32-bit ABIs.
+  padded_eight_byte_scalar_in_registers:
+    - uint8_t
+    - uint64_t
+
+  # `ArgumentsCanBeSplitBetweenRegistersAndStack`
+  #
+  # - `true`: `big_struct` uses the forth GPR *and* stack.
+  # - `false`: `big_struct` only uses the stack.
+  struct_after_three_gprs:
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - big_struct
+
+  # `BigArgumentsUsePointersToCopy`
+  #
+  # The behavior is highlighted by
+  # the `single_big_struct_argument` test:
+  # - `true`: it will pass the struct as a pointer-to-copy in the first GPR.
+  # - `false`: it will pass the struct using the stack.
+
+  # `NoRegisterArgumentsCanComeAfterStackOnes`
+  #
+  # - `true`: the second argument uses stack.
+  # - `false`: the second argument uses a GPR.
+  a_primitive_argument_after_a_big_struct:
+    - big_struct
+    - gpr_t
+
+  # `AllowPackedTypesInRegisters`
+  #
+  # The behavior is highlighted by
+  # the `unnaturally_aligned_struct_32_in_registers` test:
+  # - `true`: the second argument uses a GPR.
+  # - `false`: the second argument uses the stack/pointer-to-copy.
+
+#
+# Group 3. Stack arguments.
+#
+
+# This group got dedicated generator support to reduce the amount of duplicated
+# information (8 `gpr_t`s repeated for each test severely impact readability).
+#
+# Adding a test to `stack_argument_tests` is the same as adding a test to
+# `argument_tests`, but with `stack_argument_test_prefix_count` of 
+# `stack_argument_test_prefix_type` arguments preceding the provided arguments.
+stack_argument_test_prefix_type: gpr_t
+stack_argument_test_prefix_count: 8
+stack_argument_tests:
+  # Group 3.1. Canary tests to make sure the stack itself is working.
+  single_primitive_on_the_stack: [uint8_t]
+  two_primitives_on_the_stack: [uint8_t, uint8_t]
+
+  # Group 3.2. Simple padded stack arguments.
+  #
+  # Note the consistent structure of these tests:
+  # - a dummy argument meant to consume a slot (and to produce explicit padding
+  #   before the next argument,
+  # - the tested argument repeated twice,
+  # - another dummy argument. Because of the fact that the tested argument is
+  #   repeated twice (so it always occupies an even number of slots), it is
+  #   guaranteed to not match the slot of the first dummy padding argument (if
+  #   the first one was even, this one will always be odd. If the first one was
+  #   odd - this one will always be even),
+  # - another tested argument, to make sure padding works correctly in odd-index
+  #   slots too.
+  #
+  # This structure applies to the following groups too.
+  padded_two_byte_primitive_on_stack:
+    - uint8_t
+    - int16_t
+    - int16_t
+    - uint8_t
+    - int16_t
+  padded_two_byte_struct_on_stack:
+    - uint8_t
+    - two_byte_struct
+    - two_byte_struct
+    - uint8_t
+    - two_byte_struct
+  padded_two_byte_union_on_stack:
+    - uint8_t
+    - two_byte_struct_union_with_a_smaller_scalar
+    - two_byte_struct_union_with_a_smaller_scalar
+    - uint8_t
+    - two_byte_struct_union_with_a_smaller_scalar
+  padded_four_byte_scalar_on_stack:
+    - uint8_t
+    - int32_t
+    - int32_t
+    - uint8_t
+    - int32_t
+  padded_four_byte_struct_on_stack:
+    - uint8_t
+    - four_byte_struct
+    - four_byte_struct
+    - uint8_t
+    - four_byte_struct
+  padded_four_byte_union_on_stack:
+    - uint8_t
+    - four_byte_struct_union_with_a_smaller_scalar
+    - four_byte_struct_union_with_a_smaller_scalar
+    - uint8_t
+    - four_byte_struct_union_with_a_smaller_scalar
+  padded_eight_byte_scalar_on_stack:
+    - uint8_t
+    - int64_t
+    - int64_t
+    - uint8_t
+    - int64_t
+  padded_eight_byte_struct_on_stack:
+    - uint8_t
+    - eight_byte_struct
+    - eight_byte_struct
+    - uint8_t
+    - eight_byte_struct
+  padded_eight_byte_union_on_stack:
+    - uint8_t
+    - eight_byte_struct_union_with_a_smaller_scalar
+    - eight_byte_struct_union_with_a_smaller_scalar
+    - uint8_t
+    - eight_byte_struct_union_with_a_smaller_scalar
+
+  # Including nested structs/unions.
+  padded_struct_of_structs_on_stack:
+    - uint8_t
+    - struct_of_structs
+    - struct_of_structs
+    - uint8_t
+    - struct_of_structs
+  padded_union_of_unions_on_stack:
+    - uint8_t
+    - union_of_unions
+    - union_of_unions
+    - uint8_t
+    - union_of_unions
+
+  # Group 3.3. Double-gpr-aligned stack arguments.
+  #
+  # Sixteen-byte fields/primitives usually involve wider alignment,
+  # these tests help us verify we compute it correctly in all the major cases.
+  padded_sixteen_byte_scalar_on_stack:
+    - uint8_t
+    - INT128_T
+    - INT128_T
+    - uint8_t
+    - INT128_T
+  padded_struct_with_a_sixteen_byte_field_at_the_start_on_stack:
+    - uint8_t
+    - struct_with_a_sixteen_byte_field_at_the_start
+    - struct_with_a_sixteen_byte_field_at_the_start
+    - uint8_t
+    - struct_with_a_sixteen_byte_field_at_the_start
+  padded_struct_with_a_sixteen_byte_field_at_the_end_on_stack:
+    - uint8_t
+    - struct_with_a_sixteen_byte_field_at_the_end
+    - struct_with_a_sixteen_byte_field_at_the_end
+    - uint8_t
+    - struct_with_a_sixteen_byte_field_at_the_end
+  padded_union_with_a_sixteen_byte_field_at_the_start_on_stack:
+    - uint8_t
+    - union_with_a_sixteen_byte_field_at_the_start
+    - union_with_a_sixteen_byte_field_at_the_start
+    - uint8_t
+    - union_with_a_sixteen_byte_field_at_the_start
+  padded_union_with_a_sixteen_byte_field_at_the_end_on_stack:
+    - uint8_t
+    - union_with_a_sixteen_byte_field_at_the_end
+    - union_with_a_sixteen_byte_field_at_the_end
+    - uint8_t
+    - union_with_a_sixteen_byte_field_at_the_end
+
+  # Group 3.4. Unnaturally sized stack arguments.
+  #
+  # Similar to the above, alignment computation near these can be tricky,
+  # these tests ensure we do not mis-compute it.
+  padded_three_byte_struct_on_stack:
+    - uint8_t
+    - three_byte_struct
+    - three_byte_struct
+    - uint8_t
+    - three_byte_struct
+  padded_seven_byte_struct_on_stack:
+    - uint8_t
+    - seven_byte_struct
+    - seven_byte_struct
+    - uint8_t
+    - seven_byte_struct
+  padded_unnaturally_sized_three_byte_struct_on_stack:
+    - uint8_t
+    - unnaturally_sized_three_byte_struct
+    - unnaturally_sized_three_byte_struct
+    - uint8_t
+    - unnaturally_sized_three_byte_struct
+  padded_unnaturally_sized_six_byte_struct_on_stack:
+    - uint8_t
+    - unnaturally_sized_six_byte_struct
+    - unnaturally_sized_six_byte_struct
+    - uint8_t
+    - unnaturally_sized_six_byte_struct
+  padded_unnaturally_sized_nine_byte_struct_on_stack:
+    - uint8_t
+    - unnaturally_sized_nine_byte_struct
+    - unnaturally_sized_nine_byte_struct
+    - uint8_t
+    - unnaturally_sized_nine_byte_struct
+  padded_unnaturally_sized_forteen_byte_struct_on_stack:
+    - uint8_t
+    - unnaturally_sized_forteen_byte_struct
+    - unnaturally_sized_forteen_byte_struct
+    - uint8_t
+    - unnaturally_sized_forteen_byte_struct
+  padded_three_byte_union_on_stack:
+    - uint8_t
+    - three_byte_struct_union_with_a_smaller_scalar
+    - three_byte_struct_union_with_a_smaller_scalar
+    - uint8_t
+    - three_byte_struct_union_with_a_smaller_scalar
+  padded_seven_byte_union_on_stack:
+    - uint8_t
+    - seven_byte_struct_union_with_a_smaller_scalar
+    - seven_byte_struct_union_with_a_smaller_scalar
+    - uint8_t
+    - seven_byte_struct_union_with_a_smaller_scalar
+  padded_unnaturally_sized_three_byte_union_on_stack:
+    - uint8_t
+    - unnaturally_sized_three_byte_union_with_a_smaller_scalar
+    - unnaturally_sized_three_byte_union_with_a_smaller_scalar
+    - uint8_t
+    - unnaturally_sized_three_byte_union_with_a_smaller_scalar
+  padded_unnaturally_sized_six_byte_union_on_stack:
+    - uint8_t
+    - unnaturally_sized_six_byte_struct_union_with_a_smaller_scalar
+    - unnaturally_sized_six_byte_struct_union_with_a_smaller_scalar
+    - uint8_t
+    - unnaturally_sized_six_byte_struct_union_with_a_smaller_scalar
+  padded_unnaturally_sized_nine_byte_union_on_stack:
+    - uint8_t
+    - unnaturally_sized_nine_byte_struct_union_with_a_smaller_scalar
+    - unnaturally_sized_nine_byte_struct_union_with_a_smaller_scalar
+    - uint8_t
+    - unnaturally_sized_nine_byte_struct_union_with_a_smaller_scalar
+  padded_unnaturally_sized_forteen_byte_union_on_stack:
+    - uint8_t
+    - unnaturally_sized_forteen_byte_struct_with_a_smaller_scalar
+    - unnaturally_sized_forteen_byte_struct_with_a_smaller_scalar
+    - uint8_t
+    - unnaturally_sized_forteen_byte_struct_with_a_smaller_scalar
+
+  # Group 3.5. Unnaturally aligned stack arguments.
+  #
+  # Similar to the above, alignment computation near these can be tricky,
+  # these tests ensure we do not mis-compute it.
+  padded_unnaturally_aligned_struct_16_on_stack:
+    - uint8_t
+    - unnaturally_aligned_struct_16
+    - unnaturally_aligned_struct_16
+    - uint8_t
+    - unnaturally_aligned_struct_16
+  padded_unnaturally_aligned_struct_32_on_stack:
+    - uint8_t
+    - unnaturally_aligned_struct_32
+    - unnaturally_aligned_struct_32
+    - uint8_t
+    - unnaturally_aligned_struct_32
+  padded_unnaturally_aligned_struct_64_on_stack:
+    - uint8_t
+    - unnaturally_aligned_struct_64
+    - unnaturally_aligned_struct_64
+    - uint8_t
+    - unnaturally_aligned_struct_64
+  padded_unnaturally_aligned_struct_128_on_stack:
+    - uint8_t
+    - unnaturally_aligned_struct_128
+    - unnaturally_aligned_struct_128
+    - uint8_t
+    - unnaturally_aligned_struct_128
+  padded_unnaturally_aligned_union_16_on_stack:
+    - uint8_t
+    - unnaturally_aligned_union_16
+    - unnaturally_aligned_union_16
+    - uint8_t
+    - unnaturally_aligned_union_16
+  padded_unnaturally_aligned_union_32_on_stack:
+    - uint8_t
+    - unnaturally_aligned_union_32
+    - unnaturally_aligned_union_32
+    - uint8_t
+    - unnaturally_aligned_union_32
+  padded_unnaturally_aligned_union_64_on_stack:
+    - uint8_t
+    - unnaturally_aligned_union_64
+    - unnaturally_aligned_union_64
+    - uint8_t
+    - unnaturally_aligned_union_64
+  padded_unnaturally_aligned_union_128_on_stack:
+    - uint8_t
+    - unnaturally_aligned_union_128
+    - unnaturally_aligned_union_128
+    - uint8_t
+    - unnaturally_aligned_union_128
+
+  # Group 3.6. Stack arguments involving floating point.
+  #
+  # Because floats often use a separate register set, the `gpr_t` trick does not
+  # help here. Let's still keep it, just in case, but, to avoid having to
+  # extend the generator-side logic even further, let's just list the new
+  # "dummy" arguments manually.
+  #
+  # The biggest currently supported number of register floating point arguments
+  # carried in registers is 16 floats OR 8 doubles, packed into q0-q3 in ARM-32.
+  # As such, let's use 8 double arguments.
+  padded_float_on_stack:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+    # and 8 `double`s already preceed them.
+    - uint8_t
+    - float
+    - float
+    - uint8_t
+    - float
+  padded_double_on_stack:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+    # and 8 `double`s already preceed them.
+    - uint8_t
+    - double
+    - double
+    - uint8_t
+    - double
+  padded_float_struct_on_stack:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+    # and 8 `double`s already preceed them.
+    - uint8_t
+    - float_struct
+    - float_struct
+    - uint8_t
+    - float_struct
+  padded_double_struct_on_stack:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+    # and 8 `double`s already preceed them.
+    - uint8_t
+    - double_struct
+    - double_struct
+    - uint8_t
+    - double_struct
+  padded_four_float_struct_on_stack:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+    # and 8 `double`s already preceed them.
+    - uint8_t
+    - four_float_struct
+    - four_float_struct
+    - uint8_t
+    - four_float_struct
+  padded_four_double_struct_on_stack:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+    # and 8 `double`s already preceed them.
+    - uint8_t
+    - four_double_struct
+    - four_double_struct
+    - uint8_t
+    - four_double_struct
+
+  # Including deeply nested cases
+  nested_float_struct_argument_on_stack:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+    # and 8 `double`s already preceed them.
+    - uint8_t
+    - nested_float_struct
+    - nested_float_struct
+    - uint8_t
+    - nested_float_struct
+  deeply_nested_float_struct_argument_on_stack:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+    # and 8 `double`s already preceed them.
+    - uint8_t
+    - deeply_nested_float_struct
+    - deeply_nested_float_struct
+    - uint8_t
+    - deeply_nested_float_struct
+  needle_in_a_haystack_float_struct_argument_on_stack:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+    # and 8 `double`s already preceed them.
+    - uint8_t
+    - needle_in_a_haystack_float_struct
+    - needle_in_a_haystack_float_struct
+    - uint8_t
+    - needle_in_a_haystack_float_struct
+  nested_float_struct_union_argument_on_stack:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+    # and 8 `double`s already preceed them.
+    - uint8_t
+    - nested_float_struct_union
+    - nested_float_struct_union
+    - uint8_t
+    - nested_float_struct_union
+  deeply_nested_float_struct_union_argument_on_stack:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+    # and 8 `double`s already preceed them.
+    - uint8_t
+    - deeply_nested_float_struct_union
+    - deeply_nested_float_struct_union
+    - uint8_t
+    - deeply_nested_float_struct_union
+  needle_in_a_haystack_float_struct_union_argument_on_stack:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+    # and 8 `double`s already preceed them.
+    - uint8_t
+    - needle_in_a_haystack_float_struct_union
+    - needle_in_a_haystack_float_struct_union
+    - uint8_t
+    - needle_in_a_haystack_float_struct_union
+
+  #
+  # Group 4. Boolean-specific tests (the second half).
+  #
+
+  # `PackStackArguments`
+  #
+  # - `true`: the stack arguments use struct-like rules.
+  # - `false`: the stack arguments use stack-like rules.
   apple_two_byte_aligned_primitive_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
     - uint8_t
     - uint8_t
     - uint16_t
   apple_reverse_two_byte_aligned_primitive_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
     - uint16_t
     - uint8_t
     - uint8_t
   apple_padded_two_byte_aligned_primitive_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
     - uint8_t
     - uint16_t
   apple_four_byte_aligned_primitive_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
     - uint8_t
     - uint8_t
     - uint8_t
     - uint8_t
     - uint32_t
   apple_reverse_four_byte_aligned_primitive_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
     - uint32_t
     - uint8_t
     - uint8_t
     - uint8_t
     - uint8_t
   apple_padded_four_byte_aligned_primitive_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
     - uint8_t
     - uint8_t
     - uint8_t
     - uint32_t
   apple_eight_byte_aligned_primitive_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
     - uint8_t
     - uint8_t
     - uint8_t
@@ -1393,14 +1435,6 @@ argument_tests:
     - uint8_t
     - uint64_t
   apple_reverse_eight_byte_aligned_primitive_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
     - uint64_t
     - uint8_t
     - uint8_t
@@ -1411,14 +1445,6 @@ argument_tests:
     - uint8_t
     - uint8_t
   apple_padded_eight_byte_aligned_primitive_on_stack:
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
-    - gpr_t
     - uint8_t
     - uint8_t
     - uint8_t
@@ -1428,127 +1454,506 @@ argument_tests:
     - uint8_t
     - uint64_t
 
+  # `TreatAllAggregatesAsPacked`
+  #
+  # - `true`: all the aggregates are padded despite what other booleans say.
+  # - `false`: the aggregates behave according to the normal rules.
+  apple_two_byte_aligned_aggregate_on_stack:
+    - uint8_t
+    - uint8_t
+    - two_byte_struct
+  apple_reverse_two_byte_aligned_aggregate_on_stack:
+    - two_byte_struct
+    - uint8_t
+    - uint8_t
+  apple_padded_two_byte_aligned_aggregate_on_stack:
+    - uint8_t
+    - two_byte_struct
+  apple_four_byte_aligned_aggregate_on_stack:
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - four_byte_struct
+  apple_reverse_four_byte_aligned_aggregate_on_stack:
+    - four_byte_struct
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+  apple_padded_four_byte_aligned_aggregate_on_stack:
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - four_byte_struct
+  apple_eight_byte_aligned_aggregate_on_stack:
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - eight_byte_struct
+  apple_reverse_eight_byte_aligned_aggregate_on_stack:
+    - eight_byte_struct
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+  apple_padded_eight_byte_aligned_aggregate_on_stack:
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - eight_byte_struct
+
+  apple_mixed_aggregates_on_stack:
+    - one_byte_struct
+    - one_byte_struct
+    - two_byte_struct
+  apple_reverse_mixed_aggregates_on_stack:
+    - two_byte_struct
+    - one_byte_struct
+    - one_byte_struct
+  apple_padded_mixed_aggregates_on_stack:
+    - one_byte_struct
+    - two_byte_struct
+
+  apple_mixed_primitives_and_aggregates_on_stack:
+    - one_byte_struct
+    - uint8_t
+    - two_byte_struct
+  apple_reverse_mixed_primitives_and_aggregates_on_stack:
+    - two_byte_struct
+    - uint8_t
+    - one_byte_struct
+
 return_value_tests:
-  single_8_bit_return_value: "uint8_t"
-  single_16_bit_return_value: "int16_t"
-  single_32_bit_return_value: "uint32_t"
-  single_64_bit_return_value: "int64_t"
-  single_128_bit_return_value: "UINT128_T"
+  #
+  # Group 5. Return value tests.
+  #
 
-  single_float_return_value: "float"
-  single_double_return_value: "double"
+  # Note that these tests closely mirror the argument tests from group 1.
+  # See comments in that section for more context as well as the sub-group-
+  # related explanation.
 
-  single_one_byte_struct_return_value: "one_byte_struct"
-  single_two_byte_struct_return_value: "two_byte_struct"
-  single_three_byte_struct_return_value: "three_byte_struct"
-  single_four_byte_struct_return_value: "four_byte_struct"
-  single_seven_byte_struct_return_value: "seven_byte_struct"
-  single_eight_byte_struct_return_value: "eight_byte_struct"
-  single_sixteen_byte_struct_return_value: "sixteen_byte_struct"
+  # Group 5.1. Integers and pointers
 
-  single_one_byte_union_return_value: "one_byte_union"
-  single_two_byte_union_return_value: "two_byte_union"
-  single_three_byte_union_return_value: "three_byte_union"
-  single_four_byte_union_return_value: "four_byte_union"
-  single_seven_byte_union_return_value: "seven_byte_union"
-  single_eight_byte_union_return_value: "eight_byte_union"
-  single_sixteen_byte_union_return_value: "sixteen_byte_union"
+  single_8_bit_return_value: uint8_t
+  single_16_bit_return_value: int16_t
+  single_32_bit_return_value: uint32_t
+  single_64_bit_return_value: int64_t
+  single_128_bit_return_value: INT128_T
 
-  single_small_struct_return_value: "small_struct"
-  single_padded_struct_return_value: "padded_struct"
-  single_array_struct_return_value: "array_struct"
+  single_void_pointer_return_value: void *
+  single_struct_pointer_return_value: four_byte_struct *
 
-  single_small_union_return_value: "small_union"
-  single_padded_union_return_value: "padded_union"
-  single_array_union_return_value: "array_union"
+  single_gpr_return_value: gpr_t
 
-  single_small_struct_of_structs_return_value: "small_struct_of_structs"
-  single_struct_of_structs_return_value: "struct_of_structs"
+  # Group 5.2. Float primitives
 
-  single_unnaturally_aligned_struct_16_return_value: "unnaturally_aligned_struct_16"
-  single_unnaturally_aligned_struct_32_return_value: "unnaturally_aligned_struct_32"
-  single_unnaturally_aligned_struct_64_return_value: "unnaturally_aligned_struct_64"
-  single_unnaturally_aligned_struct_128_return_value: "unnaturally_aligned_struct_128"
+  single_float_return_value: float
+  single_double_return_value: double
 
-  single_unnaturally_aligned_union_16_return_value: "unnaturally_aligned_union_16"
-  single_unnaturally_aligned_union_32_return_value: "unnaturally_aligned_union_32"
-  single_unnaturally_aligned_union_64_return_value: "unnaturally_aligned_union_64"
-  single_unnaturally_aligned_union_128_return_value: "unnaturally_aligned_union_128"
+  # Group 5.3. Simple structs and unions.
 
-  single_void_pointer_return_value: "void *"
-  single_int_pointer_return_value: "uint32_t *"
-  single_struct_pointer_return_value: "huge_struct *"
+  single_one_byte_struct_return_value: one_byte_struct
+  single_two_byte_struct_return_value: two_byte_struct
+  single_unnaturally_sized_three_byte_struct_return_value: unnaturally_sized_three_byte_struct
+  single_three_byte_struct_return_value: three_byte_struct
+  single_four_byte_struct_return_value: four_byte_struct
+  single_unnaturally_sized_six_byte_struct_return_value: unnaturally_sized_six_byte_struct
+  single_unnaturally_sized_seven_byte_struct_return_value: unnaturally_sized_seven_byte_struct
+  single_seven_byte_struct_return_value: seven_byte_struct
+  single_eight_byte_struct_return_value: eight_byte_struct
+  single_unnaturally_sized_nine_byte_struct_return_value: unnaturally_sized_nine_byte_struct
+  single_unnaturally_sized_forteen_byte_struct_return_value: unnaturally_sized_forteen_byte_struct
+  single_sixteen_byte_struct_return_value: sixteen_byte_struct
 
-  single_big_struct_return_value: "big_struct"
-  single_huge_struct_return_value: "huge_struct"
+  single_one_byte_struct_union_with_a_smaller_scalar_return_value: one_byte_struct_union_with_a_smaller_scalar
+  single_one_byte_struct_union_with_a_bigger_scalar_return_value: one_byte_struct_union_with_a_bigger_scalar
+  single_two_byte_struct_union_with_a_smaller_scalar_return_value: two_byte_struct_union_with_a_smaller_scalar
+  single_two_byte_struct_union_with_a_bigger_scalar_return_value: two_byte_struct_union_with_a_bigger_scalar
+  single_unnaturally_sized_three_byte_union_with_a_smaller_scalar_return_value: unnaturally_sized_three_byte_union_with_a_smaller_scalar
+  single_unnaturally_sized_three_byte_union_with_a_bigger_scalar_return_value: unnaturally_sized_three_byte_union_with_a_bigger_scalar
+  single_three_byte_struct_union_with_a_smaller_scalar_return_value: three_byte_struct_union_with_a_smaller_scalar
+  single_three_byte_struct_union_with_a_bigger_scalar_return_value: three_byte_struct_union_with_a_bigger_scalar
+  single_four_byte_struct_union_with_a_smaller_scalar_return_value: four_byte_struct_union_with_a_smaller_scalar
+  single_four_byte_struct_union_with_a_bigger_scalar_return_value: four_byte_struct_union_with_a_bigger_scalar
+  single_unnaturally_sized_seven_byte_union_with_a_smaller_scalar_return_value: unnaturally_sized_seven_byte_union_with_a_smaller_scalar
+  single_unnaturally_sized_seven_byte_union_with_a_bigger_scalar_return_value: unnaturally_sized_seven_byte_union_with_a_bigger_scalar
+  single_seven_byte_struct_union_with_a_smaller_scalar_return_value: seven_byte_struct_union_with_a_smaller_scalar
+  single_seven_byte_struct_union_with_a_bigger_scalar_return_value: seven_byte_struct_union_with_a_bigger_scalar
+  single_eight_byte_struct_union_with_a_smaller_scalar_return_value: eight_byte_struct_union_with_a_smaller_scalar
+  single_eight_byte_struct_union_with_a_bigger_scalar_return_value: eight_byte_struct_union_with_a_bigger_scalar
+  single_unnaturally_sized_nine_byte_struct_union_with_a_smaller_scalar_return_value: unnaturally_sized_nine_byte_struct_union_with_a_smaller_scalar
+  single_unnaturally_sized_nine_byte_struct_union_with_a_bigger_scalar_return_value: unnaturally_sized_nine_byte_struct_union_with_a_bigger_scalar
+  single_unnaturally_sized_forteen_byte_struct_with_a_smaller_scalar_return_value: unnaturally_sized_forteen_byte_struct_with_a_smaller_scalar
+  single_unnaturally_sized_forteen_byte_struct_with_a_bigger_scalar_return_value: unnaturally_sized_forteen_byte_struct_with_a_bigger_scalar
+  single_sixteen_byte_struct_union_with_a_smaller_scalar_return_value: sixteen_byte_struct_union_with_a_smaller_scalar
 
-  single_big_union_return_value: "big_union"
-  single_huge_union_return_value: "huge_union"
+  # Group 5.4. Special structs and unions.
 
-  single_float_struct_return_value: "float_struct"
-  single_two_float_struct_return_value: "two_float_struct"
-  single_three_float_struct_return_value: "three_float_struct"
-  single_four_float_struct_return_value: "four_float_struct"
-  single_five_float_struct_return_value: "five_float_struct"
-  single_six_float_struct_return_value: "six_float_struct"
-  single_seven_float_struct_return_value: "seven_float_struct"
-  single_eight_float_struct_return_value: "eight_float_struct"
+  single_array_struct_return_value: array_struct
+  single_array_struct_32_bit_return_value: array_struct_32_bit
+  single_big_struct_return_value: big_struct
+  single_huge_struct_return_value: huge_struct
+  single_array_union_return_value: array_union
+  single_array_union_32_bit_return_value: array_union_32_bit
+  single_big_union_return_value: big_union
+  single_huge_union_return_value: huge_union
 
-  single_double_struct_return_value: "double_struct"
-  single_two_double_struct_return_value: "two_double_struct"
-  single_three_double_struct_return_value: "three_double_struct"
-  single_four_double_struct_return_value: "four_double_struct"
+  single_struct_with_a_sixteen_byte_field_at_the_start_return_value: struct_with_a_sixteen_byte_field_at_the_start
+  single_struct_with_a_sixteen_byte_field_at_the_end_return_value: struct_with_a_sixteen_byte_field_at_the_end
+  single_union_with_a_sixteen_byte_field_at_the_start_return_value: union_with_a_sixteen_byte_field_at_the_start
+  single_union_with_a_sixteen_byte_field_at_the_end_return_value: union_with_a_sixteen_byte_field_at_the_end
 
-  single_float_double_struct_return_value: "float_double_struct"
-  single_double_float_struct_return_value: "double_float_struct"
-  single_float_double_float_struct_return_value: "float_double_float_struct"
-  single_double_float_double_struct_return_value: "double_float_double_struct"
-  single_float_double_double_struct_return_value: "float_double_double_struct"
-  single_double_float_float_struct_return_value: "double_float_float_struct"
+  single_small_struct_of_structs_return_value: small_struct_of_structs
+  single_struct_of_structs_return_value: struct_of_structs
 
-  single_int_float_struct_return_value: "int_float_struct"
-  single_float_int_struct_return_value: "float_int_struct"
-  single_int_double_struct_return_value: "int_double_struct"
-  single_double_int_struct_return_value: "double_int_struct"
-  single_padded_float_struct_return_value: "padded_float_struct"
-  single_padded_double_struct_return_value: "padded_double_struct"
-  single_float_array_struct_return_value: "float_array_struct"
-  single_double_array_struct_return_value: "double_array_struct"
+  single_unnaturally_aligned_struct_16_return_value: unnaturally_aligned_struct_16
+  single_unnaturally_aligned_struct_32_return_value: unnaturally_aligned_struct_32
+  single_unnaturally_aligned_struct_64_return_value: unnaturally_aligned_struct_64
+  single_unnaturally_aligned_struct_128_return_value: unnaturally_aligned_struct_128
+  single_unnaturally_aligned_union_16_return_value: unnaturally_aligned_union_16
+  single_unnaturally_aligned_union_32_return_value: unnaturally_aligned_union_32
+  single_unnaturally_aligned_union_64_return_value: unnaturally_aligned_union_64
+  single_unnaturally_aligned_union_128_return_value: unnaturally_aligned_union_128
 
-  single_double_aligned_float_struct_return_value: "double_aligned_float_struct"
-  single_double_aligned_double_struct_return_value: "double_aligned_double_struct"
-  single_small_struct_of_structs_with_floats_return_value: "small_struct_of_structs_with_floats"
-  single_struct_of_structs_with_floats_return_value: "struct_of_structs_with_floats"
-  single_padded_struct_of_structs_with_floats_return_value: "padded_struct_of_structs_with_floats"
-  single_double_padded_struct_of_structs_with_floats_return_value: "double_padded_struct_of_structs_with_floats"
+  # Group 5.5. Simple structs and unions with float fields.
 
-  single_unnaturally_aligned_float_struct_return_value: "unnaturally_aligned_float_struct"
-  single_unnaturally_aligned_double_struct_return_value: "unnaturally_aligned_double_struct"
+  single_float_struct_return_value: float_struct
+  single_two_float_struct_return_value: two_float_struct
+  single_three_float_struct_return_value: three_float_struct
+  single_four_float_struct_return_value: four_float_struct
+  single_five_float_struct_return_value: five_float_struct
+  single_six_float_struct_return_value: six_float_struct
+  single_seven_float_struct_return_value: seven_float_struct
+  single_eight_float_struct_return_value: eight_float_struct
+  single_nine_float_struct_return_value: nine_float_struct
 
-  single_float_or_int_union_return_value: "float_or_int_union"
-  single_float_or_bigger_int_union_return_value: "float_or_bigger_int_union"
-  single_float_or_smaller_int_union_return_value: "float_or_smaller_int_union"
-  single_double_or_int_union_return_value: "double_or_int_union"
-  single_double_or_bigger_int_union_return_value: "double_or_bigger_int_union"
-  single_double_or_smaller_int_union_return_value: "double_or_smaller_int_union"
+  single_double_struct_return_value: double_struct
+  single_two_double_struct_return_value: two_double_struct
+  single_three_double_struct_return_value: three_double_struct
+  single_four_double_struct_return_value: four_double_struct
+  single_five_double_struct_return_value: five_double_struct
 
-  single_float_or_double_union_return_value: "float_or_double_union"
-  single_float_or_float_struct_union_return_value: "float_or_float_struct_union"
-  single_float_or_two_float_struct_union_return_value: "float_or_two_float_struct_union"
-  single_float_or_double_struct_union_return_value: "float_or_double_struct_union"
-  single_double_or_float_struct_union_return_value: "double_or_float_struct_union"
-  single_double_or_two_float_struct_union_return_value: "double_or_two_float_struct_union"
-  single_double_or_double_struct_union_return_value: "double_or_double_struct_union"
+  single_float_double_struct_return_value: float_double_struct
+  single_double_float_struct_return_value: double_float_struct
+  single_float_double_float_struct_return_value: float_double_float_struct
+  single_double_float_double_struct_return_value: double_float_double_struct
+  single_float_double_double_struct_return_value: float_double_double_struct
+  single_double_float_float_struct_return_value: double_float_float_struct
 
-  single_float_array_union_return_value: "float_array_union"
-  single_double_array_union_return_value: "double_array_union"
+  single_float_or_double_union_return_value: float_or_double_union
+  single_float_or_float_struct_union_return_value: float_or_float_struct_union
+  single_float_or_two_float_struct_union_return_value: float_or_two_float_struct_union
+  single_float_or_double_struct_union_return_value: float_or_double_struct_union
+  single_double_or_float_struct_union_return_value: double_or_float_struct_union
+  single_double_or_two_float_struct_union_return_value: double_or_two_float_struct_union
+  single_double_or_double_struct_union_return_value: double_or_double_struct_union
+  single_float_array_union_return_value: float_array_union
+  single_double_array_union_return_value: double_array_union
+  single_four_double_struct_union_return_value: four_double_struct_union
 
-  single_unnaturally_aligned_float_union_return_value: "unnaturally_aligned_float_union"
-  single_unnaturally_aligned_double_union_return_value: "unnaturally_aligned_double_union"
+  # Group 5.6. Integer-float-mixing structs and unions.
+  single_int_float_struct_return_value: int_float_struct
+  single_float_int_struct_return_value: float_int_struct
+  single_int_double_struct_return_value: int_double_struct
+  single_double_int_struct_return_value: double_int_struct
 
-  single_nested_float_struct_return_value: "nested_float_struct"
-  single_deeply_nested_float_struct_return_value: "deeply_nested_float_struct"
-  single_needle_in_a_haystack_float_struct_return_value: "needle_in_a_haystack_float_struct"
-  single_nested_float_struct_union_return_value: "nested_float_struct_union"
-  single_deeply_nested_float_struct_union_return_value: "deeply_nested_float_struct_union"
-  single_needle_in_a_haystack_float_struct_union_return_value: "needle_in_a_haystack_float_struct_union"
+  single_float_int_float_struct_return_value: float_int_float_struct
+  single_int_float_int_struct_return_value: int_float_int_struct
+  single_float_int_int_struct_return_value: float_int_int_struct
+  single_int_float_float_struct_return_value: int_float_float_struct
+  single_int_double_int_struct_return_value: int_double_int_struct
+  single_double_int_double_struct_return_value: double_int_double_struct
+  single_int_double_double_struct_return_value: int_double_double_struct
+  single_double_int_int_struct_return_value: double_int_int_struct
+
+  single_padded_float_struct_return_value: padded_float_struct
+  single_padded_double_struct_return_value: padded_double_struct
+
+  single_float_or_int_union_return_value: float_or_int_union
+  single_float_or_bigger_int_union_return_value: float_or_bigger_int_union
+  single_float_or_smaller_int_union_return_value: float_or_smaller_int_union
+  single_double_or_int_union_return_value: double_or_int_union
+  single_double_or_bigger_int_union_return_value: double_or_bigger_int_union
+  single_double_or_smaller_int_union_return_value: double_or_smaller_int_union
+
+  # Group 5.7. Special structs and unions (big, padded, misaligned, etc)
+  #            with floating point fields.
+
+  single_float_array_struct_return_value: float_array_struct
+  single_double_array_struct_return_value: double_array_struct
+  single_big_float_struct_return_value: big_float_struct
+  single_big_double_struct_return_value: big_double_struct
+  single_huge_float_struct_return_value: huge_float_struct
+  single_huge_double_struct_return_value: huge_double_struct
+
+  single_float_struct_with_a_sixteen_byte_field_at_the_start_return_value: float_struct_with_a_sixteen_byte_field_at_the_start
+  single_float_struct_with_a_sixteen_byte_field_at_the_end_return_value: float_struct_with_a_sixteen_byte_field_at_the_end
+  single_double_struct_with_a_sixteen_byte_field_at_the_start_return_value: double_struct_with_a_sixteen_byte_field_at_the_start
+  single_double_struct_with_a_sixteen_byte_field_at_the_end_return_value: double_struct_with_a_sixteen_byte_field_at_the_end
+  single_float_union_with_a_sixteen_byte_field_at_the_start_return_value: float_union_with_a_sixteen_byte_field_at_the_start
+  single_float_union_with_a_sixteen_byte_field_at_the_end_return_value: float_union_with_a_sixteen_byte_field_at_the_end
+  single_double_union_with_a_sixteen_byte_field_at_the_start_return_value: double_union_with_a_sixteen_byte_field_at_the_start
+  single_double_union_with_a_sixteen_byte_field_at_the_end_return_value: double_union_with_a_sixteen_byte_field_at_the_end
+
+  single_nested_float_struct_return_value: nested_float_struct
+  single_deeply_nested_float_struct_return_value: deeply_nested_float_struct
+  single_needle_in_a_haystack_float_struct_return_value: needle_in_a_haystack_float_struct
+  single_nested_float_struct_union_return_value: nested_float_struct_union
+  single_deeply_nested_float_struct_union_return_value: deeply_nested_float_struct_union
+  single_needle_in_a_haystack_float_struct_union_return_value: needle_in_a_haystack_float_struct_union
+
+  single_unnaturally_aligned_float_struct_return_value: unnaturally_aligned_float_struct
+  single_unnaturally_aligned_double_struct_return_value: unnaturally_aligned_double_struct
+  single_unnaturally_aligned_float_union_return_value: unnaturally_aligned_float_union
+  single_unnaturally_aligned_double_union_return_value: unnaturally_aligned_double_union
+
+structs:
+  # Simple structs of typical sizes
+  one_byte_struct: ["uint8_t a"]
+  two_byte_struct: ["uint16_t a"]
+  three_byte_struct: ["uint16_t a", "uint8_t b"]
+  four_byte_struct: ["uint32_t a"]
+  seven_byte_struct: ["uint32_t a", "uint16_t b", "uint8_t c"]
+  eight_byte_struct: ["uint64_t a"]
+  sixteen_byte_struct: ["uint64_t a", "uint64_t b"]
+
+  # Big structs
+  array_struct: ["uint64_t a[2]"]
+  array_struct_32_bit: ["uint32_t a[2]"]
+  big_struct: ["uint64_t a[8]"]
+  huge_struct: ["uint64_t a[32]"]
+
+  # Structs with a double-gpr-aligned (under some ABIs) field.
+  struct_with_a_sixteen_byte_field_at_the_start: ["INT128_T a", "uint8_t b"]
+  struct_with_a_sixteen_byte_field_at_the_end: ["uint8_t a", "INT128_T b"]
+
+  # Nested structs
+  small_struct_of_structs: ["two_byte_struct a", "one_byte_struct b"]
+  struct_of_structs: ["small_struct_of_structs a[2]", "one_byte_struct b"]
+
+  # Simple structs with floats and doubles *only.*
+  float_struct: ["float a"]
+  two_float_struct: ["float a", "float b"]
+  three_float_struct: ["float a", "float b", "float c"]
+  four_float_struct: ["float a", "float b", "float c", "float d"]
+  five_float_struct: ["float a", "float b", "float c", "float d", "float e"]
+  six_float_struct: ["float a", "float b", "float c", "float d", "float e", "float f"]
+  seven_float_struct: ["float a", "float b", "float c", "float d", "float e", "float f", "float g"]
+  eight_float_struct:
+    ["float a", "float b", "float c", "float d", "float e", "float f", "float g", "float h"]
+  nine_float_struct:
+    ["float a", "float b", "float c", "float d", "float e", "float f", "float g", "float h", "float i"]
+
+  double_struct: ["double a"]
+  two_double_struct: ["double a", "double b"]
+  three_double_struct: ["double a", "double b", "double c"]
+  four_double_struct: ["double a", "double b", "double c", "double d"]
+  five_double_struct: ["double a", "double b", "double c", "double d", "double e"]
+
+  float_double_struct: ["float a", "double b"]
+  double_float_struct: ["double a", "float b"]
+
+  float_double_float_struct: ["float a", "double b", "float c"]
+  double_float_double_struct: ["double a", "float b", "double c"]
+  float_double_double_struct: ["float a", "double b", "double c"]
+  double_float_float_struct: ["double a", "float b", "float c"]
+
+  # Simple structs with a mix of floats/doubles and integers.
+  int_float_struct: ["uint32_t a", "float b"]
+  float_int_struct: ["float a", "uint32_t b"]
+
+  int_double_struct: ["int64_t a", "double b"]
+  double_int_struct: ["double a", "int64_t b"]
+
+  float_int_float_struct: ["float a", "uint64_t b", "float c"]
+  int_float_int_struct: ["uint64_t a", "float b", "uint64_t c"]
+  float_int_int_struct: ["float a", "uint64_t b", "uint64_t c"]
+  int_float_float_struct: ["uint64_t a", "float b", "float c"]
+
+  int_double_int_struct: ["uint32_t a", "double b", "uint32_t c"]
+  double_int_double_struct: ["double a", "uint32_t b", "double c"]
+  int_double_double_struct: ["uint32_t a", "double b", "double c"]
+  double_int_int_struct: ["double a", "uint32_t b", "uint32_t c"]
+
+  padded_float_struct: ["uint8_t a", "float b"]
+  padded_double_struct: ["uint8_t a", "double b"]
+
+  # Big structs with floats
+  float_array_struct: ["float a[2]"]
+  double_array_struct: ["double a[2]"]
+  big_float_struct: ["float a[8]"]
+  big_double_struct: ["double a[8]"]
+  huge_float_struct: ["float a[32]"]
+  huge_double_struct: ["double a[32]"]
+
+  # Float structs with a double-gpr-aligned (under some ABIs) field.
+  float_struct_with_a_sixteen_byte_field_at_the_start: ["INT128_T a", "float b"]
+  float_struct_with_a_sixteen_byte_field_at_the_end: ["float a", "INT128_T b"]
+  double_struct_with_a_sixteen_byte_field_at_the_start: ["INT128_T a", "double b"]
+  double_struct_with_a_sixteen_byte_field_at_the_end: ["double a", "INT128_T b"]
+
+  # Nested structs with floats and doubles
+  nested_float_struct: ["one_byte_struct a", "two_byte_struct b", "float_struct c"]
+  deeply_nested_float_struct: ["one_byte_struct a", "two_byte_struct b", "nested_float_struct c"]
+  needle_in_a_haystack_float_struct:
+    ["one_byte_struct a", "two_byte_struct b", "deeply_nested_float_struct c"]
+
+  # TODO: add other floating point types (16-bit, 128-bit, etc)
+
+packed_structs:
+  # Unnaturally aligned structs, where "unnaturally aligned" means a struct or
+  # union that recursively contains at least one non-naturally-aligned field
+  # (field offset of which is not a multiple of its own alignment).
+  unnaturally_aligned_struct_16: ["char prepadding[1]", "uint16_t a", "char postpadding[1]"]
+  unnaturally_aligned_struct_32: ["char prepadding[2]", "uint32_t a", "char postpadding[2]"]
+  unnaturally_aligned_struct_64: ["char prepadding[2]", "uint64_t a", "char postpadding[6]"]
+  unnaturally_aligned_struct_128: ["char prepadding[2]", "INT128_T a", "char postpadding[14]"]
+
+  unnaturally_aligned_float_struct: ["char prepadding[2]", "float a", "char postpadding[2]"]
+  unnaturally_aligned_double_struct: ["char prepadding[2]", "double a", "char postpadding[2]"]
+
+  # Unnaturally sized structs, where "unnaturally sized" means a size that is
+  # only possible to produce by "packing" the struct. Practically, this prevents
+  # the compiler from extending the struct size using the alignment of its
+  # biggest member.
+  #
+  # These are still naturally aligned, even if their size is not typical.
+  #
+  # NOTE: all of these have a non-unnaturally-sized alternatives, but those get
+  #       padding at the end of the struct, so their size does not really match
+  #       the name.
+  unnaturally_sized_three_byte_struct: ["uint16_t a", "uint8_t b"]
+  unnaturally_sized_seven_byte_struct: ["uint32_t a", "uint16_t b", "uint8_t c"]
+
+  # Most important situation where unnatural struct size reveals itself is in
+  # the case where there's an array of them - namely it can to a case where
+  # an unnaturally struct is constructed purely from the naturally aligned
+  # members!
+  #
+  # For example,
+  # ```cpp
+  # unnaturally_sized_six_byte_struct test;
+  # test.a[1].a = 0;
+  # ```
+  # `test.a[1].a` is at offset 3 despite having the alignment of 2 (and being
+  # naturally aligned (offset 0) inside `unnaturally_sized_three_byte_struct`).
+  unnaturally_sized_six_byte_struct: ["unnaturally_sized_three_byte_struct a[2]"]
+  unnaturally_sized_nine_byte_struct: ["unnaturally_sized_three_byte_struct a[3]"]
+  unnaturally_sized_forteen_byte_struct: ["unnaturally_sized_seven_byte_struct a[2]"]
+
+  # The same thing, but with float fields in the mix.
+  unnaturally_sized_five_byte_struct_with_float: ["float a", "uint8_t b"]
+  unnaturally_sized_nine_byte_struct_with_double: ["double a", "uint8_t b"]
+
+  # Unnatural alignment despite all the natural alignment of all the field types
+  unnaturally_sized_ten_byte_struct_with_float: ["unnaturally_sized_five_byte_struct_with_float a[2]"]
+  unnaturally_sized_fifteen_byte_struct_with_float: ["unnaturally_sized_five_byte_struct_with_float a[3]"]
+  unnaturally_sized_eighteen_byte_struct_with_double: ["unnaturally_sized_nine_byte_struct_with_double a[2]"]
+
+unions:
+  # Simple unions of typical sizes - half-primitive, half-struct, the *struct* is bigger
+  one_byte_struct_union_with_a_smaller_scalar: ["one_byte_struct a", "uint8_t b"]
+  two_byte_struct_union_with_a_smaller_scalar: ["two_byte_struct a", "uint8_t b"]
+  unnaturally_sized_three_byte_union_with_a_smaller_scalar: ["unnaturally_sized_three_byte_struct a", "uint8_t b"]
+  unnaturally_sized_six_byte_struct_union_with_a_smaller_scalar: ["unnaturally_sized_six_byte_struct a", "uint8_t b"]
+  three_byte_struct_union_with_a_smaller_scalar: ["three_byte_struct a", "uint8_t b"]
+  four_byte_struct_union_with_a_smaller_scalar: ["four_byte_struct a", "uint8_t b"]
+  unnaturally_sized_seven_byte_union_with_a_smaller_scalar: ["unnaturally_sized_seven_byte_struct a", "uint8_t b"]
+  seven_byte_struct_union_with_a_smaller_scalar: ["seven_byte_struct a", "uint8_t b"]
+  eight_byte_struct_union_with_a_smaller_scalar: ["eight_byte_struct a", "uint8_t b"]
+  unnaturally_sized_nine_byte_struct_union_with_a_smaller_scalar: ["unnaturally_sized_nine_byte_struct a", "uint8_t b"]
+  unnaturally_sized_forteen_byte_struct_with_a_smaller_scalar: ["unnaturally_sized_forteen_byte_struct a", "uint8_t b"]
+  sixteen_byte_struct_union_with_a_smaller_scalar: ["sixteen_byte_struct a", "uint8_t b"]
+
+  # Simple unions of typical sizes - half-primitive, half-struct, the *primitive* is bigger
+  one_byte_struct_union_with_a_bigger_scalar: ["one_byte_struct a", "uint16_t b"]
+  two_byte_struct_union_with_a_bigger_scalar: ["two_byte_struct a", "uint32_t b"]
+  unnaturally_sized_three_byte_union_with_a_bigger_scalar: ["unnaturally_sized_three_byte_struct a", "uint64_t b"]
+  three_byte_struct_union_with_a_bigger_scalar: ["three_byte_struct a", "uint64_t b"]
+  four_byte_struct_union_with_a_bigger_scalar: ["four_byte_struct a", "uint64_t b"]
+  unnaturally_sized_seven_byte_union_with_a_bigger_scalar: ["unnaturally_sized_seven_byte_struct a", "UINT128_T b"]
+  seven_byte_struct_union_with_a_bigger_scalar: ["seven_byte_struct a", "UINT128_T b"]
+  eight_byte_struct_union_with_a_bigger_scalar: ["eight_byte_struct a", "UINT128_T b"]
+  unnaturally_sized_nine_byte_struct_union_with_a_bigger_scalar: ["unnaturally_sized_nine_byte_struct a", "UINT128_T b"]
+  unnaturally_sized_forteen_byte_struct_with_a_bigger_scalar: ["unnaturally_sized_forteen_byte_struct a", "UINT128_T b"]
+
+  # Big unions
+  array_union: ["uint64_t a[2]", "uint8_t b"]
+  array_union_32_bit: ["uint32_t a[2]", "uint8_t b"]
+  big_union: ["uint64_t a", "big_struct b"]
+  huge_union: ["uint64_t a", "huge_struct b"]
+
+  # Unions with a double-gpr-aligned (under some ABIs) field.
+  union_with_a_sixteen_byte_field_at_the_start: ["struct_with_a_sixteen_byte_field_at_the_start a", "uint8_t b"]
+  union_with_a_sixteen_byte_field_at_the_end: ["struct_with_a_sixteen_byte_field_at_the_end a", "uint8_t b"]
+
+  # Nested union
+  union_of_unions: ["two_byte_struct_union_with_a_smaller_scalar a", "four_byte_struct_union_with_a_smaller_scalar b"]
+
+  # Unnaturally aligned unions, were "unnaturally aligned" means a struct or
+  # union that recursively contains at least one non-naturally-aligned field.
+  unnaturally_aligned_union_16: ["uint8_t a", "unnaturally_aligned_struct_16 b"]
+  unnaturally_aligned_union_32: ["uint8_t a", "unnaturally_aligned_struct_32 b"]
+  unnaturally_aligned_union_64: ["uint8_t a", "unnaturally_aligned_struct_64 b"]
+  unnaturally_aligned_union_128: ["uint8_t a", "unnaturally_aligned_struct_128 b"]
+
+  # Unions with floats/doubles
+  float_or_double_union: ["float a", "double b"]
+  float_or_float_struct_union: ["float a", "float_struct b"]
+  float_or_two_float_struct_union: ["float a", "two_float_struct b"]
+  float_or_double_struct_union: ["float a", "double_struct b"]
+
+  double_or_float_struct_union: ["double a", "float_struct b"]
+  double_or_two_float_struct_union: ["double a", "two_float_struct b"]
+  double_or_double_struct_union: ["double a", "double_struct b"]
+
+  float_array_union: ["float a[3]", "float_array_struct b"]
+  double_array_union: ["double a[3]", "double_array_struct b"]
+  four_double_struct_union: ["double a", "four_double_struct b"]
+
+  # Mixed integer-float unions
+  float_or_int_union: ["float a", "uint32_t b"]
+  float_or_bigger_int_union: ["float a", "uint64_t b"]
+  float_or_smaller_int_union: ["float a", "uint16_t b"]
+
+  double_or_int_union: ["double a", "uint64_t b"]
+  double_or_bigger_int_union: ["double a", "INT128_T b"]
+  double_or_smaller_int_union: ["double a", "uint32_t b"]
+
+  # Big unions with floats
+  array_float_union: ["float a[2]", "uint8_t b"]
+  big_float_union: ["uint64_t a", "big_float_struct b"]
+  huge_float_union: ["uint64_t a", "huge_float_struct b"]
+  array_double_union: ["double a[2]", "uint8_t b"]
+  big_double_union: ["uint64_t a", "big_double_struct b"]
+  huge_double_union: ["uint64_t a", "huge_double_struct b"]
+
+  # Float unions with a double-gpr-aligned (under some ABIs) field.
+  float_union_with_a_sixteen_byte_field_at_the_start: ["float_struct_with_a_sixteen_byte_field_at_the_start a", "float b"]
+  float_union_with_a_sixteen_byte_field_at_the_end: ["float_struct_with_a_sixteen_byte_field_at_the_end a", "float b"]
+  double_union_with_a_sixteen_byte_field_at_the_start: ["double_struct_with_a_sixteen_byte_field_at_the_start a", "float b"]
+  double_union_with_a_sixteen_byte_field_at_the_end: ["double_struct_with_a_sixteen_byte_field_at_the_end a", "float b"]
+
+  # Unnaturally aligned unions, were "unnaturally aligned" means a struct or
+  # union that recursively contains at least one non-naturally-aligned field.
+  unnaturally_aligned_float_union: ["uint8_t a", "unnaturally_aligned_float_struct b"]
+  unnaturally_aligned_double_union: ["uint8_t a", "unnaturally_aligned_double_struct b"]
+
+  # Deeply nested unions with floats and doubles
+  nested_float_struct_union: ["uint64_t a", "nested_float_struct b"]
+  deeply_nested_float_struct_union: ["uint64_t a", "deeply_nested_float_struct b"]
+  needle_in_a_haystack_float_struct_union: ["uint64_t a", "needle_in_a_haystack_float_struct b"]
