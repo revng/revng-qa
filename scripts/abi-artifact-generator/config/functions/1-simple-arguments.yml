@@ -1,0 +1,369 @@
+#
+# Simple argument tests (see README.md).
+#
+
+argument_tests:
+  # 1. Integers and pointers
+  #
+  # The simplest cases possible: a single GPR argument of a given width,
+  # these cover the typical c primitives.
+  #
+  # Note that differentiation between the signed and unsigned variants is
+  # superficial, as the ABIs we support do not act on the distinction between
+  # the two. That is to say, there's no reason to provide two versions of each
+  # test, but just in case, the signedness is mixed.
+  #
+  # - 1 byte
+  single_8_bit_argument: ["uint8_t"]
+  # - 2 bytes
+  single_16_bit_argument: ["int16_t"]
+  # - 4 bytes
+  single_32_bit_argument: ["uint32_t"]
+  # - 8 bytes
+  single_64_bit_argument: ["int64_t"]
+  # - 16 bytes
+  #
+  # Note that this one is not available for every architecture. The binaries
+  # produced by a compiler that does not advertise the support use a fallback
+  # struct of equivalent size instead.
+  single_128_bit_argument: ["INT128_T"]
+
+  # Same as above, but using a pointer as the type.
+  single_void_pointer_argument: ["void *"]
+  single_struct_pointer_argument: ["four_byte_struct *"]
+
+  # `gpr_t` is a typedef we use in the stack tests to make sure a certain number
+  # of registers is occupied (thus forcing the next argument to be placed on
+  # the stack).
+  #
+  # This test is just a canary to make sure whatever problem happened is not
+  # with the type itself.
+  single_gpr_argument: ["gpr_t"]
+
+  # 2. Floats
+  #
+  # The floating point counterparts of the above.
+  #
+  # TODO: add more sizes once revng supports those.
+  #
+  # - 4 bytes
+  single_float_argument: ["float"]
+  # - 8 bytes
+  single_double_argument: ["double"]
+
+  # 3. Simple structs and unions.
+  #
+  # Each of these represents a struct/union of *at least* the given size, with
+  # the potential of trailing padding following the fields.
+  #
+  # Note that some of them are marked as "unnaturally sized", those are
+  # intentionally not padded to their alignment. See their definition in the
+  # `structs:` section below for more context.
+  #
+  # - 1 byte
+  single_one_byte_struct_argument: ["one_byte_struct"]
+  # - 2 bytes
+  single_two_byte_struct_argument: ["two_byte_struct"]
+  # - 3 bytes
+  single_unnaturally_sized_three_byte_struct_argument: ["unnaturally_sized_three_byte_struct"]
+  # - 3 bytes but padded to 4.
+  single_three_byte_struct_argument: ["three_byte_struct"]
+  # - 4 bytes, identical to the above.
+  single_four_byte_struct_argument: ["four_byte_struct"]
+  # - 6 bytes (not padded!)
+  single_unnaturally_sized_six_byte_struct_argument: ["unnaturally_sized_six_byte_struct"]
+  # - 7 bytes
+  single_unnaturally_sized_seven_byte_struct_argument: ["unnaturally_sized_seven_byte_struct"]
+  # - 7 bytes but padded to 8.
+  single_seven_byte_struct_argument: ["seven_byte_struct"]
+  # - 8 bytes
+  single_eight_byte_struct_argument: ["eight_byte_struct"]
+  # - 9 bytes (not padded!)
+  single_unnaturally_sized_nine_byte_struct_argument: ["unnaturally_sized_nine_byte_struct"]
+  # - 14 bytes (not padded!)
+  single_unnaturally_sized_forteen_byte_struct_argument: ["unnaturally_sized_forteen_byte_struct"]
+  # - 16 bytes
+  single_sixteen_byte_struct_argument: ["sixteen_byte_struct"]
+
+  # The same structs, but as union fields, accompanied with either a smaller or
+  # a bigger primitive.
+  #
+  # This helps us detect any mismatch of behavior between a struct and a union,
+  # all other things equal.
+  #
+  # Note that there are ABIs that compute argument "kind" per-GPR-sized-chunk as
+  # opposed to only cutting on the argument boundary (like `SystemV-x86-64`).
+  # Which is why there are seemingly unnecessary tests here intentionally
+  # putting primitives against structs against each other.
+  #
+  # Note, since both halves of the union have the same kind here, this is mostly
+  # for the sake of verifying the classification system does not break in
+  # typical cases, whereas the floating point versions of these (see sections 5
+  # and especially 6 for) are what's really testing the classification system.
+  #
+  # Think of it this way: if only the floating point versions of these tests
+  # fail - the problem is with the classification system. If some of these tests
+  # fail with them - the problem is likely somewhere else.
+  #
+  # As in, these serve as the ground truth ensuring that classification system
+  # inputs reach it in a valid shape.
+  #
+  # - 1-byte
+  single_one_byte_struct_union_with_a_smaller_scalar_argument:
+    - one_byte_struct_union_with_a_smaller_scalar
+  single_one_byte_struct_union_with_a_bigger_scalar_argument:
+    - one_byte_struct_union_with_a_bigger_scalar
+  # - 2-byte
+  single_two_byte_struct_union_with_a_smaller_scalar_argument:
+    - two_byte_struct_union_with_a_smaller_scalar
+  single_two_byte_struct_union_with_a_bigger_scalar_argument:
+    - two_byte_struct_union_with_a_bigger_scalar
+  # - 3 bytes
+  single_unnaturally_sized_three_byte_union_with_a_smaller_scalar_argument:
+    - unnaturally_sized_three_byte_union_with_a_smaller_scalar
+  single_unnaturally_sized_three_byte_union_with_a_bigger_scalar_argument:
+    - unnaturally_sized_three_byte_union_with_a_bigger_scalar
+  # - 3 bytes padded to 4.
+  single_three_byte_struct_union_with_a_smaller_scalar_argument:
+    - three_byte_struct_union_with_a_smaller_scalar
+  single_three_byte_struct_union_with_a_bigger_scalar_argument:
+    - three_byte_struct_union_with_a_bigger_scalar
+  # - 4 bytes
+  single_four_byte_struct_union_with_a_smaller_scalar_argument:
+    - four_byte_struct_union_with_a_smaller_scalar
+  single_four_byte_struct_union_with_a_bigger_scalar_argument:
+    - four_byte_struct_union_with_a_bigger_scalar
+  # - 7 bytes
+  single_unnaturally_sized_seven_byte_union_with_a_smaller_scalar_argument:
+    - unnaturally_sized_seven_byte_union_with_a_smaller_scalar
+  single_unnaturally_sized_seven_byte_union_with_a_bigger_scalar_argument:
+    - unnaturally_sized_seven_byte_union_with_a_bigger_scalar
+  # - 7 bytes padded to 8.
+  single_seven_byte_struct_union_with_a_smaller_scalar_argument:
+    - seven_byte_struct_union_with_a_smaller_scalar
+  single_seven_byte_struct_union_with_a_bigger_scalar_argument:
+    - seven_byte_struct_union_with_a_bigger_scalar
+  # - 8 bytes
+  single_eight_byte_struct_union_with_a_smaller_scalar_argument:
+    - eight_byte_struct_union_with_a_smaller_scalar
+  single_eight_byte_struct_union_with_a_bigger_scalar_argument:
+    - eight_byte_struct_union_with_a_bigger_scalar
+  # - 9 bytes (not padded!)
+  single_unnaturally_sized_nine_byte_struct_union_with_a_smaller_scalar_argument:
+    - unnaturally_sized_nine_byte_struct_union_with_a_smaller_scalar
+  single_unnaturally_sized_nine_byte_struct_union_with_a_bigger_scalar_argument:
+    - unnaturally_sized_nine_byte_struct_union_with_a_bigger_scalar
+  # - 14 bytes (not padded!)
+  single_unnaturally_sized_forteen_byte_struct_with_a_smaller_scalar_argument:
+    - unnaturally_sized_forteen_byte_struct_with_a_smaller_scalar
+  single_unnaturally_sized_forteen_byte_struct_with_a_bigger_scalar_argument:
+    - unnaturally_sized_forteen_byte_struct_with_a_bigger_scalar
+  # - 16 bytes
+  single_sixteen_byte_struct_union_with_a_smaller_scalar_argument:
+    - sixteen_byte_struct_union_with_a_smaller_scalar
+
+  # 4. Special structs and unions.
+
+  # The goal of the "big" (quoted because some of them are not that big) structs
+  # and unions is to verify the situation where the registers cannot fit
+  # the argument so the stack is forced.
+  #
+  # Note that the `array_*`-labeled one is only two-gpr-sized. That's
+  # intentional - it should be treated as a normal struct in non-position-based
+  # ABIs while being treated as a big struct (think pointer-to-copy) in position
+  # based ones (as it does not fit into a single register).
+  #
+  # Note that's why there's a special "32-bit" edition of the array struct.
+  #
+  # Bigger ones are self-explanatory.
+  single_array_struct_argument: ["array_struct"]
+  single_array_struct_32_bit_argument: ["array_struct_32_bit"]
+  single_big_struct_argument: ["big_struct"]
+  single_huge_struct_argument: ["huge_struct"]
+  single_array_union_argument: ["array_union"]
+  single_array_union_32_bit_argument: ["array_union_32_bit"]
+  single_big_union_argument: ["big_union"]
+  single_huge_union_argument: ["huge_union"]
+
+  # Structs and unions with double-gpr-aligned (under some ABIs) fields.
+  #
+  # The goal of the aggregates with double-gpr-aligned fields is to make sure
+  # we correctly handle the non-trivial amount of both inter-field and trailing
+  # padding.
+  single_struct_with_a_sixteen_byte_field_at_the_start_argument:
+    - struct_with_a_sixteen_byte_field_at_the_start
+  single_struct_with_a_sixteen_byte_field_at_the_end_argument:
+    - struct_with_a_sixteen_byte_field_at_the_end
+  single_union_with_a_sixteen_byte_field_at_the_start_argument:
+    - union_with_a_sixteen_byte_field_at_the_start
+  single_union_with_a_sixteen_byte_field_at_the_end_argument:
+    - union_with_a_sixteen_byte_field_at_the_end
+
+  # Nested structs and unions.
+  #
+  # These tests are basic, they serve as canaries for the alignment computation
+  # system. If these fail, it is either severely broken or its inputs don't
+  # reach it correctly.
+  #
+  # In simple words, if the more complicated alignment tests fail, these are
+  # a good indication on whether the problem thing is the alignment computation
+  # itself or something before it - as the alignment computation for these is
+  # trivial (while still involving a proper visit of the type system).
+  #
+  # Note that section 6 (integer-float-mixing-aggregates) contains deeply nested
+  # versions of these, but they are omitted from the non-floating-point sections
+  # to reduce the number of tests.
+  single_small_struct_of_structs_argument: ["small_struct_of_structs"]
+  single_struct_of_structs_argument: ["struct_of_structs"]
+
+  # Unnaturally aligned structs and unions, where "unnaturally aligned" means
+  # a struct or union that recursively contains at least one non-naturally-
+  # aligned field (field offset of which is not a multiple of its own alignment)
+  single_unnaturally_aligned_struct_16_argument: ["unnaturally_aligned_struct_16"]
+  single_unnaturally_aligned_struct_32_argument: ["unnaturally_aligned_struct_32"]
+  single_unnaturally_aligned_struct_64_argument: ["unnaturally_aligned_struct_64"]
+  single_unnaturally_aligned_struct_128_argument: ["unnaturally_aligned_struct_128"]
+  single_unnaturally_aligned_union_16_argument: ["unnaturally_aligned_union_16"]
+  single_unnaturally_aligned_union_32_argument: ["unnaturally_aligned_union_32"]
+  single_unnaturally_aligned_union_64_argument: ["unnaturally_aligned_union_64"]
+  single_unnaturally_aligned_union_128_argument: ["unnaturally_aligned_union_128"]
+
+  # 5. Simple structs and unions with float fields.
+  #
+  # Note that there are a lot of these. Namely, this is because there are
+  # ABIs (for example, ARM-32) that unroll such structs into a series of
+  # floating point arguments and *pack* them into vectors, which, practically,
+  # means that quite a few such fields can be passed while only occupying
+  # a relatively small register number.
+  single_float_struct_argument: ["float_struct"]
+  single_two_float_struct_argument: ["two_float_struct"]
+  single_three_float_struct_argument: ["three_float_struct"]
+  single_four_float_struct_argument: ["four_float_struct"]
+  single_five_float_struct_argument: ["five_float_struct"]
+  single_six_float_struct_argument: ["six_float_struct"]
+  single_seven_float_struct_argument: ["seven_float_struct"]
+  single_eight_float_struct_argument: ["eight_float_struct"]
+  single_nine_float_struct_argument: ["nine_float_struct"]
+
+  single_double_struct_argument: ["double_struct"]
+  single_two_double_struct_argument: ["two_double_struct"]
+  single_three_double_struct_argument: ["three_double_struct"]
+  single_four_double_struct_argument: ["four_double_struct"]
+  single_five_double_struct_argument: ["five_double_struct"]
+
+  # Similar of the above, the mixed tests are extra explicit because some ABIs
+  # (for example, ARM-32) pack them into vectors - meaning non-trivial logic
+  # applies to them.
+  #
+  # NOTE: these specific functions should NOT be packed as the structs use
+  #       mixed typing! But they are still important to make sure the related
+  #       logic does not *try to* pack them in.
+  single_float_double_struct_argument: ["float_double_struct"]
+  single_double_float_struct_argument: ["double_float_struct"]
+  single_float_double_float_struct_argument: ["float_double_float_struct"]
+  single_double_float_double_struct_argument: ["double_float_double_struct"]
+  single_float_double_double_struct_argument: ["float_double_double_struct"]
+  single_double_float_float_struct_argument: ["double_float_float_struct"]
+
+  # These unions are simple, but important, for the same reason as above: we
+  # need to make sure they are excluded from the packing logic.
+  #
+  # On top of that, they also serve as canaries for the alignment computation:
+  # they allow us to easily tell whether the floating point alignment is
+  # a problem or struct/union/array-related computation is (depending on a set
+  # of tests that fail at the same time).
+  single_float_or_double_union_argument: ["float_or_double_union"]
+  single_float_or_float_struct_union_argument: ["float_or_float_struct_union"]
+  single_float_or_two_float_struct_union_argument: ["float_or_two_float_struct_union"]
+  single_float_or_double_struct_union_argument: ["float_or_double_struct_union"]
+  single_double_or_float_struct_union_argument: ["double_or_float_struct_union"]
+  single_double_or_two_float_struct_union_argument: ["double_or_two_float_struct_union"]
+  single_double_or_double_struct_union_argument: ["double_or_double_struct_union"]
+  single_float_array_union_argument: ["float_array_union"]
+  single_double_array_union_argument: ["double_array_union"]
+  single_four_double_struct_union_argument: ["four_double_struct_union"]
+
+  # 6. Integer-float-mixing structs and unions.
+  #
+  # These are important, first and foremost, for the ABIs that classify their
+  # arguments into kinds (for example, `SystemV-x86-64`), as we want to make
+  # sure the kind we compute matches the one that lead the compiler to place
+  # the argument where it did.
+  single_int_float_struct_argument: ["int_float_struct"]
+  single_float_int_struct_argument: ["float_int_struct"]
+  single_int_double_struct_argument: ["int_double_struct"]
+  single_double_int_struct_argument: ["double_int_struct"]
+
+  # Note that bigger, intentionally multi-GPR sized ones are extra important
+  # because `SystemV-x86-64` computes the kind per-gpr-sized-chunk as opposed
+  # to trusting the argument boundary - hence, extra cases.
+  single_float_int_float_struct_argument: ["float_int_float_struct"]
+  single_int_float_int_struct_argument: ["int_float_int_struct"]
+  single_float_int_int_struct_argument: ["float_int_int_struct"]
+  single_int_float_float_struct_argument: ["int_float_float_struct"]
+  single_int_double_int_struct_argument: ["int_double_int_struct"]
+  single_double_int_double_struct_argument: ["double_int_double_struct"]
+  single_int_double_double_struct_argument: ["int_double_double_struct"]
+  single_double_int_int_struct_argument: ["double_int_int_struct"]
+
+  # Including ones with pronounced padding.
+  single_padded_float_struct_argument: ["padded_float_struct"]
+  single_padded_double_struct_argument: ["padded_double_struct"]
+
+  # Unions situation is relatively simple, as we just want to make sure we hit
+  # the `int > float` case.
+  #
+  # That being said, just in cases, let's keep the differently sized integers.
+  single_float_or_int_union_argument: ["float_or_int_union"]
+  single_float_or_bigger_int_union_argument: ["float_or_bigger_int_union"]
+  single_float_or_smaller_int_union_argument: ["float_or_smaller_int_union"]
+  single_double_or_int_union_argument: ["double_or_int_union"]
+  single_double_or_bigger_int_union_argument: ["double_or_bigger_int_union"]
+  single_double_or_smaller_int_union_argument: ["double_or_smaller_int_union"]
+
+  # 7. Special structs and unions (big, padded, misaligned, etc)
+  #    with floating point fields.
+  #
+  # Note that this section mirrors section 4 pretty closely, so take a look there
+  # some extra context that applies here just as well.
+
+  # Big structs (see section 4).
+  single_float_array_struct_argument: ["float_array_struct"]
+  single_double_array_struct_argument: ["double_array_struct"]
+  single_big_float_struct_argument: ["big_float_struct"]
+  single_big_double_struct_argument: ["big_double_struct"]
+  single_huge_float_struct_argument: ["huge_float_struct"]
+  single_huge_double_struct_argument: ["huge_double_struct"]
+
+  # Double-gpr-aligned fields (see section 4).
+  single_float_struct_with_a_sixteen_byte_field_at_the_start_argument:
+    - float_struct_with_a_sixteen_byte_field_at_the_start
+  single_float_struct_with_a_sixteen_byte_field_at_the_end_argument:
+    - float_struct_with_a_sixteen_byte_field_at_the_end
+  single_double_struct_with_a_sixteen_byte_field_at_the_start_argument:
+    - double_struct_with_a_sixteen_byte_field_at_the_start
+  single_double_struct_with_a_sixteen_byte_field_at_the_end_argument:
+    - double_struct_with_a_sixteen_byte_field_at_the_end
+  single_float_union_with_a_sixteen_byte_field_at_the_start_argument:
+    - float_union_with_a_sixteen_byte_field_at_the_start
+  single_float_union_with_a_sixteen_byte_field_at_the_end_argument:
+    - float_union_with_a_sixteen_byte_field_at_the_end
+  single_double_union_with_a_sixteen_byte_field_at_the_start_argument:
+    - double_union_with_a_sixteen_byte_field_at_the_start
+  single_double_union_with_a_sixteen_byte_field_at_the_end_argument:
+    - double_union_with_a_sixteen_byte_field_at_the_end
+
+  # Nested structs (see section 4).
+  single_nested_float_struct_argument: ["nested_float_struct"]
+  single_deeply_nested_float_struct_argument: ["deeply_nested_float_struct"]
+  single_needle_in_a_haystack_float_struct_argument: ["needle_in_a_haystack_float_struct"]
+  single_nested_float_struct_union_argument: ["nested_float_struct_union"]
+  single_deeply_nested_float_struct_union_argument: ["deeply_nested_float_struct_union"]
+  single_needle_in_a_haystack_float_struct_union_argument:
+    - needle_in_a_haystack_float_struct_union
+
+  # Unnaturally aligned (see section 4).
+  single_unnaturally_aligned_float_struct_argument: ["unnaturally_aligned_float_struct"]
+  single_unnaturally_aligned_double_struct_argument: ["unnaturally_aligned_double_struct"]
+  single_unnaturally_aligned_float_union_argument: ["unnaturally_aligned_float_union"]
+  single_unnaturally_aligned_double_union_argument: ["unnaturally_aligned_double_union"]

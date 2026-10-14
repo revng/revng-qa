@@ -1,0 +1,473 @@
+#
+# Stack argument tests (see README.md).
+#
+
+# These tests are similar to `3-multiple-arguments.yml`, but they *additionally*
+# contain enough dummy arguments to make sure all the registers are occupied,
+# allowing us to actually verify the stack placement logic.
+#
+# Specifically, adding a test to `stack_argument_tests` is the same as adding
+# an identical test to `argument_tests`, but with
+# `stack_argument_test_prefix_count` of `stack_argument_test_prefix_type`
+# arguments placed before the provided arguments.
+stack_argument_test_prefix_type: gpr_t
+stack_argument_test_prefix_count: 8
+
+stack_argument_tests:
+  # 1. Canary tests to make sure the stack itself is working.
+  single_primitive_on_the_stack: [uint8_t]
+  two_primitives_on_the_stack: [uint8_t, uint8_t]
+
+  # 2. Simple padded stack arguments.
+  #
+  # Note the consistent structure of these tests:
+  # - a dummy argument meant to consume a slot (and to produce explicit padding
+  #   before the next argument,
+  # - the tested argument repeated twice,
+  # - another dummy argument. Because of the fact that the tested argument is
+  #   repeated twice (so it always occupies an even number of slots), it is
+  #   guaranteed to not match the slot of the first dummy padding argument (if
+  #   the first one was even, this one will always be odd. If the first one was
+  #   odd - this one will always be even),
+  # - another tested argument, to make sure padding works correctly in odd-index
+  #   slots too.
+  #
+  # This structure applies to the following sections too.
+  padded_two_byte_primitive_on_stack:
+    - uint8_t
+    - int16_t
+    - int16_t
+    - uint8_t
+    - int16_t
+  padded_two_byte_struct_on_stack:
+    - uint8_t
+    - two_byte_struct
+    - two_byte_struct
+    - uint8_t
+    - two_byte_struct
+  padded_two_byte_union_on_stack:
+    - uint8_t
+    - two_byte_struct_union_with_a_smaller_scalar
+    - two_byte_struct_union_with_a_smaller_scalar
+    - uint8_t
+    - two_byte_struct_union_with_a_smaller_scalar
+  padded_four_byte_scalar_on_stack:
+    - uint8_t
+    - int32_t
+    - int32_t
+    - uint8_t
+    - int32_t
+  padded_four_byte_struct_on_stack:
+    - uint8_t
+    - four_byte_struct
+    - four_byte_struct
+    - uint8_t
+    - four_byte_struct
+  padded_four_byte_union_on_stack:
+    - uint8_t
+    - four_byte_struct_union_with_a_smaller_scalar
+    - four_byte_struct_union_with_a_smaller_scalar
+    - uint8_t
+    - four_byte_struct_union_with_a_smaller_scalar
+  padded_eight_byte_scalar_on_stack:
+    - uint8_t
+    - int64_t
+    - int64_t
+    - uint8_t
+    - int64_t
+  padded_eight_byte_struct_on_stack:
+    - uint8_t
+    - eight_byte_struct
+    - eight_byte_struct
+    - uint8_t
+    - eight_byte_struct
+  padded_eight_byte_union_on_stack:
+    - uint8_t
+    - eight_byte_struct_union_with_a_smaller_scalar
+    - eight_byte_struct_union_with_a_smaller_scalar
+    - uint8_t
+    - eight_byte_struct_union_with_a_smaller_scalar
+
+  # Including nested structs/unions.
+  padded_struct_of_structs_on_stack:
+    - uint8_t
+    - struct_of_structs
+    - struct_of_structs
+    - uint8_t
+    - struct_of_structs
+  padded_union_of_unions_on_stack:
+    - uint8_t
+    - union_of_unions
+    - union_of_unions
+    - uint8_t
+    - union_of_unions
+
+  # 3. Double-gpr-aligned stack arguments.
+  #
+  # Sixteen-byte fields/primitives usually involve wider alignment,
+  # these tests help us verify we compute it correctly in all the major cases.
+  padded_sixteen_byte_scalar_on_stack:
+    - uint8_t
+    - INT128_T
+    - INT128_T
+    - uint8_t
+    - INT128_T
+  padded_struct_with_a_sixteen_byte_field_at_the_start_on_stack:
+    - uint8_t
+    - struct_with_a_sixteen_byte_field_at_the_start
+    - struct_with_a_sixteen_byte_field_at_the_start
+    - uint8_t
+    - struct_with_a_sixteen_byte_field_at_the_start
+  padded_struct_with_a_sixteen_byte_field_at_the_end_on_stack:
+    - uint8_t
+    - struct_with_a_sixteen_byte_field_at_the_end
+    - struct_with_a_sixteen_byte_field_at_the_end
+    - uint8_t
+    - struct_with_a_sixteen_byte_field_at_the_end
+  padded_union_with_a_sixteen_byte_field_at_the_start_on_stack:
+    - uint8_t
+    - union_with_a_sixteen_byte_field_at_the_start
+    - union_with_a_sixteen_byte_field_at_the_start
+    - uint8_t
+    - union_with_a_sixteen_byte_field_at_the_start
+  padded_union_with_a_sixteen_byte_field_at_the_end_on_stack:
+    - uint8_t
+    - union_with_a_sixteen_byte_field_at_the_end
+    - union_with_a_sixteen_byte_field_at_the_end
+    - uint8_t
+    - union_with_a_sixteen_byte_field_at_the_end
+
+  # 4. Unnaturally sized stack arguments.
+  #
+  # Similar to the above, alignment computation near these can be tricky,
+  # these tests ensure we do not mis-compute it.
+  padded_three_byte_struct_on_stack:
+    - uint8_t
+    - three_byte_struct
+    - three_byte_struct
+    - uint8_t
+    - three_byte_struct
+  padded_seven_byte_struct_on_stack:
+    - uint8_t
+    - seven_byte_struct
+    - seven_byte_struct
+    - uint8_t
+    - seven_byte_struct
+  padded_unnaturally_sized_three_byte_struct_on_stack:
+    - uint8_t
+    - unnaturally_sized_three_byte_struct
+    - unnaturally_sized_three_byte_struct
+    - uint8_t
+    - unnaturally_sized_three_byte_struct
+  padded_unnaturally_sized_six_byte_struct_on_stack:
+    - uint8_t
+    - unnaturally_sized_six_byte_struct
+    - unnaturally_sized_six_byte_struct
+    - uint8_t
+    - unnaturally_sized_six_byte_struct
+  padded_unnaturally_sized_nine_byte_struct_on_stack:
+    - uint8_t
+    - unnaturally_sized_nine_byte_struct
+    - unnaturally_sized_nine_byte_struct
+    - uint8_t
+    - unnaturally_sized_nine_byte_struct
+  padded_unnaturally_sized_forteen_byte_struct_on_stack:
+    - uint8_t
+    - unnaturally_sized_forteen_byte_struct
+    - unnaturally_sized_forteen_byte_struct
+    - uint8_t
+    - unnaturally_sized_forteen_byte_struct
+  padded_three_byte_union_on_stack:
+    - uint8_t
+    - three_byte_struct_union_with_a_smaller_scalar
+    - three_byte_struct_union_with_a_smaller_scalar
+    - uint8_t
+    - three_byte_struct_union_with_a_smaller_scalar
+  padded_seven_byte_union_on_stack:
+    - uint8_t
+    - seven_byte_struct_union_with_a_smaller_scalar
+    - seven_byte_struct_union_with_a_smaller_scalar
+    - uint8_t
+    - seven_byte_struct_union_with_a_smaller_scalar
+  padded_unnaturally_sized_three_byte_union_on_stack:
+    - uint8_t
+    - unnaturally_sized_three_byte_union_with_a_smaller_scalar
+    - unnaturally_sized_three_byte_union_with_a_smaller_scalar
+    - uint8_t
+    - unnaturally_sized_three_byte_union_with_a_smaller_scalar
+  padded_unnaturally_sized_six_byte_union_on_stack:
+    - uint8_t
+    - unnaturally_sized_six_byte_struct_union_with_a_smaller_scalar
+    - unnaturally_sized_six_byte_struct_union_with_a_smaller_scalar
+    - uint8_t
+    - unnaturally_sized_six_byte_struct_union_with_a_smaller_scalar
+  padded_unnaturally_sized_nine_byte_union_on_stack:
+    - uint8_t
+    - unnaturally_sized_nine_byte_struct_union_with_a_smaller_scalar
+    - unnaturally_sized_nine_byte_struct_union_with_a_smaller_scalar
+    - uint8_t
+    - unnaturally_sized_nine_byte_struct_union_with_a_smaller_scalar
+  padded_unnaturally_sized_forteen_byte_union_on_stack:
+    - uint8_t
+    - unnaturally_sized_forteen_byte_struct_with_a_smaller_scalar
+    - unnaturally_sized_forteen_byte_struct_with_a_smaller_scalar
+    - uint8_t
+    - unnaturally_sized_forteen_byte_struct_with_a_smaller_scalar
+
+  # 5. Unnaturally aligned stack arguments.
+  #
+  # Similar to the above, alignment computation near these can be tricky,
+  # these tests ensure we do not mis-compute it.
+  padded_unnaturally_aligned_struct_16_on_stack:
+    - uint8_t
+    - unnaturally_aligned_struct_16
+    - unnaturally_aligned_struct_16
+    - uint8_t
+    - unnaturally_aligned_struct_16
+  padded_unnaturally_aligned_struct_32_on_stack:
+    - uint8_t
+    - unnaturally_aligned_struct_32
+    - unnaturally_aligned_struct_32
+    - uint8_t
+    - unnaturally_aligned_struct_32
+  padded_unnaturally_aligned_struct_64_on_stack:
+    - uint8_t
+    - unnaturally_aligned_struct_64
+    - unnaturally_aligned_struct_64
+    - uint8_t
+    - unnaturally_aligned_struct_64
+  padded_unnaturally_aligned_struct_128_on_stack:
+    - uint8_t
+    - unnaturally_aligned_struct_128
+    - unnaturally_aligned_struct_128
+    - uint8_t
+    - unnaturally_aligned_struct_128
+  padded_unnaturally_aligned_union_16_on_stack:
+    - uint8_t
+    - unnaturally_aligned_union_16
+    - unnaturally_aligned_union_16
+    - uint8_t
+    - unnaturally_aligned_union_16
+  padded_unnaturally_aligned_union_32_on_stack:
+    - uint8_t
+    - unnaturally_aligned_union_32
+    - unnaturally_aligned_union_32
+    - uint8_t
+    - unnaturally_aligned_union_32
+  padded_unnaturally_aligned_union_64_on_stack:
+    - uint8_t
+    - unnaturally_aligned_union_64
+    - unnaturally_aligned_union_64
+    - uint8_t
+    - unnaturally_aligned_union_64
+  padded_unnaturally_aligned_union_128_on_stack:
+    - uint8_t
+    - unnaturally_aligned_union_128
+    - unnaturally_aligned_union_128
+    - uint8_t
+    - unnaturally_aligned_union_128
+
+  # 6. Stack arguments involving floating point.
+  #
+  # Because floats often use a separate register set, the `gpr_t` trick does not
+  # help here. Let's still keep it, just in case, but, to avoid having to
+  # extend the generator-side logic even further, let's just list the new
+  # "dummy" arguments manually.
+  #
+  # The biggest currently supported number of register floating point arguments
+  # carried in registers is 16 floats OR 8 doubles, packed into q0-q3 in ARM-32.
+  # As such, let's use 8 double arguments.
+  padded_float_on_stack:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+    # and 8 `double`s already precede them.
+    - uint8_t
+    - float
+    - float
+    - uint8_t
+    - float
+  padded_double_on_stack:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+    # and 8 `double`s already precede them.
+    - uint8_t
+    - double
+    - double
+    - uint8_t
+    - double
+  padded_float_struct_on_stack:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+    # and 8 `double`s already precede them.
+    - uint8_t
+    - float_struct
+    - float_struct
+    - uint8_t
+    - float_struct
+  padded_double_struct_on_stack:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+    # and 8 `double`s already precede them.
+    - uint8_t
+    - double_struct
+    - double_struct
+    - uint8_t
+    - double_struct
+  padded_four_float_struct_on_stack:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+    # and 8 `double`s already precede them.
+    - uint8_t
+    - four_float_struct
+    - four_float_struct
+    - uint8_t
+    - four_float_struct
+  padded_four_double_struct_on_stack:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+    # and 8 `double`s already precede them.
+    - uint8_t
+    - four_double_struct
+    - four_double_struct
+    - uint8_t
+    - four_double_struct
+
+  # Including deeply nested cases
+  nested_float_struct_argument_on_stack:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+    # and 8 `double`s already precede them.
+    - uint8_t
+    - nested_float_struct
+    - nested_float_struct
+    - uint8_t
+    - nested_float_struct
+  deeply_nested_float_struct_argument_on_stack:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+    # and 8 `double`s already precede them.
+    - uint8_t
+    - deeply_nested_float_struct
+    - deeply_nested_float_struct
+    - uint8_t
+    - deeply_nested_float_struct
+  needle_in_a_haystack_float_struct_argument_on_stack:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+    # and 8 `double`s already precede them.
+    - uint8_t
+    - needle_in_a_haystack_float_struct
+    - needle_in_a_haystack_float_struct
+    - uint8_t
+    - needle_in_a_haystack_float_struct
+  nested_float_struct_union_argument_on_stack:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+    # and 8 `double`s already precede them.
+    - uint8_t
+    - nested_float_struct_union
+    - nested_float_struct_union
+    - uint8_t
+    - nested_float_struct_union
+  deeply_nested_float_struct_union_argument_on_stack:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+    # and 8 `double`s already precede them.
+    - uint8_t
+    - deeply_nested_float_struct_union
+    - deeply_nested_float_struct_union
+    - uint8_t
+    - deeply_nested_float_struct_union
+  needle_in_a_haystack_float_struct_union_argument_on_stack:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+    # and 8 `double`s already precede them.
+    - uint8_t
+    - needle_in_a_haystack_float_struct_union
+    - needle_in_a_haystack_float_struct_union
+    - uint8_t
+    - needle_in_a_haystack_float_struct_union

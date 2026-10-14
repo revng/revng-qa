@@ -1,0 +1,278 @@
+# NOTE: this is a helper file containing struct/unions tests use.
+#       See the other files in the same directory (as well as the README.md)
+#       first for a better entry point.
+
+structs:
+  # Simple structs of typical sizes
+  one_byte_struct: ["uint8_t a"]
+  two_byte_struct: ["uint16_t a"]
+  three_byte_struct: ["uint16_t a", "uint8_t b"]
+  four_byte_struct: ["uint32_t a"]
+  seven_byte_struct: ["uint32_t a", "uint16_t b", "uint8_t c"]
+  eight_byte_struct: ["uint64_t a"]
+  sixteen_byte_struct: ["uint64_t a", "uint64_t b"]
+
+  # Big structs
+  array_struct: ["uint64_t a[2]"]
+  array_struct_32_bit: ["uint32_t a[2]"]
+  big_struct: ["uint64_t a[8]"]
+  huge_struct: ["uint64_t a[20]"]
+
+  # Structs with a double-gpr-aligned (under some ABIs) field.
+  struct_with_a_sixteen_byte_field_at_the_start: ["INT128_T a", "uint8_t b"]
+  struct_with_a_sixteen_byte_field_at_the_end: ["uint8_t a", "INT128_T b"]
+
+  # Nested structs
+  small_struct_of_structs: ["two_byte_struct a", "one_byte_struct b"]
+  struct_of_structs: ["small_struct_of_structs a[2]", "one_byte_struct b"]
+
+  # Simple structs with floats and doubles *only.*
+  float_struct: ["float a"]
+  two_float_struct: ["float a", "float b"]
+  three_float_struct: ["float a", "float b", "float c"]
+  four_float_struct: ["float a", "float b", "float c", "float d"]
+  five_float_struct: ["float a", "float b", "float c", "float d", "float e"]
+  six_float_struct: ["float a", "float b", "float c", "float d", "float e", "float f"]
+  seven_float_struct: ["float a", "float b", "float c", "float d", "float e", "float f", "float g"]
+  eight_float_struct:
+    ["float a", "float b", "float c", "float d", "float e", "float f", "float g", "float h"]
+  nine_float_struct:
+    ["float a", "float b", "float c", "float d", "float e", "float f", "float g", "float h", "float i"]
+
+  double_struct: ["double a"]
+  two_double_struct: ["double a", "double b"]
+  three_double_struct: ["double a", "double b", "double c"]
+  four_double_struct: ["double a", "double b", "double c", "double d"]
+  five_double_struct: ["double a", "double b", "double c", "double d", "double e"]
+
+  float_double_struct: ["float a", "double b"]
+  double_float_struct: ["double a", "float b"]
+
+  float_double_float_struct: ["float a", "double b", "float c"]
+  double_float_double_struct: ["double a", "float b", "double c"]
+  float_double_double_struct: ["float a", "double b", "double c"]
+  double_float_float_struct: ["double a", "float b", "float c"]
+
+  # Simple structs with a mix of floats/doubles and integers.
+  int_float_struct: ["uint32_t a", "float b"]
+  float_int_struct: ["float a", "uint32_t b"]
+
+  int_double_struct: ["int64_t a", "double b"]
+  double_int_struct: ["double a", "int64_t b"]
+
+  float_int_float_struct: ["float a", "uint64_t b", "float c"]
+  int_float_int_struct: ["uint64_t a", "float b", "uint64_t c"]
+  float_int_int_struct: ["float a", "uint64_t b", "uint64_t c"]
+  int_float_float_struct: ["uint64_t a", "float b", "float c"]
+
+  int_double_int_struct: ["uint32_t a", "double b", "uint32_t c"]
+  double_int_double_struct: ["double a", "uint32_t b", "double c"]
+  int_double_double_struct: ["uint32_t a", "double b", "double c"]
+  double_int_int_struct: ["double a", "uint32_t b", "uint32_t c"]
+
+  padded_float_struct: ["uint8_t a", "float b"]
+  padded_double_struct: ["uint8_t a", "double b"]
+
+  # Big structs with floats
+  float_array_struct: ["float a[2]"]
+  double_array_struct: ["double a[2]"]
+  big_float_struct: ["float a[8]"]
+  big_double_struct: ["double a[8]"]
+  huge_float_struct: ["float a[32]"]
+  huge_double_struct: ["double a[32]"]
+
+  # Float structs with a double-gpr-aligned (under some ABIs) field.
+  float_struct_with_a_sixteen_byte_field_at_the_start: ["INT128_T a", "float b"]
+  float_struct_with_a_sixteen_byte_field_at_the_end: ["float a", "INT128_T b"]
+  double_struct_with_a_sixteen_byte_field_at_the_start: ["INT128_T a", "double b"]
+  double_struct_with_a_sixteen_byte_field_at_the_end: ["double a", "INT128_T b"]
+
+  # Nested structs with floats and doubles
+  nested_float_struct: ["one_byte_struct a", "two_byte_struct b", "float_struct c"]
+  deeply_nested_float_struct: ["one_byte_struct a", "two_byte_struct b", "nested_float_struct c"]
+  needle_in_a_haystack_float_struct:
+    ["one_byte_struct a", "two_byte_struct b", "deeply_nested_float_struct c"]
+
+  # TODO: add other floating point types (16-bit, 128-bit, etc)
+
+# `packed_structs` are the same as `structs`, except that they get declared in
+# the output header inside the `#pragma pack(push, 1)` and
+# `#pragma pack(pop)` pair.
+packed_structs:
+  # Unnaturally aligned structs, where "unnaturally aligned" means a struct or
+  # union that recursively contains at least one non-naturally-aligned field
+  # (field offset of which is not a multiple of its own alignment).
+  unnaturally_aligned_struct_16: ["char prepadding[1]", "uint16_t a", "char postpadding[1]"]
+  unnaturally_aligned_struct_32: ["char prepadding[2]", "uint32_t a", "char postpadding[2]"]
+  unnaturally_aligned_struct_64: ["char prepadding[2]", "uint64_t a", "char postpadding[6]"]
+  unnaturally_aligned_struct_128: ["char prepadding[2]", "INT128_T a", "char postpadding[14]"]
+
+  unnaturally_aligned_float_struct: ["char prepadding[2]", "float a", "char postpadding[2]"]
+  unnaturally_aligned_double_struct: ["char prepadding[2]", "double a", "char postpadding[2]"]
+
+  # Unnaturally sized structs, where "unnaturally sized" means a size that is
+  # only possible to produce by "packing" the struct. Practically, this prevents
+  # the compiler from extending the struct size using the alignment of its
+  # biggest member.
+  #
+  # These are still naturally aligned, even if their size is not typical.
+  #
+  # NOTE: all of these have a non-unnaturally-sized alternatives, but those get
+  #       padding at the end of the struct, so their size does not really match
+  #       the name.
+  unnaturally_sized_three_byte_struct: ["uint16_t a", "uint8_t b"]
+  unnaturally_sized_seven_byte_struct: ["uint32_t a", "uint16_t b", "uint8_t c"]
+
+  # Most important situation where unnatural struct size reveals itself is in
+  # the case where there's an array of them - namely it can to a case where
+  # an unnaturally struct is constructed purely from the naturally aligned
+  # members!
+  #
+  # For example,
+  # ```cpp
+  # unnaturally_sized_six_byte_struct test;
+  # test.a[1].a = 0;
+  # ```
+  # `test.a[1].a` is at offset 3 despite having the alignment of 2 (and being
+  # naturally aligned (offset 0) inside `unnaturally_sized_three_byte_struct`).
+  unnaturally_sized_six_byte_struct: ["unnaturally_sized_three_byte_struct a[2]"]
+  unnaturally_sized_nine_byte_struct: ["unnaturally_sized_three_byte_struct a[3]"]
+  unnaturally_sized_forteen_byte_struct: ["unnaturally_sized_seven_byte_struct a[2]"]
+
+  # The same thing, but with float fields in the mix.
+  unnaturally_sized_five_byte_struct_with_float: ["float a", "uint8_t b"]
+  unnaturally_sized_nine_byte_struct_with_double: ["double a", "uint8_t b"]
+
+  # Unnatural alignment despite all the natural alignment of all the field types
+  unnaturally_sized_ten_byte_struct_with_float:
+    - unnaturally_sized_five_byte_struct_with_float a[2]
+  unnaturally_sized_fifteen_byte_struct_with_float:
+    - unnaturally_sized_five_byte_struct_with_float a[3]
+  unnaturally_sized_eighteen_byte_struct_with_double:
+    - unnaturally_sized_nine_byte_struct_with_double a[2]
+
+unions:
+  # Simple unions of typical sizes - half-primitive, half-struct, the *struct* is bigger
+  one_byte_struct_union_with_a_smaller_scalar: ["one_byte_struct a", "uint8_t b"]
+  two_byte_struct_union_with_a_smaller_scalar: ["two_byte_struct a", "uint8_t b"]
+  unnaturally_sized_three_byte_union_with_a_smaller_scalar:
+    - unnaturally_sized_three_byte_struct a
+    - uint8_t b
+  unnaturally_sized_six_byte_struct_union_with_a_smaller_scalar:
+    - unnaturally_sized_six_byte_struct a
+    - uint8_t b
+  three_byte_struct_union_with_a_smaller_scalar: ["three_byte_struct a", "uint8_t b"]
+  four_byte_struct_union_with_a_smaller_scalar: ["four_byte_struct a", "uint8_t b"]
+  unnaturally_sized_seven_byte_union_with_a_smaller_scalar:
+    - unnaturally_sized_seven_byte_struct a
+    - uint8_t b
+  seven_byte_struct_union_with_a_smaller_scalar: ["seven_byte_struct a", "uint8_t b"]
+  eight_byte_struct_union_with_a_smaller_scalar: ["eight_byte_struct a", "uint8_t b"]
+  unnaturally_sized_nine_byte_struct_union_with_a_smaller_scalar:
+    - unnaturally_sized_nine_byte_struct a
+    - uint8_t b
+  unnaturally_sized_forteen_byte_struct_with_a_smaller_scalar:
+    - unnaturally_sized_forteen_byte_struct a
+    - uint8_t b
+  sixteen_byte_struct_union_with_a_smaller_scalar: ["sixteen_byte_struct a", "uint8_t b"]
+
+  # Simple unions of typical sizes - half-primitive, half-struct, the *primitive* is bigger
+  one_byte_struct_union_with_a_bigger_scalar: ["one_byte_struct a", "uint16_t b"]
+  two_byte_struct_union_with_a_bigger_scalar: ["two_byte_struct a", "uint32_t b"]
+  unnaturally_sized_three_byte_union_with_a_bigger_scalar:
+    - unnaturally_sized_three_byte_struct a
+    - uint64_t b
+  three_byte_struct_union_with_a_bigger_scalar: ["three_byte_struct a", "uint64_t b"]
+  four_byte_struct_union_with_a_bigger_scalar: ["four_byte_struct a", "uint64_t b"]
+  unnaturally_sized_seven_byte_union_with_a_bigger_scalar:
+    - unnaturally_sized_seven_byte_struct a
+    - UINT128_T b
+  seven_byte_struct_union_with_a_bigger_scalar: ["seven_byte_struct a", "UINT128_T b"]
+  eight_byte_struct_union_with_a_bigger_scalar: ["eight_byte_struct a", "UINT128_T b"]
+  unnaturally_sized_nine_byte_struct_union_with_a_bigger_scalar:
+    - unnaturally_sized_nine_byte_struct a
+    - UINT128_T b
+  unnaturally_sized_forteen_byte_struct_with_a_bigger_scalar:
+    - unnaturally_sized_forteen_byte_struct a
+    - UINT128_T b
+
+  # Big unions
+  array_union: ["uint64_t a[2]", "uint8_t b"]
+  array_union_32_bit: ["uint32_t a[2]", "uint8_t b"]
+  big_union: ["uint64_t a", "big_struct b"]
+  huge_union: ["uint64_t a", "huge_struct b"]
+
+  # Unions with a double-gpr-aligned (under some ABIs) field.
+  union_with_a_sixteen_byte_field_at_the_start:
+    - struct_with_a_sixteen_byte_field_at_the_start a
+    - uint8_t b
+  union_with_a_sixteen_byte_field_at_the_end:
+    - struct_with_a_sixteen_byte_field_at_the_end a
+    - uint8_t b
+
+  # Nested union
+  union_of_unions:
+    - two_byte_struct_union_with_a_smaller_scalar a
+    - four_byte_struct_union_with_a_smaller_scalar b
+
+  # Unnaturally aligned unions, were "unnaturally aligned" means a struct or
+  # union that recursively contains at least one non-naturally-aligned field.
+  unnaturally_aligned_union_16: ["uint8_t a", "unnaturally_aligned_struct_16 b"]
+  unnaturally_aligned_union_32: ["uint8_t a", "unnaturally_aligned_struct_32 b"]
+  unnaturally_aligned_union_64: ["uint8_t a", "unnaturally_aligned_struct_64 b"]
+  unnaturally_aligned_union_128: ["uint8_t a", "unnaturally_aligned_struct_128 b"]
+
+  # Unions with floats/doubles
+  float_or_double_union: ["float a", "double b"]
+  float_or_float_struct_union: ["float a", "float_struct b"]
+  float_or_two_float_struct_union: ["float a", "two_float_struct b"]
+  float_or_double_struct_union: ["float a", "double_struct b"]
+
+  double_or_float_struct_union: ["double a", "float_struct b"]
+  double_or_two_float_struct_union: ["double a", "two_float_struct b"]
+  double_or_double_struct_union: ["double a", "double_struct b"]
+
+  float_array_union: ["float a[3]", "float_array_struct b"]
+  double_array_union: ["double a[3]", "double_array_struct b"]
+  four_double_struct_union: ["double a", "four_double_struct b"]
+
+  # Mixed integer-float unions
+  float_or_int_union: ["float a", "uint32_t b"]
+  float_or_bigger_int_union: ["float a", "uint64_t b"]
+  float_or_smaller_int_union: ["float a", "uint16_t b"]
+
+  double_or_int_union: ["double a", "uint64_t b"]
+  double_or_bigger_int_union: ["double a", "INT128_T b"]
+  double_or_smaller_int_union: ["double a", "uint32_t b"]
+
+  # Big unions with floats
+  array_float_union: ["float a[2]", "uint8_t b"]
+  big_float_union: ["uint64_t a", "big_float_struct b"]
+  huge_float_union: ["uint64_t a", "huge_float_struct b"]
+  array_double_union: ["double a[2]", "uint8_t b"]
+  big_double_union: ["uint64_t a", "big_double_struct b"]
+  huge_double_union: ["uint64_t a", "huge_double_struct b"]
+
+  # Float unions with a double-gpr-aligned (under some ABIs) field.
+  float_union_with_a_sixteen_byte_field_at_the_start:
+    - float_struct_with_a_sixteen_byte_field_at_the_start a
+    - float b
+  float_union_with_a_sixteen_byte_field_at_the_end:
+    - float_struct_with_a_sixteen_byte_field_at_the_end a
+    - float b
+  double_union_with_a_sixteen_byte_field_at_the_start:
+    - double_struct_with_a_sixteen_byte_field_at_the_start a
+    - float b
+  double_union_with_a_sixteen_byte_field_at_the_end:
+    - double_struct_with_a_sixteen_byte_field_at_the_end a
+    - float b
+
+  # Unnaturally aligned unions, were "unnaturally aligned" means a struct or
+  # union that recursively contains at least one non-naturally-aligned field.
+  unnaturally_aligned_float_union: ["uint8_t a", "unnaturally_aligned_float_struct b"]
+  unnaturally_aligned_double_union: ["uint8_t a", "unnaturally_aligned_double_struct b"]
+
+  # Deeply nested unions with floats and doubles
+  nested_float_struct_union: ["uint64_t a", "nested_float_struct b"]
+  deeply_nested_float_struct_union: ["uint64_t a", "deeply_nested_float_struct b"]
+  needle_in_a_haystack_float_struct_union: ["uint64_t a", "needle_in_a_haystack_float_struct b"]

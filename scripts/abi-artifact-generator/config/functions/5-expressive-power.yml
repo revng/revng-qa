@@ -1,0 +1,232 @@
+#
+# `abi::Definition`-inspired tests (see README.md).
+#
+
+# Each test group starts with a name of the corresponding boolean and/or
+# strategy in `abi::Definition`.
+#
+# Note that not all the tests belong to this file. Some tests are instead
+# replaced with a comment mentioning the names of test functions defined
+# elsewhere that highlight the given boolean/strategy logic.
+argument_tests:
+  ### `abi::Definition::ArgumentsArePositionBased`
+  #
+  # Register-related behavior is highlighted by
+  # the `mixed_int_32_float_arguments` test:
+  # - `true`: it will use the first and the third GPR.
+  # - `false`: it will use the first and the second GPR.
+  #
+  # Big value related behavior is highlighted by
+  # the `single_big_struct_argument` test:
+  # - `true`: it will pass the struct as a pointer-to-copy in the first GPR.
+  # - `false`: it will pass the struct using the stack.
+
+  ### `abi::Definition::OnlyStartDoubleArgumentsFromAnEvenRegister`
+  #
+  # - `true`: it will use the first 4 GPRs (where the second one is padding).
+  # - `false`: it will use the first 3 GPRs.
+  padded_sixteen_byte_scalar_in_registers:
+    - uint8_t
+    - UINT128_T
+
+  # Identical to the above but targeting 32-bit architectures.
+  padded_eight_byte_scalar_in_registers:
+    - uint8_t
+    - uint64_t
+
+  ### `abi::Definition::ArgumentsCanBeSplitBetweenRegistersAndStack`
+  #
+  # - `true`: `big_struct` uses the forth GPR *and* stack.
+  # - `false`: `big_struct` only uses the stack.
+  struct_after_three_gprs:
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - big_struct
+
+  ### `abi::Definition::BigArgumentsUsePointersToCopy`
+  #
+  # The register-related behavior is highlighted by
+  # the `single_big_struct_argument` test:
+  # - `true`: it will pass the struct as a pointer-to-copy in the first GPR.
+  # - `false`: it will pass the struct using the stack.
+  #
+  # The stack-related behavior is highlighted by
+  # the `huge_struct_on_the_stack` test.
+  # See the relevant explanation provided where that function is defined, as
+  # the logic here mirrors that of ``abi::Definition::ArgumentsArePositionBased`
+
+  ### `abi::Definition::NoRegisterArgumentsCanComeAfterStackOnes`
+  #
+  # - `true`: the second argument uses stack.
+  # - `false`: the second argument uses a GPR.
+  a_primitive_argument_after_a_big_struct:
+    - big_struct
+    - gpr_t
+
+  ### `abi::Definition::AllowPackedTypesInRegisters`
+  #
+  # The behavior is highlighted by
+  # the `unnaturally_aligned_struct_32_in_registers` test:
+  # - `true`: the second argument uses a GPR.
+  # - `false`: the second argument uses the stack/pointer-to-copy.
+
+stack_argument_tests:
+  ### `abi::Definition::ArgumentsArePositionBased`
+  #
+  # NOTE: this is a continuation of the section from `argument_tests`.
+  #
+  # - `true`: the `huge_struct` is replaced with a pointer to copy even on the
+  #   stack, meaning the second non-dummy argument will be placed at
+  #   a pointer-sized offset.
+  # - `false`: the entire `huge_struct` is on the argument section of the stack,
+  #   meaning the second non-dummy argument will be placed at
+  #   a `huge-struct`-sized offset.
+  huge_struct_on_the_stack:
+    - huge_struct
+    - uint32_t
+
+  ### `abi::Definition::PackStackArguments`
+  #
+  # - `true`: the stack arguments use struct-like rules.
+  # - `false`: the stack arguments use stack-like rules.
+  apple_two_byte_aligned_primitive_on_stack:
+    - uint8_t
+    - uint8_t
+    - uint16_t
+  apple_reverse_two_byte_aligned_primitive_on_stack:
+    - uint16_t
+    - uint8_t
+    - uint8_t
+  apple_padded_two_byte_aligned_primitive_on_stack:
+    - uint8_t
+    - uint16_t
+  apple_four_byte_aligned_primitive_on_stack:
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint32_t
+  apple_reverse_four_byte_aligned_primitive_on_stack:
+    - uint32_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+  apple_padded_four_byte_aligned_primitive_on_stack:
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint32_t
+  apple_eight_byte_aligned_primitive_on_stack:
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint64_t
+  apple_reverse_eight_byte_aligned_primitive_on_stack:
+    - uint64_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+  apple_padded_eight_byte_aligned_primitive_on_stack:
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint64_t
+
+  ### `abi::Definition::TreatAllAggregatesAsPacked`
+  #
+  # - `true`: all the aggregates are padded despite what other booleans say.
+  # - `false`: the aggregates behave according to the normal rules.
+  apple_two_byte_aligned_aggregate_on_stack:
+    - uint8_t
+    - uint8_t
+    - two_byte_struct
+  apple_reverse_two_byte_aligned_aggregate_on_stack:
+    - two_byte_struct
+    - uint8_t
+    - uint8_t
+  apple_padded_two_byte_aligned_aggregate_on_stack:
+    - uint8_t
+    - two_byte_struct
+  apple_four_byte_aligned_aggregate_on_stack:
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - four_byte_struct
+  apple_reverse_four_byte_aligned_aggregate_on_stack:
+    - four_byte_struct
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+  apple_padded_four_byte_aligned_aggregate_on_stack:
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - four_byte_struct
+  apple_eight_byte_aligned_aggregate_on_stack:
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - eight_byte_struct
+  apple_reverse_eight_byte_aligned_aggregate_on_stack:
+    - eight_byte_struct
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+  apple_padded_eight_byte_aligned_aggregate_on_stack:
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - eight_byte_struct
+
+  apple_mixed_aggregates_on_stack:
+    - one_byte_struct
+    - one_byte_struct
+    - two_byte_struct
+  apple_reverse_mixed_aggregates_on_stack:
+    - two_byte_struct
+    - one_byte_struct
+    - one_byte_struct
+  apple_padded_mixed_aggregates_on_stack:
+    - one_byte_struct
+    - two_byte_struct
+
+  apple_mixed_primitives_and_aggregates_on_stack:
+    - one_byte_struct
+    - uint8_t
+    - two_byte_struct
+  apple_reverse_mixed_primitives_and_aggregates_on_stack:
+    - two_byte_struct
+    - uint8_t
+    - one_byte_struct

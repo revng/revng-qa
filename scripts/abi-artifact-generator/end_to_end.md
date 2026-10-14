@@ -6,20 +6,34 @@ The suite starts with the generator (see [here](./README.md)), which, in its ess
 
 Let's look into a fictional example with only a couple of test functions:
 ```yaml
-# functions.yml
+# functions/types.yaml
 structs:
   small_struct: ["uint16_t a", "uint16_t b"]
   big_struct: ["uint64_t a[8]"]
+```
 
+```yaml
+# functions/simple-arguments.yaml
 argument_tests:
-  args: ["small_struct", big_struct]
+  simple_argument: ["small_struct"]
+```
 
+```yaml
+# functions/mixed-arguments.yaml
+argument_tests:
+  two_arguments: ["small_struct", big_struct]
+```
+
+```yaml
+# functions/return-values.yaml
 return_value_tests:
   small_rv: "small_struct"
   big_rv: "big_struct"
 ```
 
-Based on this configuration file, the generated `functions.h` will look something like this:
+Every YAML file in the `functions` directory is loaded and the results are merged together, key by key. See `simple_arg` and `two_args` above - they will end up as two elements of the same dictionary after the configuration is loaded.
+
+Based on this configuration, the generated `functions.h` will look like this:
 ```cpp
 typedef struct {
   uint16_t a;
@@ -29,8 +43,11 @@ typedef struct {
   uint64_t a[8];
 } big_struct;
 
-void setup_args(void);
-NOINLINE void ABIDEF test_args(small_struct argument_0, big_struct argument_1);
+void setup_simple_argument(void);
+NOINLINE void ABIDEF test_simple_argument(small_struct argument_0);
+
+void setup_two_arguments(void);
+NOINLINE void ABIDEF test_two_arguments(small_struct argument_0, big_struct argument_1);
 
 void setup_small_rv(void);
 NOINLINE small_struct ABIDEF test_small_rv(void);
@@ -39,6 +56,8 @@ void setup_big_rv(void);
 NOINLINE big_struct ABIDEF test_big_rv(void);
 ```
 There's not much to say about it: these are the same structs and function prototypes seen in the yaml about, but converted to C.
+
+Note that using the same name for multiple different tests is a hard error.
 
 You might also notice that each test also has a `setup_X` counterpart: it serves the purpose of the entry point for the specific test, in other words, the _caller_, while `test_X` is the analyzed _callee_.
 
