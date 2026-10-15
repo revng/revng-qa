@@ -1,0 +1,281 @@
+#
+# This file is distributed under the MIT License. See LICENSE.md for details.
+#
+
+# A program with a relocated pointer for each kind of target, see
+# `share/revng/test/tests/model/import/relocations/relocations.c`, built with
+# several toolchains and relocation encodings. Each output is stripped.
+
+tags:
+  - name: for-import-relocations
+
+  # The kind of binary, which determines what the checks expect
+  - name: relocations-elf-pie
+  - name: relocations-elf-exec
+  - name: relocations-macho-pie
+  - name: relocations-macho-exec
+  - name: relocations-pe-pie
+  - name: relocations-pe-fixed
+
+  # GCC
+  - name: relocations-gcc
+  - name: relocations-gcc-pie
+    implies: [relocations-gcc, relocations-elf-pie]
+    variables:
+      RELOCATIONS_FLAGS:
+        - -fPIE
+        - -pie
+  - name: relocations-gcc-thumb-pie
+    implies: [relocations-gcc, relocations-elf-pie]
+    variables:
+      RELOCATIONS_FLAGS:
+        - -mthumb
+        - -fPIE
+        - -pie
+  - name: relocations-gcc-exec
+    implies: [relocations-gcc, relocations-elf-exec]
+    variables:
+      RELOCATIONS_FLAGS:
+        - -fno-pie
+        - -no-pie
+
+  # ld.lld, packing relative relocations in different ways
+  - name: relocations-lld
+  - name: relocations-lld-relr
+    implies: [relocations-lld, relocations-elf-pie]
+    variables:
+      RELOCATIONS_FLAGS:
+        - -z
+        - pack-relative-relocs
+  - name: relocations-lld-android
+    implies: [relocations-lld, relocations-elf-pie]
+    variables:
+      RELOCATIONS_FLAGS:
+        - --pack-dyn-relocs=android
+  - name: relocations-lld-android-relr
+    implies: [relocations-lld, relocations-elf-pie]
+    variables:
+      RELOCATIONS_FLAGS:
+        - --pack-dyn-relocs=android+relr
+        - --use-android-relr-tags
+
+  # ld64.lld
+  - name: relocations-ld64
+  - name: relocations-ld64-rebase
+    implies: [relocations-ld64, relocations-macho-pie]
+  - name: relocations-ld64-chained
+    implies: [relocations-ld64, relocations-macho-pie]
+    variables:
+      RELOCATIONS_FLAGS:
+        - -fixup_chains
+  - name: relocations-ld64-exec
+    implies: [relocations-ld64, relocations-macho-exec]
+    variables:
+      RELOCATIONS_FLAGS:
+        - -no_pie
+
+  # lld-link
+  - name: relocations-lld-link
+  - name: relocations-lld-link-dynamic-base
+    implies: [relocations-lld-link, relocations-pe-pie]
+  - name: relocations-lld-link-fixed
+    implies: [relocations-lld-link, relocations-pe-fixed]
+    variables:
+      RELOCATIONS_FLAGS:
+        - /fixed
+  - name: relocations-windows-x86-64
+    variables:
+      POINTER_SIZE: "64"
+      WINDOWS_TRIPLE: x86_64-pc-windows-msvc
+      WINDOWS_MACHINE: x64
+  - name: relocations-windows-i386
+    variables:
+      POINTER_SIZE: "32"
+      WINDOWS_TRIPLE: i686-pc-windows-msvc
+      WINDOWS_MACHINE: x86
+  - name: relocations-windows-aarch64
+    variables:
+      POINTER_SIZE: "64"
+      WINDOWS_TRIPLE: aarch64-pc-windows-msvc
+      WINDOWS_MACHINE: arm64
+
+sources:
+  - tags: [for-import-relocations]
+    prefix: share/revng/test/tests/model/import/relocations/
+    repeat-for:
+      - [x86-64, relocations-gcc-pie]
+      - [x86-64, relocations-gcc-exec]
+      - [i386, relocations-gcc-pie]
+      - [i386, relocations-gcc-exec]
+      - [arm, relocations-gcc-pie]
+      - [arm, relocations-gcc-thumb-pie]
+      - [arm, relocations-gcc-exec]
+      - [aarch64, relocations-gcc-pie]
+      - [aarch64, relocations-gcc-exec]
+      - [mips, relocations-gcc-pie]
+      - [mips, relocations-gcc-exec]
+      - [mipsel, relocations-gcc-pie]
+      - [mipsel, relocations-gcc-exec]
+      - [s390x, relocations-gcc-pie]
+      - [s390x, relocations-gcc-exec]
+      - [x86-64, relocations-lld-relr]
+      - [x86-64, relocations-lld-android]
+      - [x86-64, relocations-lld-android-relr]
+      - [i386, relocations-lld-relr]
+      - [i386, relocations-lld-android]
+      - [i386, relocations-lld-android-relr]
+      - [arm, relocations-lld-relr]
+      - [arm, relocations-lld-android]
+      - [arm, relocations-lld-android-relr]
+      - [aarch64, relocations-lld-relr]
+      - [aarch64, relocations-lld-android]
+      - [aarch64, relocations-lld-android-relr]
+      - [apple-x86-64, relocations-ld64-rebase]
+      - [apple-x86-64, relocations-ld64-chained]
+      - [apple-x86-64, relocations-ld64-exec]
+      - [apple-aarch64, relocations-ld64-rebase]
+      - [apple-aarch64, relocations-ld64-chained]
+      - [relocations-windows-x86-64, relocations-lld-link-dynamic-base]
+      - [relocations-windows-x86-64, relocations-lld-link-fixed]
+      - [relocations-windows-i386, relocations-lld-link-dynamic-base]
+      - [relocations-windows-i386, relocations-lld-link-fixed]
+      # arm64 requires a dynamic base
+      - [relocations-windows-aarch64, relocations-lld-link-dynamic-base]
+    members:
+      - relocations.c
+
+# `clang` links against host libraries: invoke the linker directly
+commands:
+  - type: revng-qa.relocations
+    from:
+      - type: source
+        filter: for-import-relocations and relocations-gcc
+    command: |-
+      LIBRARY="$$(temp -d)/libimported.so";
+      ${TRIPLE}gcc
+        -O1
+        -nostdlib
+        -fPIC
+        -shared
+        -Wl,-soname,libimported.so
+        "$$(dirname "${INPUT}")/imported.c"
+        -o "$$LIBRARY";
+      ${TRIPLE}gcc
+        -O1
+        -nostdlib
+        -Wl,-e,entry
+        ${RELOCATIONS_FLAGS}
+        "${INPUT}"
+        "$$LIBRARY"
+        -o "${OUTPUT}";
+      llvm-objcopy --strip-all "${OUTPUT}"
+
+  - type: revng-qa.relocations
+    from:
+      - type: source
+        filter: for-import-relocations and relocations-lld
+    command: |-
+      TEMPORARY="$$(temp -d)";
+      clang
+        ${CLANG_CFLAGS}
+        -O1
+        -fPIC
+        -c
+        "$$(dirname "${INPUT}")/imported.c"
+        -o "$$TEMPORARY/imported.o";
+      ld.lld
+        -shared
+        -soname libimported.so
+        "$$TEMPORARY/imported.o"
+        -o "$$TEMPORARY/libimported.so";
+      clang
+        ${CLANG_CFLAGS}
+        -O1
+        -fPIC
+        -c
+        "${INPUT}"
+        -o "$$TEMPORARY/relocations.o";
+      ld.lld
+        -pie
+        -e entry
+        ${RELOCATIONS_FLAGS}
+        "$$TEMPORARY/relocations.o"
+        "$$TEMPORARY/libimported.so"
+        -o "${OUTPUT}";
+      llvm-objcopy --strip-all "${OUTPUT}"
+
+  # Function starts would reach the targets without relocations
+  - type: revng-qa.relocations
+    from:
+      - type: source
+        filter: for-import-relocations and relocations-ld64
+    command: |-
+      TEMPORARY="$$(temp -d)";
+      clang
+        --target="${APPLE_TRIPLE}"
+        -O1
+        -c
+        "$$(dirname "${INPUT}")/imported.c"
+        -o "$$TEMPORARY/imported.o";
+      ld64.lld
+        -arch ${APPLE_NAME}
+        -platform_version macos 14.5 1
+        -dylib
+        -install_name @rpath/libimported.dylib
+        "$$TEMPORARY/imported.o"
+        -o "$$TEMPORARY/libimported.dylib";
+      clang
+        --target="${APPLE_TRIPLE}"
+        -O1
+        -c
+        "${INPUT}"
+        -o "$$TEMPORARY/relocations.o";
+      ld64.lld
+        -arch ${APPLE_NAME}
+        -platform_version macos 14.5 1
+        -e _entry
+        -no_function_starts
+        ${RELOCATIONS_FLAGS}
+        "$$TEMPORARY/relocations.o"
+        "$$TEMPORARY/libimported.dylib"
+        -o "${OUTPUT}";
+      llvm-objcopy --strip-all "${OUTPUT}"
+
+  # PE executables have no symbols to strip
+  - type: revng-qa.relocations
+    from:
+      - type: source
+        filter: for-import-relocations and relocations-lld-link
+    command: |-
+      TEMPORARY="$$(temp -d)";
+      clang
+        --target="${WINDOWS_TRIPLE}"
+        -O1
+        -c
+        "$$(dirname "${INPUT}")/imported.c"
+        -o "$$TEMPORARY/imported.obj";
+      lld-link
+        /dll
+        /noentry
+        /nodefaultlib
+        /brepro
+        /machine:${WINDOWS_MACHINE}
+        /export:imported_function
+        /implib:"$$TEMPORARY/imported.lib"
+        /out:"$$TEMPORARY/imported.dll"
+        "$$TEMPORARY/imported.obj";
+      clang
+        --target="${WINDOWS_TRIPLE}"
+        -O1
+        -c
+        "${INPUT}"
+        -o "$$TEMPORARY/relocations.obj";
+      lld-link
+        /entry:entry
+        /subsystem:console
+        /nodefaultlib
+        /brepro
+        ${RELOCATIONS_FLAGS}
+        /out:"${OUTPUT}"
+        "$$TEMPORARY/relocations.obj"
+        "$$TEMPORARY/imported.lib"
