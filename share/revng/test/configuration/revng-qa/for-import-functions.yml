@@ -1,0 +1,72 @@
+#
+# This file is distributed under the MIT License. See LICENSE.md for details.
+#
+
+# Programs whose functions are reachable only through information for the
+# loader, see `share/revng/test/tests/model/import/functions/`. Each output is
+# stripped.
+
+tags:
+  - name: for-import-functions
+  - name: functions-ifunc
+  - name: functions-exports
+  - name: functions-function-starts
+  - name: functions-no-function-starts
+    variables:
+      FUNCTIONS_FLAGS:
+        - -no_function_starts
+
+sources:
+  - tags: [for-import-functions, functions-ifunc, native]
+    prefix: share/revng/test/tests/model/import/functions/
+    members:
+      - ifunc.c
+
+  - tags: [for-import-functions, functions-exports]
+    prefix: share/revng/test/tests/model/import/functions/
+    repeat-for:
+      - [apple-x86-64, functions-function-starts]
+      - [apple-x86-64, functions-no-function-starts]
+      - [apple-aarch64, functions-function-starts]
+      - [apple-aarch64, functions-no-function-starts]
+    members:
+      - exports.c
+
+commands:
+  - type: revng-qa.functions
+    from:
+      - type: source
+        filter: for-import-functions and functions-ifunc
+    command: |-
+      ${TRIPLE}gcc
+        -O1
+        -nostdlib
+        -fPIE
+        -pie
+        -Wl,-e,entry
+        "${INPUT}"
+        -o "${OUTPUT}";
+      llvm-objcopy --strip-all "${OUTPUT}"
+
+  # `clang` links against host libraries: invoke the linker directly
+  - type: revng-qa.functions
+    from:
+      - type: source
+        filter: for-import-functions and functions-exports
+    command: |-
+      OBJECT="$$(temp -d)/exports.o";
+      clang
+        --target="${APPLE_TRIPLE}"
+        -O1
+        -c
+        "${INPUT}"
+        -o "$$OBJECT";
+      ld64.lld
+        -arch ${APPLE_NAME}
+        -platform_version macos 14.5 1
+        -dylib
+        -install_name @rpath/libexports.dylib
+        ${FUNCTIONS_FLAGS}
+        "$$OBJECT"
+        -o "${OUTPUT}";
+      llvm-objcopy --strip-all "${OUTPUT}"
