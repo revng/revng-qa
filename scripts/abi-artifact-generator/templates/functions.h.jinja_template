@@ -35,19 +35,18 @@ This template file is distributed under the MIT License. See LICENSE.md for deta
  * Avoid problems on architectures without __int128_t support
  */
 #ifdef __SIZEOF_INT128__
-#define INT128_T __int128_t
-#define UINT128_T __uint128_t
+typedef signed __int128 int128_t;
+typedef unsigned __int128 uint128_t;
+#elif defined(__BITINT_MAXWIDTH__) && __BITINT_MAXWIDTH__ >= 128
+typedef signed _BitInt(128) int128_t;
+typedef unsigned _BitInt(128) uint128_t;
 #else
 typedef struct {
-  int64_t low, high;
-} replacement_for___int128_t;
-#define INT128_T replacement_for___int128_t
-
-typedef struct {
-  uint64_t low, high;
-} replacement_for___uint128_t;
-#define UINT128_T replacement_for___uint128_t
+  char data[16];
+} int128_t, uint128_t;
 #endif
+
+typedef size_t gpr_t;
 
 /*
  * Helper structs used by the functions
@@ -85,6 +84,19 @@ typedef struct {
 
 /*{ endfor -}*/
 #pragma pack(pop)
+
+/*
+ * Helper unions used by the functions
+ */
+
+/*{ for name, fields in unions.items() -}*/
+typedef union {
+/*{ for field in fields -}*/
+  /*( field | indent(2, true) )*/;
+/*{ endfor -}*/
+} /*( name )*/;
+
+/*{ endfor -}*/
 
 /*
  * Functions designed to test argument passing

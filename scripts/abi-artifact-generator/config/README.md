@@ -53,7 +53,7 @@ Pointers are allowed, arrays are not (but you can use structs to simulate them).
 
 ### Additional notes
 
-- On top of typical C types (signed and unsigned versions of `int8_t`, `int16_t`, `int32_t`, and `int64_t`), special macros are provided for `INT128_T` and `UINT128_T`. They are replaced by the compiler specific version of the type if the compiler provides one for the given architecture or by a similarly sized struct for those that do not.
+- On top of typical C types (signed and unsigned versions of `int8_t`, `int16_t`, `int32_t`, and `int64_t`), `int128_t` and `uint128_t` are provided as typedefs. They are the compiler specific version of the type if the compiler provides one for the given architecture (`__int128` or `_BitInt(128)`), or a similarly sized struct for those that do not.
 
 ## `architectures.yml`
 

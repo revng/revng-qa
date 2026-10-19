@@ -65,28 +65,15 @@ def render_helper(env, template_name: str, result_path: str, variable_dictionary
         file.write(jinja_template.render(variable_dictionary))
 
 
-def register_type(register_size: str):
-    if register_size == 1:
+def gpr_type(gpr_size: str):
+    if gpr_size == 1:
         return "uint8_t"
-    elif register_size == 2:
+    elif gpr_size == 2:
         return "uint16_t"
-    elif register_size == 4:
+    elif gpr_size == 4:
         return "uint32_t"
-    elif register_size == 8:
+    elif gpr_size == 8:
         return "uint64_t"
-    else:
-        raise Exception("unsupported register size")
-
-
-def intel_register_type(register_size: str):
-    if register_size == 1:
-        return "byte"
-    elif register_size == 2:
-        return "word"
-    elif register_size == 4:
-        return "dword"
-    elif register_size == 8:
-        return "qword"
     else:
         raise Exception("unsupported register size")
 
@@ -97,6 +84,31 @@ def get_generation_notice():
  */"""
 
 
+def register_lists(architecture):
+    lists = []
+    offset = 0
+    for entry in architecture:
+        count = len(entry["register_list"])
+        size = entry["register_size"]
+        lists.append(
+            {
+                "group": entry["group"],
+                "register_list": entry["register_list"],
+                "count": count,
+                "register_size": size,
+                "offset": offset,
+            }
+        )
+        offset += count * size
+
+    return {
+        "lists": lists,
+        # Size of the whole register block, i.e. every list concatenated.
+        # The stack snapshot follows immediately after it.
+        "total_bytes": offset,
+    }
+
+
 def render_functions(jinja_environment, config, functions, out_dir: str):
     dictionary = {
         "generation_notice": get_generation_notice(),
@@ -104,6 +116,7 @@ def render_functions(jinja_environment, config, functions, out_dir: str):
         "maximum_argument_size": config["maximum_argument_size"],
         "structs": functions["structs"],
         "packed_structs": functions["packed_structs"],
+        "unions": functions["unions"],
         "argument_functions": functions["argument_tests"],
         "return_value_functions": functions["return_value_tests"],
     }
@@ -119,26 +132,24 @@ def render_functions(jinja_environment, config, functions, out_dir: str):
 
 def render_function_description(jinja_env, architectures, config, functions, out_dir):
     for architecture_name, architecture in architectures.items():
+        gpr_size = architecture[0]["register_size"]
         dictionary = {
             "generation_notice": get_generation_notice(),
-            "architecture_name": architecture_name,
             "stack_byte_count": config["stack_byte_count"],
             "lfsr_seed": config["lfsr_seed"],
             "iteration_count": config["iteration_count"],
             "maximum_argument_count": config["maximum_argument_count"],
             "maximum_argument_size": config["maximum_argument_size"],
-            "register_type": register_type(architecture["register_size"]),
-            "intel_register_type": intel_register_type(architecture["register_size"]),
-            "register_size": architecture["register_size"],
-            "register_list": architecture["register_list"],
-            "register_count": len(architecture["register_list"]),
+            "gpr_type": gpr_type(gpr_size),
+            "gpr_size": gpr_size,
             "argument_functions": functions["argument_tests"],
             "return_value_functions": functions["return_value_tests"],
         }
 
-        combined_registers = dictionary["register_count"] * dictionary["register_size"]
-        dictionary["generated_byte_count"] = dictionary["stack_byte_count"] + combined_registers
-        assert dictionary["generated_byte_count"] % dictionary["register_size"] == 0
+        dictionary["generated_byte_count"] = (
+            dictionary["stack_byte_count"] + register_lists(architecture)["total_bytes"]
+        )
+        assert dictionary["generated_byte_count"] % dictionary["gpr_size"] == 0
 
         function_count = len(functions["argument_tests"]) + len(functions["return_value_tests"])
         dictionary["function_count"] = function_count
@@ -156,6 +167,21 @@ def render_function_description(jinja_env, architectures, config, functions, out
         render_helper(jinja_env, filename, path, dictionary)
 
 
+def render_registers(jinja_env, architectures, out_dir: str):
+    lists_per_architecture = {}
+    for arch_name, architecture in architectures.items():
+        lists_per_architecture[arch_name] = register_lists(architecture)
+
+    dictionary = {
+        "generation_notice": get_generation_notice(),
+        "architectures": lists_per_architecture,
+    }
+
+    filename = "registers.h"
+    path = out_dir + "/" + filename
+    render_helper(jinja_env, filename, path, dictionary)
+
+
 def main():
     arguments = accept_arguments()
     architectures, config, functions = load_configs(arguments)
@@ -165,6 +191,7 @@ def main():
     out_dir = str(arguments.output_directory)
     render_functions(environment, config, functions, out_dir)
     render_function_description(environment, architectures, config, functions, out_dir)
+    render_registers(environment, architectures, out_dir)
 
     return 0
 
