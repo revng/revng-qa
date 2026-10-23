@@ -141,7 +141,7 @@ void print_header(void) {
 #elif TARGET_mipsel
   puts("TargetArchitecture: mipsel");
 #elif TARGET_s390x
-  puts("TargetArchitecture: s390x");
+  puts("TargetArchitecture: systemz");
 #else
   puts("TargetArchitecture: UNSUPPORTED");
   _Static_assert(0, "unsupported platform architecture");
