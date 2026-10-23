@@ -2,6 +2,8 @@
 # This file is distributed under the MIT License. See LICENSE.md for details.
 #
 
+set -euo pipefail
+
 function prepare-linux-foreign-executable() {
   if [ $# -ne 5 ]; then
     echo 'prepare-linux-foreign-executable ${TRIPLE} ${CFLAGS} ${OBJDUMP_FLAGS} ${INPUT_DIRECTORY} ${OUTPUT_DIRECTORY}' > /dev/stderr
@@ -33,7 +35,7 @@ function prepare-linux-foreign-executable() {
     "${OUTPUT_DIRECTORY}/foreign-executable.o" \
     "${INPUT_DIRECTORY}/musl_memory_functions.c" \
     -o "${OUTPUT_DIRECTORY}/foreign-executable"
-    
+
   "${TRIPLE}objdump" \
     ${OBJDUMP_FLAGS} \
     --wide -h \
@@ -131,7 +133,7 @@ function prepare-windows-foreign-executable() {
     /out:"z:\\${OUTPUT_DIRECTORY}/foreign-executable.exe" \
     /pdb:"z:\\${OUTPUT_DIRECTORY}/foreign-executable.pdb" \
     /map:"z:\\${OUTPUT_DIRECTORY}/foreign-executable-symbols.txt"
-    
+
   timeout 240 ${MSVC_TRIPLE}dumpbin \
     -nologo -headers \
     z:\\"${OUTPUT_DIRECTORY}/foreign-executable.exe" \

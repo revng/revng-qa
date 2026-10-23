@@ -1,0 +1,63 @@
+/*#-
+This template file is distributed under the MIT License. See LICENSE.md for details.
+#*/
+
+/*(- generation_notice )*/
+
+#ifndef ABI_REGISTERS_H
+#define ABI_REGISTERS_H
+
+// Register lists below, generated from `config/architectures.yml`.
+//
+// Grouping them like this makes the runner code easier to read.
+//
+// Fields:
+// - `names`: the list of registers in this group.
+// - `count`: how many `names` there are.
+// - `register_size`: how big each register is, in bytes.
+// - `offset`: where this list starts in the state buffer.
+// - `capture`: the function that returns a pointer to the correct register when
+//   called mid-interrupt. The index corresponds to the index in `names`.
+struct register_list {
+  const char *const *names;
+
+  uint32_t count;
+  uint32_t register_size;
+  uint32_t offset;
+
+  const void *(*capture)(void *context, uint32_t index);
+};
+
+/*{ for arch_name, arch in architectures.items() -}*/
+#if defined(TARGET_/*( arch_name )*/)
+
+/*{ for l in arch.lists -}*/
+static const char *const /*( arch_name )*/_/*( l.group )*/_names[/*( l.count )*/] = {
+/*{ for register_name in l.register_list -}*/
+  "/*( register_name )*/",
+/*{ endfor -}*/
+};
+
+/*{ endfor -}*/
+
+// Every group of this architecture, in storage order.
+#define REGISTER_LIST_COUNT (/*( arch.lists | length )*/u)
+static const struct register_list register_lists[REGISTER_LIST_COUNT] = {
+/*{ for l in arch.lists -}*/
+  {
+    .names = /*( arch_name )*/_/*( l.group )*/_names,
+    .count = /*( l.count )*/,
+    .register_size = /*( l.register_size )*/,
+    .offset = /*( l.offset )*/,
+    .capture = capture_/*( l.group )*/
+  },
+/*{ endfor -}*/
+};
+
+// Size of the whole register block, i.e. every group concatenated.
+#define REGISTER_BYTES (/*( arch.total_bytes )*/u)
+
+#endif
+/*{ endfor -}*/
+
+#endif

@@ -98,7 +98,7 @@ void NOINLINE setup_args(void) {
   size_dumps[0] = sizeof(small_struct);
   small_struct argument_0 = *(small_struct *) (expected_state + current_offset);
   current_offset += sizeof(small_struct);
-  
+
   _Static_assert(sizeof(big_struct) <= 256,
                  "Size of an argument exceeds the allowed maximum.");
   size_dumps[1] = sizeof(big_struct);

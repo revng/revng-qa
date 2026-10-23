@@ -23,3 +23,21 @@
 #else
 #error "Impossible to find sources because the target architecture is unknown."
 #endif
+
+
+#ifdef _MSC_VER
+/*
+ * Lack of `_fltused` is an MSVC-specific problem: it is impossible to link any
+ * Microsoft ABI binaries that use floating point types without either manually
+ * defining it OR linking against ANY C runtime library (which we have to avoid,
+ * as we are dynamically calling functions built with a different toolchain).
+ *
+ * For some context, this is an old x86-x87 compatibility hack and is only
+ * really relevant on machines without x87 FPU support.
+ *
+ * As such, in the context of our test suite, there's not a reason to do
+ * anything more involved than just to define this marker to make the linker
+ * happy.
+ */
+void _fltused(void) { /* Intentionally empty. */ }
+#endif
