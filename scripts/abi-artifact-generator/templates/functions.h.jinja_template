@@ -49,6 +49,8 @@ typedef struct {
 #define UINT128_T replacement_for___uint128_t
 #endif
 
+typedef size_t gpr_t;
+
 /*
  * Helper structs used by the functions
  */
@@ -85,6 +87,19 @@ typedef struct {
 
 /*{ endfor -}*/
 #pragma pack(pop)
+
+/*
+ * Helper unions used by the functions
+ */
+
+/*{ for name, fields in unions.items() -}*/
+typedef union {
+/*{ for field in fields -}*/
+  /*( field | indent(2, true) )*/;
+/*{ endfor -}*/
+} /*( name )*/;
+
+/*{ endfor -}*/
 
 /*
  * Functions designed to test argument passing
