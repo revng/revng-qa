@@ -162,6 +162,11 @@ void handler(int signal, siginfo_t *info, void *context) {
          (void *) (size_t) SP(context),
          constants.stack_byte_count);
 
+#if defined(TARGET_s390x)
+  // Make sure the interrupt didn't move the PSW.
+  ((ucontext_t *) context)->uc_mcontext.psw.addr = (unsigned long) info->si_addr;
+#endif
+
   // Restore the instruction that caused current interrupt to its original value
   if (current_state == 0)
     ACCESS_A_WORD(saved.function->callsites[0].before) = saved.before_the_call;
