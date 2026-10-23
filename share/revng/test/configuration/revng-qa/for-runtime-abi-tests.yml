@@ -304,9 +304,7 @@ sources:
       - [mipsel-systemv-hardfloat-abi]
       - [mipsel-systemv-softfloat-abi]
 
-      # TODO: re-enable once qemu stops segfaulting on these binaries
-      #       (when we update it?).
-      # - [s390x-systemz-abi]
+      - [s390x-systemz-abi]
     members:
       - share/revng/test/tests/abi/
 
