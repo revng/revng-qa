@@ -57,7 +57,6 @@ Pointers are allowed, arrays are not (but you can use structs to simulate them).
 
 ## `architectures.yml`
 
-NOTE: this template was heavily used in the past, when we generated the test function bodies as assembly. Now it's slimmed down to just two fields:
+This template defines which register values should be extracted for a given architecture. The registers are grouped by the capture method (each group expects a dedicated `capture_${group_name}` function defined in the runner).
 
-- `register_size` - the size of a single general purpose register for a given architecture
-- `register_list` - the list of registers we are interested in testing.
+NOTE: the first group must always be the GPR group (its size has special meaning).
