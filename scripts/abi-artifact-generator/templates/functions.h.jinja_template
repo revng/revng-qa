@@ -9,7 +9,7 @@ This template file is distributed under the MIT License. See LICENSE.md for deta
 
 /**
  * Provides the prototypes of all the structs and functions defined in
- * `function.yml` configuration file.
+ * the `functions` configuration directory.
  *
  * There are two functions per test: `setup_X` (runner entry point) and
  * `test_X` (the callee to be analyzed).

@@ -34,13 +34,121 @@ def accept_arguments():
     return parser.parse_args()
 
 
+def yaml_files_in(directory):
+    """Returns the YAML files in `directory`, in a deterministic order.
+
+    The directory is expected to only contain YAML and Markdown files.
+    Anything else is a hard error.
+    """
+
+    result = []
+    for name in sorted(os.listdir(str(directory))):
+        path = os.path.join(str(directory), name)
+        if os.path.isdir(path):
+            continue
+
+        extension = os.path.splitext(name)[1]
+        if extension == ".yml":
+            result.append(path)
+
+        elif extension == ".md":
+            continue  # ignore documentation
+
+        else:
+            raise Exception("`" + path + "` is neither a YAML nor a Markdown file")
+
+    return result
+
+
+def load_function_list(directory):
+    """Loads every YAML file in `directory` and merges them together.
+
+    The files are merged per top-level key. For example, the `argument_tests`
+    in *all* the files form a single `argument_tests` map. The same holds for
+    the other keys. Defining the same entry in two files is an error.
+    """
+
+    paths = yaml_files_in(directory)
+    if not paths:
+        raise Exception("no YAML files found in `" + str(directory) + "`")
+
+    result = {}
+
+    # Keep track of the entries we already loaded so we can point conflicting
+    # tests out.
+    key_origins = {}
+    entry_origins = {}
+
+    for path in paths:
+        with open(path, "r") as file:
+            document = yaml.safe_load(file)
+
+        if document is None:
+            continue
+
+        if not isinstance(document, dict):
+            raise Exception("`" + path + "` does not contain a map")
+
+        for key, value in document.items():
+            if key not in result:
+                result[key] = value
+                key_origins[key] = path
+                if isinstance(value, dict):
+                    for entry in value:
+                        entry_origins[(key, entry)] = path
+                continue
+
+            if not isinstance(result[key], dict) or not isinstance(value, dict):
+                raise Exception(
+                    "`"
+                    + key
+                    + "` is defined in both `"
+                    + key_origins[key]
+                    + "` and `"
+                    + path
+                    + "`, and it is not "
+                    "a map, so the two definitions cannot be merged."
+                )
+
+            for entry, entry_value in value.items():
+                if entry in result[key]:
+                    raise Exception(
+                        "`"
+                        + key
+                        + "."
+                        + entry
+                        + "` is defined in both `"
+                        + entry_origins[(key, entry)]
+                        + "` and `"
+                        + path
+                        + "`, which would generate two functions with the "
+                        "same name."
+                    )
+                result[key][entry] = entry_value
+                entry_origins[(key, entry)] = path
+
+    return result
+
+
 def load_configs(arguments):
-    with open(str(arguments.config_directory) + "/architectures.yml", "r") as file:
+    config_directory = str(arguments.config_directory)
+
+    # The configuration directory is expected to *only* contain YAML files
+    # and the documentation. Anything else is a hard error.
+    yaml_files = yaml_files_in(config_directory)
+    if len(yaml_files) != 2:
+        raise Exception(
+            "Expected exactly two configuration files: `architectures.yml` and `common.yml`, instead found: "
+            + str(yaml_files)
+        )
+
+    with open(os.path.join(config_directory, "architectures.yml"), "r") as file:
         architectures = yaml.safe_load(file)
-    with open(str(arguments.config_directory) + "/common.yml", "r") as file:
+    with open(os.path.join(config_directory, "common.yml"), "r") as file:
         config = yaml.safe_load(file)
-    with open(str(arguments.config_directory) + "/functions.yml", "r") as file:
-        functions = yaml.safe_load(file)
+
+    functions = load_function_list(os.path.join(config_directory, "functions"))
+
     return (architectures, config, functions)
 
 

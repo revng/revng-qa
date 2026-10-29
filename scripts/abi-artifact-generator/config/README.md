@@ -9,9 +9,16 @@ This file is used to declare global options that stay the same for every archite
 - `iteration_count` - number of times each test should be repeated. Multiple iterations are a good way to make colliding results caused by limited randomness of generated numbers have no practical impact on the test results.
 - `maximum_argument_count` and `maximum_argument_size` - the maximum number of possible arguments, and their maximum size. They are used when choosing the size of the buffers used for intermediate data storage.
 
-## `functions.yml`
+## `functions/`
 
-This file is used to declare the list of test functions (and structs they use) in an architecture-independent manner.
+This directory is used to declare the list of test functions (and structs they use) in an architecture-independent manner.
+It holds one YAML file per group of tests, named after the group (see [here](./functions/README.md) for the description of the individual files).
+
+Every YAML file in this directory is loaded and the results are merged together, key by key: the `argument_tests` of all the files form a single `argument_tests` map, and the same holds for the other maps. This way the test definitions can be split between multiple files and new tests can be added without touching the other files.
+
+Defining the same entry in two files is a hard error. The same holds for a top-level key that is not a map (like `stack_argument_test_prefix_type`) being defined in more than one file.
+
+The directory is expected to contain nothing but YAML (`.yml`) and Markdown (`.md`) files. Anything else is a hard error.
 
 ### - `structs`
 

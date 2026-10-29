@@ -106,7 +106,7 @@ To summarize, each iteration contains three "state" points extracted:
 Each of those state points lists all the architecture specific registers in the format of `Name-Value-Bytes`.
 It also contains the configured (see [here](./config/README.md#commonyml)) number of top stack bytes starting from the current value of the stack pointer as a raw `Bytes` array.
 
-On top of that, it also provides the values of the arguments OR return values (depending on the test type, see [here](./config/functions.yml)) of the functions generated in `functions.inc` (see [here](./templates/README.md#functionsinc)).
+On top of that, it also provides the values of the arguments OR return values (depending on the test type, see [here](./config/functions/)) of the functions generated in `functions.inc` (see [here](./templates/README.md#functionsinc)).
 
 For argument functions, the output is equivalent to something like this:
 ```cpp
