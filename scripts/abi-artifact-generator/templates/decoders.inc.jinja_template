@@ -13,6 +13,7 @@ This template file is distributed under the MIT License. See LICENSE.md for deta
  * printer function.
  */
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -41,13 +42,23 @@ _Static_assert(sizeof(uint8_t) == 1, "A type with size == 1 is required.");
     print_bytes(((union helper *) (POINTER))->a, sizeof(TYPE)); \
   } while (0)
 
-void decode_a_register(const char *name, const uint8_t *value) {
+void decode_a_register(const char *name, const uint8_t *value,
+                       uint32_t byte_count) {
   printf("        - Name: \"%s\"\n"
-         "          Value: 0x%0/*( register_size * 2 )*/zx\n",
-         name,
-         *(/*( register_type )*/ *) value);
+         "          Value: 0x",
+         name);
+
+  if (byte_count == 4) {
+    printf("%08" PRIx32 "\n", *(const uint32_t *) value);
+
+  } else {
+    assert(byte_count >= 8 && "unsupported register size");
+
+    printf("%016" PRIx64 "\n", *(const uint64_t *) value);
+  }
+
   printf("          Bytes: ");
-  print_bytes(value, /*( register_size )*/);
+  print_bytes(value, byte_count);
 }
 
 void decode_stack(uint8_t *data) {
@@ -58,11 +69,11 @@ void decode_stack(uint8_t *data) {
 #define DECODE_A_SINGLE_VALUE(TYPE, SIZE, ADDRESS, INPUT, OUTPUT) \
   do {                                                            \
     printf("      - Type: " #TYPE " # size = %zu\n"               \
-           "        Address: 0x%0/*( register_size * 2 )*/zx\n"   \
+           "        Address: 0x%0/*( gpr_size * 2 )*/zx\n"          \
            "        AddressBytes: ",                              \
-           (/*( register_type )*/) (SIZE),                        \
-           (/*( register_type )*/) (ADDRESS));                    \
-    PRINT_AS_BYTES(/*( register_type )*/, &ADDRESS);              \
+           (/*( gpr_type )*/) (SIZE),                            \
+           (/*( gpr_type )*/) (ADDRESS));                        \
+    PRINT_AS_BYTES(/*( gpr_type )*/, &ADDRESS);                  \
     printf("        ExpectedBytes: ");                            \
     print_bytes((INPUT), (SIZE));                                 \
     printf("        FoundBytes: ");                               \

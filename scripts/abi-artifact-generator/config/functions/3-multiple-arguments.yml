@@ -1,0 +1,595 @@
+#
+# Multi-argument tests (see README.md).
+#
+
+argument_tests:
+  # These tests are simple and are very unlikely to be the only failing ones.
+  # When any of them do fail, it's a good indication that something important
+  # is broken (like the list of registers).
+
+  # These make sure the presence of multiple primitives at once does not
+  # break anything.
+  two_32_bit_integer_arguments:
+    - uint32_t
+    - uint32_t
+  three_32_bit_integer_arguments:
+    - uint32_t
+    - uint32_t
+    - uint32_t
+  two_64_bit_integer_arguments:
+    - uint64_t
+    - uint64_t
+  three_64_bit_integer_arguments:
+    - uint64_t
+    - uint64_t
+    - uint64_t
+  mixed_32_64_bit_integer_arguments:
+    - uint32_t
+    - uint64_t
+    - uint32_t
+  mixed_64_32_bit_integer_arguments:
+    - uint64_t
+    - uint32_t
+    - uint64_t
+
+  # These make sure the presence of multiple aggregates at once does not
+  # break anything.
+  two_struct_arguments:
+    - four_byte_struct
+    - four_byte_struct
+  three_struct_arguments:
+    - four_byte_struct
+    - four_byte_struct
+    - four_byte_struct
+  two_union_arguments:
+    - four_byte_struct_union_with_a_smaller_scalar
+    - four_byte_struct_union_with_a_smaller_scalar
+  three_union_arguments:
+    - four_byte_struct_union_with_a_smaller_scalar
+    - four_byte_struct_union_with_a_smaller_scalar
+    - four_byte_struct_union_with_a_smaller_scalar
+  mixed_struct_union_arguments:
+    - four_byte_struct_union_with_a_smaller_scalar
+    - four_byte_struct
+    - four_byte_struct_union_with_a_smaller_scalar
+
+  # These make sure the presence of multiple huge (stack-bound) aggregates
+  # at once does not break anything.
+  two_huge_struct_arguments:
+    - huge_struct
+    - huge_struct
+  three_huge_struct_arguments:
+    - huge_struct
+    - huge_struct
+    - huge_struct
+  two_huge_union_arguments:
+    - huge_union
+    - huge_union
+  three_huge_union_arguments:
+    - huge_union
+    - huge_union
+    - huge_union
+  mixed_huge_struct_union_arguments:
+    - huge_union
+    - huge_struct
+    - huge_union
+
+  # These make sure a mix of primitives and aggregates does not break anything.
+  mixed_int_32_struct_32_arguments:
+    - int32_t
+    - four_byte_struct
+    - int32_t
+  mixed_struct_32_int_32_arguments:
+    - four_byte_struct
+    - int32_t
+    - four_byte_struct
+  mixed_int_64_struct_32_arguments:
+    - int64_t
+    - four_byte_struct
+    - int64_t
+  mixed_struct_32_int_64_arguments:
+    - four_byte_struct
+    - int64_t
+    - four_byte_struct
+  mixed_int_32_struct_64_arguments:
+    - int32_t
+    - eight_byte_struct
+    - int32_t
+  mixed_struct_64_int_32_arguments:
+    - eight_byte_struct
+    - int32_t
+    - eight_byte_struct
+  mixed_int_64_struct_64_arguments:
+    - int64_t
+    - eight_byte_struct
+    - int64_t
+  mixed_struct_64_int_64_arguments:
+    - eight_byte_struct
+    - int64_t
+    - eight_byte_struct
+
+  # These make sure a mix of primitives and huge (stack-bound) aggregates does
+  # not break anything.
+  mixed_int_32_huge_struct_arguments:
+    - int32_t
+    - huge_struct
+    - int32_t
+  mixed_huge_struct_int_32_arguments:
+    - huge_struct
+    - int32_t
+    - huge_struct
+  mixed_int_64_huge_struct_arguments:
+    - int64_t
+    - huge_struct
+    - int64_t
+  mixed_huge_struct_int_64_arguments:
+    - huge_struct
+    - int64_t
+    - huge_struct
+
+  # These make sure a mix of small and huge (stack-bound) aggregates does
+  # not break anything.
+  mixed_struct_32_huge_struct_arguments:
+    - four_byte_struct
+    - huge_struct
+    - four_byte_struct
+  mixed_huge_struct_struct_32_arguments:
+    - huge_struct
+    - four_byte_struct
+    - huge_struct
+  mixed_struct_64_huge_struct_arguments:
+    - eight_byte_struct
+    - huge_struct
+    - eight_byte_struct
+  mixed_huge_struct_struct_64_arguments:
+    - huge_struct
+    - eight_byte_struct
+    - huge_struct
+
+  # These make sure the presence of multiple floating point types at once does
+  # not break anything.
+  two_float_arguments:
+    - float
+    - float
+  three_float_arguments:
+    - float
+    - float
+    - float
+  two_double_arguments:
+    - double
+    - double
+  three_double_arguments:
+    - double
+    - double
+    - double
+  mixed_float_double_arguments:
+    - float
+    - double
+    - float
+  mixed_double_float_arguments:
+    - double
+    - float
+    - double
+
+  # These make sure the mix of floating point primitives and aggregates does not
+  # break anything.
+  mixed_float_float_struct_arguments:
+    - float
+    - float_struct
+    - float
+  mixed_float_struct_float_arguments:
+    - float_struct
+    - float
+    - float_struct
+  mixed_double_float_struct_arguments:
+    - double
+    - float_struct
+    - double
+  mixed_float_struct_double_arguments:
+    - float_struct
+    - double
+    - float_struct
+  mixed_float_double_struct_arguments:
+    - float
+    - double_struct
+    - float
+  mixed_double_struct_float_arguments:
+    - double_struct
+    - float
+    - double_struct
+  mixed_double_double_struct_arguments:
+    - double
+    - double_struct
+    - double
+  mixed_double_struct_double_arguments:
+    - double_struct
+    - double
+    - double_struct
+
+  # These make sure the mix of floating point primitives with regular primitives
+  # does not break anything.
+  mixed_float_int_32_arguments:
+    - float
+    - int32_t
+    - float
+  mixed_int_32_float_arguments:
+    - int32_t
+    - float
+    - int32_t
+  mixed_double_int_32_arguments:
+    - double
+    - int32_t
+    - double
+  mixed_int_32_double_arguments:
+    - int32_t
+    - double
+    - int32_t
+  mixed_float_int_64_arguments:
+    - float
+    - int64_t
+    - float
+  mixed_int_64_float_arguments:
+    - int64_t
+    - float
+    - int64_t
+  mixed_double_int_64_arguments:
+    - double
+    - int64_t
+    - double
+  mixed_int_64_double_arguments:
+    - int64_t
+    - double
+    - int64_t
+
+  # Including aggregates containing only integer fields.
+  mixed_float_struct_32_arguments:
+    - float
+    - four_byte_struct
+    - float
+  mixed_struct_32_float_arguments:
+    - four_byte_struct
+    - float
+    - four_byte_struct
+  mixed_double_struct_32_arguments:
+    - double
+    - four_byte_struct
+    - double
+  mixed_struct_32_double_arguments:
+    - four_byte_struct
+    - double
+    - four_byte_struct
+  mixed_float_struct_64_arguments:
+    - float
+    - eight_byte_struct
+    - float
+  mixed_struct_64_float_arguments:
+    - eight_byte_struct
+    - float
+    - eight_byte_struct
+  mixed_double_struct_64_arguments:
+    - double
+    - eight_byte_struct
+    - double
+  mixed_struct_64_double_arguments:
+    - eight_byte_struct
+    - double
+    - eight_byte_struct
+
+  # Including huge (stack-bound) aggregates.
+  mixed_float_huge_struct_arguments:
+    - float
+    - huge_struct
+    - float
+  mixed_huge_struct_float_arguments:
+    - huge_struct
+    - float
+    - huge_struct
+  mixed_double_huge_struct_arguments:
+    - double
+    - huge_struct
+    - double
+  mixed_huge_struct_double_arguments:
+    - huge_struct
+    - double
+    - huge_struct
+
+  # Bigger argument counts
+  five_integer_arguments:
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+  five_float_arguments:
+    - float
+    - float
+    - float
+    - float
+    - float
+  five_double_arguments:
+    - double
+    - double
+    - double
+    - double
+    - double
+  five_big_struct_arguments:
+    - big_struct
+    - big_struct
+    - big_struct
+    - big_struct
+    - big_struct
+
+  # Even bigger argument counts
+  #
+  # This test is not about any ABI - it is designed to detect problems with
+  # the test system itself.
+  #
+  # There are only so many distinct small values, so 23 one-byte arguments with
+  # five iterations of fresh data each make collisions essentially guaranteed.
+  # This is the worst case as far as checking is concerned. If we can handle
+  # this correctly - we can handle all the other cases just as well.
+  #
+  # Note that there are more than one test in this file to simplify debugging:
+  # if only the one- and, maybe, some two-byte tests fail, the test system is
+  # clearly to blame. But if the wider ones fail too, it's a strong indication
+  # that something else is at play, such as the stack not being read correctly
+  # or padding is miss-computed.
+  lots_of_one_byte_arguments:
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+    - uint8_t
+  lots_of_two_byte_arguments:
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+    - uint16_t
+  lots_of_four_byte_arguments:
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+    - uint32_t
+  lots_of_eight_byte_arguments:
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+    - uint64_t
+  lots_of_sixteen_byte_arguments:
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+    - UINT128_T
+
+  # Just in case, also do the same for aggregates,
+  lots_of_small_aggregate_arguments:
+    - one_byte_struct
+    - one_byte_struct
+    - one_byte_struct
+    - one_byte_struct
+    - one_byte_struct
+    - one_byte_struct
+    - one_byte_struct
+    - one_byte_struct
+    - one_byte_struct
+    - one_byte_struct
+    - one_byte_struct
+    - one_byte_struct
+    - one_byte_struct
+    - one_byte_struct
+    - one_byte_struct
+    - one_byte_struct
+    - one_byte_struct
+    - one_byte_struct
+    - one_byte_struct
+    - one_byte_struct
+    - one_byte_struct
+    - one_byte_struct
+    - one_byte_struct
+  lots_of_aggregate_arguments:
+    - four_byte_struct
+    - four_byte_struct
+    - four_byte_struct
+    - four_byte_struct
+    - four_byte_struct
+    - four_byte_struct
+    - four_byte_struct
+    - four_byte_struct
+    - four_byte_struct
+    - four_byte_struct
+    - four_byte_struct
+    - four_byte_struct
+    - four_byte_struct
+    - four_byte_struct
+    - four_byte_struct
+    - four_byte_struct
+    - four_byte_struct
+    - four_byte_struct
+    - four_byte_struct
+    - four_byte_struct
+    - four_byte_struct
+    - four_byte_struct
+    - four_byte_struct
+
+  # and floating point arguments.
+  lots_of_four_byte_float_arguments:
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+    - float
+  lots_of_eight_byte_float_arguments:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+
+  # Unnaturally aligned structs preceded by a single `gpr_t`.
+  # These help to highlight the padding register usage.
+  unnaturally_aligned_struct_128_in_registers:
+    - gpr_t
+    - unnaturally_aligned_struct_128
+  unnaturally_aligned_union_128_in_registers:
+    - gpr_t
+    - unnaturally_aligned_union_128
+  unnaturally_aligned_struct_64_in_registers:
+    - gpr_t
+    - unnaturally_aligned_struct_64
+  unnaturally_aligned_union_64_in_registers:
+    - gpr_t
+    - unnaturally_aligned_union_64
+  unnaturally_aligned_struct_32_in_registers:
+    - gpr_t
+    - unnaturally_aligned_struct_32
+  unnaturally_aligned_union_32_in_registers:
+    - gpr_t
+    - unnaturally_aligned_union_32
+  unnaturally_aligned_struct_16_in_registers:
+    - gpr_t
+    - unnaturally_aligned_struct_16
+  unnaturally_aligned_union_16_in_registers:
+    - gpr_t
+    - unnaturally_aligned_union_16
+  unnaturally_aligned_float_struct_in_registers:
+    - gpr_t
+    - unnaturally_aligned_float_struct
+  unnaturally_aligned_float_union_in_registers:
+    - gpr_t
+    - unnaturally_aligned_float_union
+  unnaturally_aligned_double_struct_in_registers:
+    - gpr_t
+    - unnaturally_aligned_double_struct
+  unnaturally_aligned_double_union_in_registers:
+    - gpr_t
+    - unnaturally_aligned_double_union

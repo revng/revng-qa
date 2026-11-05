@@ -63,7 +63,7 @@ Legend:
 
 ## `functions.h`
 
-This file provides the prototypes of all the structs and functions defined in `function.yml` configuration file (see [here](../config/README.md#functionsyml))
+This file provides the prototypes of all the structs and functions defined in the `functions` configuration directory (see [here](../config/README.md#functions))
 They are all emitted in a format of
 ```cpp
 void setup_{{ TEST_NAME }}(void);

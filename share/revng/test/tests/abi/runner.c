@@ -115,18 +115,38 @@ int current_state = 0;
 /* Since it's not safe to call functions like `printf` inside the handler (what
  * if an interrupt happens while inside?), these memory locations are used as
  * an intermediate place to store the state which can be printed later down
- * the line
+ * the line.
+ *
+ * Each captured state contains every register list the architecture was
+ * configured with followed by a snapshot of the stack.
  */
 uint8_t *stored_state[3];
 static void malloc_the_stored_state(void) {
-  uint64_t allocated_word_count = REGISTER_COUNT + constants.stack_byte_count;
+  uint64_t bytes = REGISTER_BYTES;
+  bytes += constants.stack_byte_count;
   for (uint32_t i = 0; i < 3; ++i)
-    stored_state[i] = (uint8_t *) malloc(sizeof(size_t) * allocated_word_count);
+    stored_state[i] = (uint8_t *) malloc(bytes);
 }
 static void free_the_stored_state(void) {
   for (uint32_t i = 0; i < 3; ++i)
     free(stored_state[i]);
 }
+
+// Copy every register into `state`.
+static void capture_registers(void *context, uint8_t *state) {
+  for (uint32_t i = 0; i < REGISTER_LIST_COUNT; ++i) {
+    const struct register_list *list = &register_lists[i];
+    for (uint32_t r = 0; r < list->count; ++r)
+      memcpy(state + list->offset + r * list->register_size,
+             list->capture(context, r),
+             list->register_size);
+  }
+}
+
+// `REGISTER_BYTES` is the total size of all the stored registers.
+//
+// And since stack follows immediately after, it doubles as the stack offset.
+#define STACK_OFFSET REGISTER_BYTES
 
 void handler(int signal, siginfo_t *info, void *context) {
   // Abort when an unexpected signal is raised just in case.
@@ -135,11 +155,10 @@ void handler(int signal, siginfo_t *info, void *context) {
 
   // Save registers.
   uint8_t *current_storage = stored_state[current_state];
-  for (uint32_t i = 0; i < REGISTER_COUNT; ++i)
-    ((size_t *) current_storage)[i] = REGISTER(context, i);
+  capture_registers(context, current_storage);
 
   // Save the stack.
-  memcpy(current_storage + REGISTER_COUNT * sizeof(size_t),
+  memcpy(current_storage + STACK_OFFSET,
          (void *) (size_t) SP(context),
          constants.stack_byte_count);
 
@@ -155,15 +174,26 @@ void handler(int signal, siginfo_t *info, void *context) {
     current_state = 0;
 }
 
-void decode_a_register(const char *name, uint8_t *value);
+void decode_a_register(const char *name,
+                       const uint8_t *value,
+                       uint32_t byte_count);
+static void decode_registers(const uint8_t *state) {
+  for (uint32_t i = 0; i < REGISTER_LIST_COUNT; ++i) {
+    const struct register_list *list = &register_lists[i];
+    for (uint32_t r = 0; r < list->count; ++r)
+      decode_a_register(list->names[r],
+                        state + list->offset + r * list->register_size,
+                        list->register_size);
+  }
+}
+
 void decode_stack(uint8_t *data);
 static void decode_single_state(uint8_t *data) {
   puts("      Registers:");
-  for (uint32_t i = 0; i < REGISTER_COUNT; ++i)
-    decode_a_register(register_names[i], data + sizeof(size_t) * i);
+  decode_registers(data);
 
   printf("      Stack: ");
-  decode_stack(data + sizeof(size_t) * REGISTER_COUNT);
+  decode_stack((uint8_t *) (data + STACK_OFFSET));
 }
 
 static void decode_saved_state(void) {
@@ -262,10 +292,12 @@ int main(int argc, char **argv) {
 
       printf("  - Function: \"%s\"\n", input.functions[function].name);
       printf("    Iteration: %d\n", i);
+      fflush(stdout);
       test_function(&input.functions[function]);
       decode(input.functions[function].name, encoded);
       decode_saved_state();
       puts("");
+      fflush(stdout);
     }
   }
 
