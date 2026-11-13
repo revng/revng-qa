@@ -206,6 +206,50 @@ argument_tests:
     - double
     - double_struct
 
+  # Under ABIs that treat homogeneous floating point aggregates as separate
+  # fields, it's valuable to make sure the edges between such aggregates are
+  # handled correctly.
+  float_then_float_struct_arguments:
+    - float
+    - float_struct
+  float_then_two_float_struct_arguments:
+    - float
+    - two_float_struct
+  float_then_three_float_struct_arguments:
+    - float
+    - three_float_struct
+  float_then_four_float_struct_arguments:
+    - float
+    - four_float_struct
+  float_then_five_float_struct_arguments:
+    - float
+    - five_float_struct
+  float_then_double_struct_arguments:
+    - float
+    - double_struct
+  float_then_two_double_struct_arguments:
+    - float
+    - two_double_struct
+  float_then_three_double_struct_arguments:
+    - float
+    - three_double_struct
+  float_then_four_double_struct_arguments:
+    - float
+    - four_double_struct
+  float_then_five_double_struct_arguments:
+    - float
+    - five_double_struct
+
+  # Including the special cases where we run out out of the dedicated registers.
+  float_then_two_four_float_struct_arguments:
+    - float
+    - four_float_struct
+    - four_float_struct
+  float_then_two_four_double_struct_arguments:
+    - float
+    - four_double_struct
+    - four_double_struct
+
   # These make sure the mix of floating point primitives with regular primitives
   # does not break anything.
   mixed_float_int_32_arguments:
