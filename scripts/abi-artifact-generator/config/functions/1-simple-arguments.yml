@@ -215,6 +215,10 @@ argument_tests:
   # to reduce the number of tests.
   single_small_struct_of_structs_argument: ["small_struct_of_structs"]
   single_struct_of_structs_argument: ["struct_of_structs"]
+  single_nested_struct_argument: ["nested_struct"]
+  single_deeply_nested_struct_argument: ["deeply_nested_struct"]
+  single_nested_struct_union_argument: ["nested_struct_union"]
+  single_deeply_nested_struct_union_argument: ["deeply_nested_struct_union"]
 
   # Unnaturally aligned structs and unions, where "unnaturally aligned" means
   # a struct or union that recursively contains at least one non-naturally-

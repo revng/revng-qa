@@ -101,6 +101,30 @@ stack_argument_tests:
     - union_of_unions
     - uint8_t
     - union_of_unions
+  nested_struct_argument_on_stack:
+    - uint8_t
+    - nested_struct
+    - nested_struct
+    - uint8_t
+    - nested_struct
+  deeply_nested_struct_argument_on_stack:
+    - uint8_t
+    - deeply_nested_struct
+    - deeply_nested_struct
+    - uint8_t
+    - deeply_nested_struct
+  nested_struct_union_argument_on_stack:
+    - uint8_t
+    - nested_struct_union
+    - nested_struct_union
+    - uint8_t
+    - nested_struct_union
+  deeply_nested_struct_union_argument_on_stack:
+    - uint8_t
+    - deeply_nested_struct_union
+    - deeply_nested_struct_union
+    - uint8_t
+    - deeply_nested_struct_union
 
   # 3. Double-gpr-aligned stack arguments.
   #

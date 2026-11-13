@@ -25,6 +25,8 @@ structs:
   # Nested structs
   small_struct_of_structs: ["two_byte_struct a", "one_byte_struct b"]
   struct_of_structs: ["small_struct_of_structs a[2]", "one_byte_struct b"]
+  nested_struct: ["one_byte_struct a", "two_byte_struct b", "four_byte_struct c"]
+  deeply_nested_struct: ["one_byte_struct a", "two_byte_struct b", "nested_struct c"]
 
   # Simple structs with floats and doubles *only.*
   float_struct: ["float a"]
@@ -210,10 +212,12 @@ unions:
     - struct_with_a_sixteen_byte_field_at_the_end a
     - uint8_t b
 
-  # Nested union
+  # Nested unions
   union_of_unions:
     - two_byte_struct_union_with_a_smaller_scalar a
     - four_byte_struct_union_with_a_smaller_scalar b
+  nested_struct_union: ["uint64_t a", "nested_struct b"]
+  deeply_nested_struct_union: ["uint64_t a", "deeply_nested_struct b"]
 
   # Unnaturally aligned unions, were "unnaturally aligned" means a struct or
   # union that recursively contains at least one non-naturally-aligned field.
