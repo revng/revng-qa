@@ -41,7 +41,7 @@ WEAK int64_t compute(struct node *n __attribute__((nonnull))) {
 
 int main(int argc, char *argv[]) {
   struct node *head = init_list();
-  int64_t result = compute(head);
+  int64_t result = sum(head) + compute(head);
   release_list(head);
   return result != 42;
 }
