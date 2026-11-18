@@ -101,6 +101,32 @@ stack_argument_tests:
     - union_of_unions
     - uint8_t
     - union_of_unions
+  nested_struct_argument_on_stack:
+    - uint8_t
+    - nested_struct
+    - nested_struct
+    - uint8_t
+    - nested_struct
+  deeply_nested_struct_argument_on_stack:
+    - uint8_t
+    - deeply_nested_struct
+    - deeply_nested_struct
+    - uint8_t
+    - deeply_nested_struct
+  nested_struct_union_argument_on_stack:
+    - uint8_t
+    - nested_struct_union
+    - nested_struct_union
+    - uint8_t
+    - nested_struct_union
+  # Disabled: the union is bigger than its biggest field.
+  # See `deeply_nested_struct_union` definition for more context.
+  # deeply_nested_struct_union_argument_on_stack:
+  #   - uint8_t
+  #   - deeply_nested_struct_union
+  #   - deeply_nested_struct_union
+  #   - uint8_t
+  #   - deeply_nested_struct_union
 
   # 3. Double-gpr-aligned stack arguments.
   #
@@ -439,22 +465,24 @@ stack_argument_tests:
     - nested_float_struct_union
     - uint8_t
     - nested_float_struct_union
-  deeply_nested_float_struct_union_argument_on_stack:
-    - double
-    - double
-    - double
-    - double
-    - double
-    - double
-    - double
-    - double
-    # The following arguments are guaranteed to use stack as 8 `gpt_t`s
-    # and 8 `double`s already precede them.
-    - uint8_t
-    - deeply_nested_float_struct_union
-    - deeply_nested_float_struct_union
-    - uint8_t
-    - deeply_nested_float_struct_union
+  # Disabled: the union is bigger than its biggest field.
+  # See `deeply_nested_struct_union` definition for more context.
+  # deeply_nested_float_struct_union_argument_on_stack:
+  #   - double
+  #   - double
+  #   - double
+  #   - double
+  #   - double
+  #   - double
+  #   - double
+  #   - double
+  #   # The following arguments are guaranteed to use stack as 8 `gpt_t`s
+  #   # and 8 `double`s already precede them.
+  #   - uint8_t
+  #   - deeply_nested_float_struct_union
+  #   - deeply_nested_float_struct_union
+  #   - uint8_t
+  #   - deeply_nested_float_struct_union
   needle_in_a_haystack_float_struct_union_argument_on_stack:
     - double
     - double

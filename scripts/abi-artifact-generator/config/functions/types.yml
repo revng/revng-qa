@@ -25,6 +25,8 @@ structs:
   # Nested structs
   small_struct_of_structs: ["two_byte_struct a", "one_byte_struct b"]
   struct_of_structs: ["small_struct_of_structs a[2]", "one_byte_struct b"]
+  nested_struct: ["one_byte_struct a", "two_byte_struct b", "four_byte_struct c"]
+  deeply_nested_struct: ["one_byte_struct a", "two_byte_struct b", "nested_struct c"]
 
   # Simple structs with floats and doubles *only.*
   float_struct: ["float a"]
@@ -210,10 +212,36 @@ unions:
     - struct_with_a_sixteen_byte_field_at_the_end a
     - uint8_t b
 
-  # Nested union
+  # Nested unions
   union_of_unions:
     - two_byte_struct_union_with_a_smaller_scalar a
     - four_byte_struct_union_with_a_smaller_scalar b
+  nested_struct_union: ["uint64_t a", "nested_struct b"]
+
+  # Sometimes unions are bigger than their biggest field:
+  #
+  # ```cpp
+  # struct A { uint32_t a[3]; };
+  # _Static_assert(sizeof(struct A) == 12);
+  # union B16 { struct A a; uint64_t b; };
+  # _Static_assert(sizeof(struct A) == 16);
+  # ```
+  #
+  # However, currently the model cannot represent this situation: the size of
+  # a union is inferred by its largest element.
+  # Once this is fixed (including the importer), we can handle this correctly.
+  #
+  # The following tests are disabled because of this. Each one is commented out
+  # where it is normally declared, so re-enabling it means uncommenting it there:
+  #
+  # - `1-simple-arguments.yml` (`argument_tests`):
+  #   - `single_deeply_nested_struct_union_argument`
+  #   - `single_deeply_nested_float_struct_union_argument`
+  #
+  # - `4-stack-arguments.yml` (`stack_argument_tests`):
+  #   - `deeply_nested_struct_union_argument_on_stack`
+  #   - `deeply_nested_float_struct_union_argument_on_stack`
+  deeply_nested_struct_union: ["uint64_t a", "deeply_nested_struct b"]
 
   # Unnaturally aligned unions, were "unnaturally aligned" means a struct or
   # union that recursively contains at least one non-naturally-aligned field.
