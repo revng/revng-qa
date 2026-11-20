@@ -71,6 +71,13 @@ argument_tests:
   # - `true`: the second argument uses a GPR.
   # - `false`: the second argument uses the stack/pointer-to-copy.
 
+  ### `abi::Definition::OnlyHomogeneousStructsWithThisManyFieldsUseFloatingPointRegisters`
+  #
+  # NOTE: unlike the booleans above, this is an integer, BUT `0` means
+  #       the option is disabled (equivalent to `false`).
+  #
+  # The behavior is highlighted by the `float_then_*_struct_arguments` tests.
+
 stack_argument_tests:
   ### `abi::Definition::ArgumentsArePositionBased`
   #
