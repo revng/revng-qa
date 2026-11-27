@@ -78,6 +78,52 @@ argument_tests:
   #
   # The behavior is highlighted by the `float_then_*_struct_arguments` tests.
 
+  ### `abi::Definition::UseSystemVx86_64RegisterSelectionLogic`
+  #
+  # - `true`: every eightbyte of the value is classified on its own.
+  # - `false`: usual logic applies.
+  #
+  # Most of the float specific tests apply (especially aggregates mixing kinds),
+  # so I won't list all of them here.
+  #
+  # On top of those, here are three specific tests for important corner cases:
+
+  # A struct that needs one GPR and one SSE register when all the GPRs are
+  # already occupied.
+  double_int_struct_with_occupied_gprs:
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - double_int_struct
+    - double
+
+  # Same as above, but this time SSE registers are the occupied ones.
+  double_int_struct_with_occupied_fprs:
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double
+    - double_int_struct
+    - int64_t
+
+  # Non-floating-point test that verifies the fact that the struct
+  # that only *partially* fits into GPRs uses stack instead.
+  two_gpr_struct_with_one_gpr_left:
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - gpr_t
+    - sixteen_byte_struct
+    - int64_t
+
 stack_argument_tests:
   ### `abi::Definition::ArgumentsArePositionBased`
   #
